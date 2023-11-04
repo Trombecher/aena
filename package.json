@@ -1,0 +1,26 @@
+{
+    "name": "aena",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "module",
+    "types": "./types/index.d.ts",
+    "files": [
+        "README.md",
+        "dist/*",
+        "jsx-runtime.d.ts"
+    ],
+    "exports": {
+        ".": {
+            "default": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        },
+        "./*": {
+            "default": "./dist/*.js",
+            "types": "./dist/*.d.ts"
+        }
+    }
+}
