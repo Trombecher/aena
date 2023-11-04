@@ -1,17 +1,26 @@
 {
     "name": "aena",
     "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "keywords": [],
-    "author": "",
+    "description": "A lightweight javascript framework.",
+    "main": "./dist/index.js",
+    "keywords": [
+        "aena",
+        "aenajs",
+        "ui",
+        "jsx",
+        "reactive",
+        "components",
+        "performance",
+        "state"
+    ],
+    "author": "Tobias Hillemanns",
     "license": "ISC",
     "type": "module",
-    "types": "./types/index.d.ts",
+    "types": "./dist/index.d.ts",
     "files": [
         "README.md",
         "dist/*",
-        "jsx-runtime.d.ts"
+        "LICENSE"
     ],
     "exports": {
         ".": {
