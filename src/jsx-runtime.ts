@@ -1,5 +1,5 @@
 import {Box} from "./box";
-import {insertBox} from "./glue";
+import {insertBox, insertBoxWithArray} from "./glue";
 
 export namespace JSX {
     export type Element = Node | Node[];
@@ -18,7 +18,10 @@ function flatChildren(target: JSX.Element[], children: any[]) {
         const child = children[i];
         if(child instanceof Node) target.push(child);
         else if(child instanceof Array) flatChildren(target, child);
-        else if(child instanceof Box) target.push(insertBox(child));
+        else if(child instanceof Box) {
+            if(child.value instanceof Array) target.push(insertBoxWithArray(child));
+            else target.push(insertBox(child));
+        }
         else target.push(document.createTextNode(child));
     }
 }

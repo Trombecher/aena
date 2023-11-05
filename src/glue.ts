@@ -7,6 +7,23 @@ export function insertBox<T>(box: Box<T>): Node {
     return textNode;
 }
 
+export function insertBoxWithArray(box: Box<JSX.Element[]>): Node[] {
+    let len = box.value.length;
+    const anchor = document.createTextNode("");
+    const nodes = new Array(len + 1);
+    nodes[0] = anchor;
+    for(let i = 1; i < len + 1; ++i)
+        nodes[i] = toNodeUnsupported(box.value[i]!);
+    box.onChange(nodes => {
+        while(len--) anchor.nextSibling!.remove();
+
+        len = nodes.length;
+        while(len--) anchor.after(toNodeUnsupported(nodes[len]!));
+        len = nodes.length;
+    })
+    return nodes;
+}
+
 function toNodeUnsupported(jsx: JSX.Element): Node {
     if(jsx instanceof Array)
         throw new Error("BoxStack: Cannot map value to fragment because multiple `Node`s per value are not supported");
