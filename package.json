@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "1.0.0",
+    "version": "0.8.0",
     "description": "A lightweight javascript framework.",
     "main": "./dist/index.js",
     "keywords": [

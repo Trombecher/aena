@@ -53,6 +53,42 @@ export class BoxArray<T> {
 
     [Symbol.iterator] = this.#array[Symbol.iterator];
 
+    indexOf(value: T): number {
+        return this.#array.indexOf(value);
+    }
+
+    swapIndices(a: number, b: number) {
+        if(a < -this.#array.length) return;
+        if(a < 0) a = a + this.#array.length;
+        else if(a >= this.#array.length) return;
+        if(b < -this.#array.length) return;
+        if(b < 0) b = b + this.#array.length;
+        else if(b >= this.#array.length) return;
+
+        const valueA = this.#array[a]!;
+        const valueB = this.#array[b]!;
+        this.#array[a] = valueB;
+        this.#array[b] = valueA;
+
+        this.#onSwapListeners.forEach(listener => listener(valueA, a, valueB, b));
+    }
+
+    swap(a: T, b: T) {
+        const indexA = this.#array.indexOf(a);
+        if(indexA === -1) return;
+        const indexB = this.#array.indexOf(a);
+        if(indexB === -1) return;
+
+        this.#array[indexA] = b;
+        this.#array[indexB] = a;
+
+        this.#onSwapListeners.forEach(listener => listener(a, indexA, b, indexB));
+    }
+
+    /**
+     * Removes the item at the specified index.
+     * @param index
+     */
     removeAt(index: number) {
         if(index < -this.#array.length) return;
         if(index < 0) index = index + this.#array.length;
