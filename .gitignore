@@ -1,3 +1,5 @@
-.vscode/*
-.idea/*
+.vscode
 dist
+.idea
+node_modules
+pnpm-lock.yaml

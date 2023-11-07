@@ -3,10 +3,10 @@
  */
 export class Box<T> {
     #value: T;
-    readonly #listeners = new Set<(value: T) => void>();
+    readonly #listeners = new Set<(element: T) => void>();
 
-    constructor(value: T) {
-        this.#value = value;
+    constructor(element: T) {
+        this.#value = element;
     }
 
     get value() {
@@ -14,16 +14,17 @@ export class Box<T> {
     }
 
     set value(value) {
+        if(this.#value === value) return;
         this.#value = value;
         this.#listeners.forEach(listener => listener(value));
     }
 
-    onChange(listener: (value: T) => void): Unlistener {
+    onChange(listener: (element: T) => void): Unlistener {
         this.#listeners.add(listener);
         return () => this.#listeners.delete(listener);
     }
 
-    derive<U>(transform: (value: T) => U): Box<U> {
+    derive<U>(transform: (element: T) => U): Box<U> {
         const box = new Box(transform(this.#value));
         this.onChange(value => box.value = transform(value));
         return box;
@@ -31,58 +32,71 @@ export class Box<T> {
 }
 
 export class BoxArray<T> {
-    readonly #array = new Array<T>();
-    readonly #onRemoveListeners = new Set<(value: T, index: number) => void>();
-    readonly #onInsertListeners = new Set<(value: T, index: number) => void>();
-    readonly #onSwapListeners = new Set<(a: T, aIndex: number, b: T, bIndex: number) => void>();
+    readonly #array;
+    readonly #onRemoveListeners = new Set<(element: T, index: number) => void>();
+    readonly #onInsertListeners = new Set<(element: T, index: number) => void>();
+    readonly #onSwapListeners = new Set<(a: T, b: T, aIndex: number, bIndex: number) => void>();
 
-    onRemove(listener: (value: T, index: number) => void): Unlistener {
+    constructor(length?: number) {
+        this.#array = length ? new Array<T>(length) : new Array<T>();
+    }
+
+    onRemove(listener: (element: T, index: number) => void): Unlistener {
         this.#onRemoveListeners.add(listener);
         return () => this.#onRemoveListeners.delete(listener);
     }
 
-    onInsert(listener: (value: T, index: number) => void): Unlistener {
+    onInsert(listener: (element: T, index: number) => void): Unlistener {
         this.#onInsertListeners.add(listener);
         return () => this.#onInsertListeners.delete(listener);
     }
 
-    onSwap(listener: (a: T, aIndex: number, b: T, bIndex: number) => void): Unlistener {
+    onSwap(listener: (a: T, b: T, aIndex: number, bIndex: number) => void): Unlistener {
         this.#onSwapListeners.add(listener);
         return () => this.#onSwapListeners.delete(listener);
     }
 
-    [Symbol.iterator] = this.#array[Symbol.iterator];
-
-    indexOf(value: T): number {
-        return this.#array.indexOf(value);
+    [Symbol.iterator]() {
+        return this.#array[Symbol.iterator]();
     }
 
-    swapIndices(a: number, b: number) {
-        if(a < -this.#array.length) return;
-        if(a < 0) a = a + this.#array.length;
-        else if(a >= this.#array.length) return;
-        if(b < -this.#array.length) return;
-        if(b < 0) b = b + this.#array.length;
-        else if(b >= this.#array.length) return;
-
-        const valueA = this.#array[a]!;
-        const valueB = this.#array[b]!;
-        this.#array[a] = valueB;
-        this.#array[b] = valueA;
-
-        this.#onSwapListeners.forEach(listener => listener(valueA, a, valueB, b));
+    indexOf(element: T): number {
+        return this.#array.indexOf(element);
     }
 
+    swapIndices(indexA: number, indexB: number) {
+        if(indexA < -this.#array.length || indexA >= this.#array.length)
+            throw new RangeError(`Encountered indexA=${indexA} out of bounds -${this.#array.length} and ${this.#array.length - 1} while swapping indexA=${indexA} and indexB=${indexB} on \`BoxArray\` with length ${this.#array.length}`);
+        if(indexA < 0) indexA = indexA + this.#array.length;
+
+        if(indexB < -this.#array.length || indexB >= this.#array.length)
+            throw new RangeError(`Encountered indexB=${indexA} out of bounds -${this.#array.length} and ${this.#array.length - 1} while swapping indexA=${indexA} and indexB=${indexB} on \`BoxArray\` with length ${this.#array.length}`);
+        if(indexB < 0) indexB = indexB + this.#array.length;
+
+        const a = this.#array[indexA]!;
+        const b = this.#array[indexB]!;
+        this.#array[indexA] = b;
+        this.#array[indexB] = a;
+
+        this.#onSwapListeners.forEach(listener => listener(a, b, indexA, indexB));
+    }
+
+    /**
+     * Swaps elements a and b. If one element does not exist, nothing will be swapped.
+     *
+     * @param a
+     * @param b
+     */
     swap(a: T, b: T) {
         const indexA = this.#array.indexOf(a);
         if(indexA === -1) return;
-        const indexB = this.#array.indexOf(a);
+        const indexB = this.#array.indexOf(b);
         if(indexB === -1) return;
 
         this.#array[indexA] = b;
         this.#array[indexB] = a;
 
-        this.#onSwapListeners.forEach(listener => listener(a, indexA, b, indexB));
+        this.#onSwapListeners.forEach(listener => listener(a, b, indexA, indexB));
     }
 
     /**
@@ -93,20 +107,22 @@ export class BoxArray<T> {
         if(index < -this.#array.length) return;
         if(index < 0) index = index + this.#array.length;
         else if(index >= this.#array.length) return;
-        const [value] = this.#array.splice(index, 1);
-        this.#onRemoveListeners.forEach(listener => listener(value!, index));
+        const [element] = this.#array.splice(index, 1);
+        this.#onRemoveListeners.forEach(listener => listener(element!, index));
     }
 
-    remove(value: T) {
-        const index = this.#array.indexOf(value);
+    remove(element: T) {
+        const index = this.#array.indexOf(element);
         if(index === -1) return;
         this.#array.splice(index, 1);
-        this.#onRemoveListeners.forEach(listener => listener(value, index));
+        this.#onRemoveListeners.forEach(listener => listener(element, index));
     }
 
-    at = this.#array.at;
+    at(index: number) {
+        return this.#array.at(index);
+    }
 
-    map<U>(mapper: (value: T, index: number) => U): U[] {
+    map<U>(mapper: (element: T, index: number) => U): U[] {
         return this.#array.map(mapper);
     }
 
@@ -114,26 +130,44 @@ export class BoxArray<T> {
         return this.#array.length;
     }
 
-    add(value: T) {
-        this.#array.push(value);
-        this.#onInsertListeners.forEach(listener => listener(value, this.#array.length));
+    add(element: T) {
+        const oldLength = this.#array.length;
+        this.#array.push(element);
+        this.#onInsertListeners.forEach(listener => listener(element, oldLength));
     }
 
-    insert(value: T, index: number) {
-        if(index < -this.#array.length) return;
-        if(index < 0) index = index + this.#array.length;
-        else if(index >= this.#array.length) return;
-        this.#array.splice(index, 0, value);
-        this.#onInsertListeners.forEach(listener => listener(value, index));
+    /**
+     * Inserts the element at the index, so that the resulting index matches the specified index, effectively shifting all elements on the right by one index.
+     *
+     * @param element The element to insert
+     *
+     * @param index Specific ranges of indices are remapped as following:
+     *
+     * - index < -length: index = 0
+     * - index < 0: index = index + length
+     * - index > length: index = length
+     *
+     * The normalized index is then passed to the listeners (after insertion)
+     */
+    insert(index: number, element: T) {
+        if(index < -this.#array.length) index = 0;
+        else if(index < 0) index = index + this.#array.length;
+        else if(index > this.#array.length) index = this.#array.length;
+
+        this.#array.splice(index, 0, element);
+        this.#onInsertListeners.forEach(listener => listener(element, index));
     }
 
-    set(value: T, index: number) {
-        if(index < -this.#array.length) return;
+    /**
+     * Sets the index to the element, effectively replacing the previous element.
+     */
+    set(index: number, element: T) {
+        if(index < -this.#array.length || index >= this.#array.length)
+            throw new RangeError(`Encountered index=${index} out of bounds -${this.#array.length} and ${this.#array.length - 1} while setting element=${element} on \`BoxArray\` with length ${this.#array.length}`);
         if(index < 0) index = index + this.#array.length;
-        else if(index >= this.#array.length) return;
-        let [oldValue] = this.#array.splice(index, 1, value);
-        this.#onRemoveListeners.forEach(listener => listener(oldValue!, index));
-        this.#onInsertListeners.forEach(listener => listener(value, index));
+        let [oldElement] = this.#array.splice(index, 1, element);
+        this.#onRemoveListeners.forEach(listener => listener(oldElement!, index));
+        this.#onInsertListeners.forEach(listener => listener(element, index));
     }
 }
 

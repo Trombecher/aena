@@ -13,6 +13,9 @@
         "performance",
         "state"
     ],
+    "scripts": {
+        "test": "vitest run"
+    },
     "author": "Tobias Hillemanns",
     "license": "ISC",
     "type": "module",
@@ -31,5 +34,8 @@
             "default": "./dist/*.js",
             "types": "./dist/*.d.ts"
         }
+    },
+    "devDependencies": {
+        "vitest": "^0.34.6"
     }
 }
