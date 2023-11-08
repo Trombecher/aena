@@ -31,14 +31,31 @@ export class Box<T> {
     }
 }
 
+/**
+ * `BoxArray` is a signal based array designed for immutable elements.
+ *
+ * # Example
+ *
+ * ```ts
+ * const numbers = new BoxArray<number>();
+ *
+ * const strings = new BoxArray<string>(10);
+ *
+ * const booleans = new BoxArray([true, false]);
+ * ```
+ */
 export class BoxArray<T> {
     readonly #array;
     readonly #onRemoveListeners = new Set<(element: T, index: number) => void>();
     readonly #onInsertListeners = new Set<(element: T, index: number) => void>();
     readonly #onSwapListeners = new Set<(a: T, b: T, aIndex: number, bIndex: number) => void>();
 
-    constructor(length?: number) {
-        this.#array = length ? new Array<T>(length) : new Array<T>();
+    constructor(lengthOrArray?: number | T[]) {
+        this.#array = lengthOrArray
+            ? (Array.isArray(lengthOrArray)
+                ? lengthOrArray
+                : new Array<T>(lengthOrArray))
+            : new Array<T>();
     }
 
     onRemove(listener: (element: T, index: number) => void): Unlistener {
@@ -165,9 +182,25 @@ export class BoxArray<T> {
         if(index < -this.#array.length || index >= this.#array.length)
             throw new RangeError(`Encountered index=${index} out of bounds -${this.#array.length} and ${this.#array.length - 1} while setting element=${element} on \`BoxArray\` with length ${this.#array.length}`);
         if(index < 0) index = index + this.#array.length;
-        let [oldElement] = this.#array.splice(index, 1, element);
+
+        let oldElement = this.#array[index];
+        if(oldElement === element) return;
+        this.#array[index] = element;
+
         this.#onRemoveListeners.forEach(listener => listener(oldElement!, index));
         this.#onInsertListeners.forEach(listener => listener(element, index));
+    }
+
+    join(separator: string) {
+        return this.#array.join(separator);
+    }
+
+    reduce<U>(reducer: (accumulator: U, element: T, index: number) => U, initialValue: U): U {
+        return this.#array.reduce(reducer, initialValue);
+    }
+
+    toString() {
+        return `[${this.join(",")}]`;
     }
 }
 

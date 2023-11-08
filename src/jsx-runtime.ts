@@ -1,5 +1,5 @@
-import {Box} from "./box";
-import {insertBox, insertBoxWithArray} from "./glue";
+import {Box, BoxArray} from "./box";
+import {insertBoxArrayAsText, insertBoxAsText, insertBoxJSX} from "./glue";
 
 export namespace JSX {
     export type Element = Node | Node[];
@@ -19,9 +19,11 @@ function flatChildren(target: JSX.Element[], children: any[]) {
         if(child instanceof Node) target.push(child);
         else if(child instanceof Array) flatChildren(target, child);
         else if(child instanceof Box) {
-            if(child.value instanceof Array) target.push(insertBoxWithArray(child));
-            else target.push(insertBox(child));
+            if(child.value instanceof Array || child.value instanceof Node)
+                target.push(insertBoxJSX(child));
+            else target.push(insertBoxAsText(child));
         }
+        else if(child instanceof BoxArray) target.push(insertBoxArrayAsText(child));
         else target.push(document.createTextNode(child));
     }
 }
@@ -35,18 +37,22 @@ function translateKey(key: string): string {
 
 export function createElement(
     tag: string | Function,
-    props: {[index: string]: any},
+    props: {[index: string]: any} | null,
     ...givenChildren: any[]
 ): JSX.Element {
     const children: JSX.Element[] = [];
     flatChildren(children, givenChildren);
 
-    if(typeof tag === "function")
-        return tag(props, children);
+    props = props || {};
+
+    if(typeof tag === "function") {
+        props.children = children;
+        return tag(props);
+    }
 
     const element = document.createElement(tag);
-    Object.keys(props || {}).forEach(key => {
-        const value = props[key];
+    Object.keys(props).forEach(key => {
+        const value = props![key];
         const translatedKey = translateKey(key);
 
         if(value instanceof Box) {
@@ -71,8 +77,12 @@ export function createElement(
     return element;
 }
 
-export function createFragment(_: any, ...givenChildren: any[]): JSX.Element[] {
-    const children: JSX.Element[] = [];
-    flatChildren(children, givenChildren);
+export function createFragment({
+    children
+}: {
+    children: any[]
+}): JSX.Element[] {
+    const flattenChildren: JSX.Element[] = [];
+    flatChildren(flattenChildren, children);
     return children;
 }
