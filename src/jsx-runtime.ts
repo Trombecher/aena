@@ -1,11 +1,12 @@
 import {Box, BoxArray} from "./box";
 import {insertBoxArrayAsText, insertBoxAsText, insertBoxJSX} from "./glue";
+import {svgElements, svgKeys} from "./constants";
 
 export namespace JSX {
     export type Element = Node | Node[];
 
     export interface IntrinsicElements {
-        [index: string]: any
+        [index: string]: any;
     }
 }
 
@@ -22,8 +23,7 @@ function flatChildren(target: JSX.Element[], children: any[]) {
             if(child.value instanceof Array || child.value instanceof Node)
                 target.push(insertBoxJSX(child));
             else target.push(insertBoxAsText(child));
-        }
-        else if(child instanceof BoxArray) target.push(insertBoxArrayAsText(child));
+        } else if(child instanceof BoxArray) target.push(insertBoxArrayAsText(child));
         else target.push(document.createTextNode(child));
     }
 }
@@ -50,21 +50,34 @@ export function createElement(
         return tag(props);
     }
 
-    const element = document.createElement(tag);
+    const element = svgElements.has(tag)
+        ? document.createElementNS("http://www.w3.org/2000/svg", tag)
+        : document.createElement(tag);
+
+    delete props.xmlns;
     Object.keys(props).forEach(key => {
         const value = props![key];
         const translatedKey = translateKey(key);
 
-        if(value instanceof Box) {
-            // @ts-ignore
-            element[keyMap[key] || key] = value.value;
-            value.onChange(value => {
+        if(svgKeys.has(translatedKey)) {
+            if(value instanceof Box) {
+                element.setAttribute(translatedKey, value.value);
+                value.onChange(value => element.setAttribute(translatedKey, value));
+            } else {
+                element.setAttribute(translatedKey, value);
+            }
+        } else {
+            if(value instanceof Box) {
+                // @ts-ignore
+                element[translatedKey] = value.value;
+                value.onChange(value => {
+                    // @ts-ignore
+                    element[translatedKey] = value;
+                });
+            } else {
                 // @ts-ignore
                 element[translatedKey] = value;
-            });
-        } else {
-            // @ts-ignore
-            element[translatedKey] = props[key];
+            }
         }
     });
 
