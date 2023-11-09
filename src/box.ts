@@ -214,6 +214,16 @@ export class BoxSet<T> {
     readonly #onAddListeners = new Set<(value: T) => void>();
     readonly #onDeleteListeners = new Set<(value: T) => void>();
 
+    onAdd(listener: (value: T) => void): Unlistener {
+        this.#onAddListeners.add(listener);
+        return () => this.#onAddListeners.delete(listener);
+    }
+
+    onDelete(listener: (value: T) => void): Unlistener {
+        this.#onDeleteListeners.add(listener);
+        return () => this.#onDeleteListeners.delete(listener);
+    }
+
     constructor(initialSet?: Set<T>) {
         this.#set = initialSet ? initialSet : new Set();
     }
