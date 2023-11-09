@@ -208,3 +208,40 @@ export class BoxArray<T> {
  * Call this "unlistener" function to remove the listener you just attached.
  */
 export type Unlistener = () => void;
+
+export class BoxSet<T> {
+    readonly #set: Set<T>;
+    readonly #onAddListeners = new Set<(value: T) => void>();
+    readonly #onDeleteListeners = new Set<(value: T) => void>();
+
+    constructor(initialSet?: Set<T>) {
+        this.#set = initialSet ? initialSet : new Set();
+    }
+
+    add(value: T) {
+        this.#set.add(value);
+        this.#onAddListeners.forEach(listener => listener(value));
+    }
+
+    clear() {
+        this.#set.clear();
+        this.#set.forEach(value => this.#onDeleteListeners.forEach(listener => listener(value)));
+    }
+
+    delete(value: T) {
+        this.#set.delete(value);
+        this.#onDeleteListeners.forEach(listener => listener(value));
+    }
+
+    [Symbol.iterator]() {
+        return this.#set[Symbol.iterator]();
+    }
+
+    forEach(callback: (value: T) => void) {
+        this.#set.forEach(callback);
+    }
+
+    has(value: T) {
+        return this.#set.has(value);
+    }
+}
