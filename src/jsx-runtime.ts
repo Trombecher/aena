@@ -67,7 +67,7 @@ export function createElement(
         const value = props![key];
         const translatedKey = translateKey(key);
 
-        if(translatedKey in element && isWritable(props!, key)) { // idl attribute
+        if(translatedKey in element && isWritable(element, key)) { // idl attribute
             if(value instanceof Box) {
                 element[translatedKey] = value.value;
                 value.onChange(value => element[translatedKey] = value);
