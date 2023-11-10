@@ -1,6 +1,6 @@
 import {Box, BoxArray} from "./box";
 import {insertBoxArrayAsText, insertBoxAsText, insertBoxJSX} from "./glue";
-import {svgElements, svgKeys} from "./constants";
+import {svgElements} from "./constants";
 
 export namespace JSX {
     export type Element = Node | Node[];
@@ -35,6 +35,14 @@ function translateKey(key: string): string {
     return key;
 }
 
+function isWritable<T extends Object>(obj: T, key: keyof T) {
+    const desc =
+        Object.getOwnPropertyDescriptor(obj, key)
+        || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(obj), key)
+        || {}
+    return Boolean(desc.writable)
+}
+
 export function createElement(
     tag: string | Function,
     props: {[index: string]: any} | null,
@@ -50,7 +58,7 @@ export function createElement(
         return tag(props);
     }
 
-    const element = svgElements.has(tag)
+    const element: Element & {[key: string]: any} = svgElements.has(tag)
         ? document.createElementNS("http://www.w3.org/2000/svg", tag)
         : document.createElement(tag);
 
@@ -59,25 +67,16 @@ export function createElement(
         const value = props![key];
         const translatedKey = translateKey(key);
 
-        if(svgKeys.has(translatedKey)) {
+        if(translatedKey in element && isWritable(props!, key)) { // idl attribute
             if(value instanceof Box) {
-                element.setAttribute(translatedKey, value.value);
-                value.onChange(value => element.setAttribute(translatedKey, value));
-            } else {
-                element.setAttribute(translatedKey, value);
-            }
-        } else {
-            if(value instanceof Box) {
-                // @ts-ignore
                 element[translatedKey] = value.value;
-                value.onChange(value => {
-                    // @ts-ignore
-                    element[translatedKey] = value;
-                });
-            } else {
-                // @ts-ignore
-                element[translatedKey] = value;
-            }
+                value.onChange(value => element[translatedKey] = value);
+            } else element[translatedKey] = value;
+        } else { // html attribute
+            if(value instanceof Box) {
+                element.setAttribute(key, value.value);
+                value.onChange(value => element.setAttribute(key, value));
+            } else element.setAttribute(key, value);
         }
     });
 
