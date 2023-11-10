@@ -36,11 +36,14 @@ function translateKey(key: string): string {
 }
 
 function isWritable<T extends Object>(obj: T, key: keyof T) {
-    const desc =
-        Object.getOwnPropertyDescriptor(obj, key)
-        || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(obj), key)
-        || {}
-    return Boolean(desc.writable)
+    while(true) {
+        const desc = Object.getOwnPropertyDescriptor(obj, key);
+        if(desc !== undefined && desc.writable)
+            return true;
+
+        obj = Object.getPrototypeOf(obj);
+        if(obj === null) return false;
+    }
 }
 
 export function createElement(
