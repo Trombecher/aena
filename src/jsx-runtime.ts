@@ -38,8 +38,7 @@ function translateKey(key: string): string {
 function isWritable<T extends Object>(obj: T, key: keyof T) {
     while(true) {
         const desc = Object.getOwnPropertyDescriptor(obj, key);
-        if(desc !== undefined && desc.writable)
-            return true;
+        if(desc) return desc.writable || !!desc.set;
 
         obj = Object.getPrototypeOf(obj);
         if(obj === null) return false;
