@@ -1,7 +1,7 @@
-import {Box, BoxArray} from "./box";
+import {Box, BoxArray, BoxMap, BoxSet} from "./box";
 import {JSX} from "./jsx-runtime";
 
-export function insertBoxAsText<T>(box: Box<T>): Node {
+export function insertBoxAsText(box: Box<any>): Node {
     const textNode = document.createTextNode(box.value + "");
     box.onChange(value => textNode.textContent = value + "");
     return textNode;
@@ -13,7 +13,7 @@ export function insertBox<T>(box: Box<T>, transform: (value: T) => string): Node
     return textNode;
 }
 
-export function insertBoxJSX(box: Box<JSX.Element>): Node[] {
+export function insertBoxJSX(box: Box<Node> | Box<Node[]>): Node[] {
     let len = Array.isArray(box.value) ? box.value.length : 1;
     const anchor = document.createTextNode("");
     const nodes = new Array(len + 1);
@@ -35,7 +35,7 @@ export function insertBoxJSX(box: Box<JSX.Element>): Node[] {
             while(len--) anchor.after(...jsx);
             len = jsx.length;
         }
-    })
+    });
     return nodes;
 }
 
@@ -73,11 +73,85 @@ export function insertBoxArray<T>(boxArray: BoxArray<T>, mapper: (value: T) => J
     return nodes;
 }
 
-export function insertBoxArrayAsText<T>(boxArray: BoxArray<T>) {
+export function insertBoxArrayAsText(boxArray: BoxArray<any>) {
     const textNode = document.createTextNode(boxArray.toString());
     const update = () => textNode.textContent = boxArray.toString();
     boxArray.onInsert(update);
     boxArray.onSwap(update);
     boxArray.onRemove(update);
+    return textNode;
+}
+
+export function insertBoxSet<T>(set: BoxSet<T>, mapper: (value: T) => JSX.Element) {
+    const anchor = document.createTextNode("");
+    const nodeMap = new Map<T, Node>();
+    set.forEach(value => nodeMap.set(value, toNodeUnsupported(mapper(value))));
+
+    let previousSize = set.size;
+
+    set.onAdd(value => {
+        let prev: ChildNode = anchor;
+        while(previousSize--)
+            prev = prev.nextSibling!;
+
+        const node = toNodeUnsupported(mapper(value))
+        nodeMap.set(value, node);
+
+        prev.after(node);
+        previousSize = set.size;
+    });
+
+    set.onDelete(value => {
+        const node = nodeMap.get(value) as ChildNode;
+        nodeMap.delete(value);
+        node.remove();
+        previousSize = set.size;
+    });
+
+    return [anchor, ...nodeMap.values()];
+}
+
+export function insertBoxSetAsText(boxSet: BoxSet<any>) {
+    const textNode = document.createTextNode(boxSet.toString());
+    const update = () => textNode.textContent = boxSet.toString();
+    boxSet.onAdd(update);
+    boxSet.onDelete(update);
+    return textNode;
+}
+
+export function insertBoxMap<K, V>(map: BoxMap<K, V>, mapper: (key: K, value: V) => JSX.Element) {
+    const anchor = document.createTextNode("");
+    const nodeMap = new Map<K, Node>();
+    map.forEach((value, key) => nodeMap.set(key, toNodeUnsupported(mapper(key, value))));
+
+    let previousSize = map.size;
+
+    map.onSet((key, value) => {
+        let prev: ChildNode = anchor;
+        while(previousSize--)
+            prev = prev.nextSibling!;
+
+        const node = toNodeUnsupported(mapper(key, value))
+        nodeMap.set(key, node);
+
+        prev.after(node);
+        previousSize = map.size;
+    });
+
+    map.onDelete(key => {
+        const node = nodeMap.get(key) as ChildNode;
+        nodeMap.delete(key);
+        node.remove();
+        previousSize = map.size;
+    });
+
+    return [anchor, ...nodeMap.values()];
+}
+
+export function insertBoxMapAsText(boxMap: BoxMap<any, any>) {
+    const textNode = document.createTextNode(boxMap.toString());
+    const update = () => textNode.textContent = boxMap.toString();
+    boxMap.onSet(update);
+    boxMap.onDelete(update);
     return textNode;
 }

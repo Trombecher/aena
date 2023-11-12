@@ -1,7 +1,7 @@
 # Aena
 
 ```tsx
-import {Box} from "aena";
+import {Box} from "aena/box";
 
 export default function App() {
     const counter = new Box(0);
@@ -14,7 +14,7 @@ export default function App() {
 }
 ```
 
-A lightweight frontend JavaScript framework designed for use in single page applications. It comes with a flexible built-in state management and TSX support.
+Aena is a lightweight frontend JavaScript framework designed for use in single page applications. It comes with flexible built-in state management and TSX support.
 
 ## Installation
 

@@ -1,5 +1,5 @@
-import {Box, BoxArray} from "./box";
-import {insertBoxArrayAsText, insertBoxAsText, insertBoxJSX} from "./glue";
+import {Box, BoxArray, BoxMap, BoxSet} from "./box";
+import {insertBoxArrayAsText, insertBoxAsText, insertBoxJSX, insertBoxMapAsText, insertBoxSetAsText} from "./glue";
 import {svgElements} from "./constants";
 
 export namespace JSX {
@@ -24,6 +24,8 @@ function flatChildren(target: JSX.Element[], children: any[]) {
                 target.push(insertBoxJSX(child));
             else target.push(insertBoxAsText(child));
         } else if(child instanceof BoxArray) target.push(insertBoxArrayAsText(child));
+        else if(child instanceof BoxSet) target.push(insertBoxSetAsText(child));
+        else if(child instanceof BoxMap) target.push(insertBoxMapAsText(child));
         else target.push(document.createTextNode(child));
     }
 }
@@ -69,7 +71,7 @@ export function createElement(
         const value = props![key];
         const translatedKey = translateKey(key);
 
-        if(translatedKey in element && isWritable(element, translatedKey)) { // idl attribute
+        if(isWritable(element, translatedKey)) { // idl attribute
             if(value instanceof Box) {
                 element[translatedKey] = value.value;
                 value.onChange(value => element[translatedKey] = value);

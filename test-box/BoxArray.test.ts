@@ -1,6 +1,6 @@
-// @ts-ignore - cannot look up vitest but vitest still works
+// @ts-ignore
 import {expect, test} from "vitest";
-import {Box, BoxArray} from "../src/box";
+import {BoxArray} from "../src/box";
 
 function create012BoxArray(): BoxArray<number> {
     const boxArray = new BoxArray<number>();
@@ -17,37 +17,16 @@ function createHelloWorldBoxArray(): BoxArray<string> {
     return boxArray;
 }
 
-test("Box.value", () => {
-    const box = new Box(10);
-    expect(box.value).toBe(10);
-});
-
-test("Box.onChange", () => {
-    const box = new Box("");
-    let newValue: string | null = null;
-    box.onChange(value => newValue = value);
-    box.value = "Test";
-    expect(newValue).toBe("Test");
-});
-
-test("Box.derive", () => {
-    const box = new Box<any>(false);
-    const boxString = box.derive(value => value.toString());
-    expect(boxString.value).toBe("false");
-    box.value = {};
-    expect(boxString.value).toBe("[object Object]");
-});
-
-test("BoxArray.new", () => {
+test("new", () => {
     new BoxArray();
 });
 
-test("BoxArray.new(length)", () => {
+test("new(length)", () => {
     const boxArray = new BoxArray(10);
     expect(boxArray.length).toBe(10);
 });
 
-test("BoxArray.add & BoxArray.at", () => {
+test("add & at", () => {
     const boxArray = create012BoxArray();
 
     expect(boxArray.at(0)).toBe(0);
@@ -57,7 +36,7 @@ test("BoxArray.add & BoxArray.at", () => {
     expect(boxArray.length).toBe(3);
 });
 
-test("BoxArray.set", () => {
+test("set", () => {
     const boxArray = new BoxArray<number>(3);
     boxArray.set(0, 0);
     boxArray.set(1, 10);
@@ -68,12 +47,12 @@ test("BoxArray.set", () => {
     expect(boxArray.at(2)).toBe(20);
 });
 
-test("BoxArray.set RangeError", () => {
+test("set RangeError", () => {
     const boxArray = new BoxArray<boolean>();
     expect(() => boxArray.set(1, true)).toThrowError();
 });
 
-test("BoxArray.insert", () => {
+test("insert", () => {
     const boxArray = new BoxArray<boolean>();
     boxArray.insert(0, false);
     boxArray.insert(0, true);
@@ -86,7 +65,7 @@ test("BoxArray.insert", () => {
     expect(boxArray.length).toBe(3);
 });
 
-test("BoxArray.indexOf", () => {
+test("indexOf", () => {
     const boxArray = create012BoxArray();
 
     expect(boxArray.indexOf(1)).toBe(1);
@@ -104,7 +83,7 @@ test("BoxArray[Symbol.iterator]", () => {
     expect(copy[2]).toBe(2);
 });
 
-test("BoxArray.swapIndices", () => {
+test("swapIndices", () => {
     const boxArray = create012BoxArray();
 
     boxArray.swapIndices(0, 1);
@@ -114,7 +93,7 @@ test("BoxArray.swapIndices", () => {
     expect(boxArray.at(2)).toBe(2);
 });
 
-test("BoxArray.swap", () => {
+test("swap", () => {
     const boxArray = create012BoxArray();
     boxArray.swap(1, 2);
     expect(boxArray.at(0)).toBe(0);
@@ -122,21 +101,21 @@ test("BoxArray.swap", () => {
     expect(boxArray.at(2)).toBe(1);
 });
 
-test("Box.removeAt", () => {
+test("removeAt", () => {
     const boxArray = create012BoxArray();
     boxArray.removeAt(0);
     expect(boxArray.at(0)).toBe(1);
     expect(boxArray.at(1)).toBe(2);
 });
 
-test("Box.remove", () => {
+test("remove", () => {
     const boxArray = create012BoxArray();
     boxArray.remove(1);
     expect(boxArray.at(0)).toBe(0);
     expect(boxArray.at(1)).toBe(2);
 });
 
-test("Box.onRemove", () => {
+test("onRemove", () => {
     const boxArray = createHelloWorldBoxArray();
     let removed: string | undefined;
     let removeIndex: number | undefined;
@@ -157,7 +136,7 @@ test("Box.onRemove", () => {
     expect(removeIndex).toBe(0);
 });
 
-test("Box.onInsert", () => {
+test("onInsert", () => {
     const boxArray = createHelloWorldBoxArray();
     let inserted: string | undefined;
     let insertIndex: number | undefined;
