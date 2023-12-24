@@ -20,8 +20,8 @@ export function insertBoxJSX(box: Box<Node> | Box<Node[]>): Node[] {
     nodes[0] = anchor;
 
     if(Array.isArray(box.value))
-        for(let i = 1; i < len + 1; ++i)
-            nodes[i] = box.value[i];
+        for(let i = 0; i < len; ++i)
+            nodes[i + 1] = box.value[i];
     else nodes[1] = box.value;
 
     box.onChange(jsx => {
