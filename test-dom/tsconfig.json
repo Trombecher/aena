@@ -20,10 +20,10 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "jsxImportSource": "../../src",
         "jsx": "preserve",
-        "jsxFactory": "createElement",
-        "jsxFragmentFactory": "createFragment"
+        "jsxFactory": "_0",
+        "jsxFragmentFactory": "_1",
+        "jsxImportSource": "../../src"
     },
     "include": [
         "src"

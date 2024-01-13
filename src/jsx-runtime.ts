@@ -37,6 +37,11 @@ function translateKey(key: string): string {
     return key;
 }
 
+// /**
+//  * Maps the prototypes to sets. If a key is writable it is in the set mapped by the prototype.
+//  */
+// const writableCache = new Map<Object, Set<string>>();
+
 function isWritable<T extends Object>(obj: T, key: keyof T) {
     while(true) {
         const desc = Object.getOwnPropertyDescriptor(obj, key);
@@ -63,10 +68,9 @@ export function createElement(
     }
 
     const element: Element & {[key: string]: any} = svgElements.has(tag)
-        ? document.createElementNS("http://www.w3.org/2000/svg", tag)
+        ? (delete props.xmlns, document.createElementNS("http://www.w3.org/2000/svg", tag))
         : document.createElement(tag);
 
-    delete props.xmlns;
     Object.keys(props).forEach(key => {
         const value = props![key];
         const translatedKey = translateKey(key);
@@ -84,16 +88,14 @@ export function createElement(
         }
     });
 
-    for(let i = 0; i < children.length; i++) {
-        const child = children[i]!;
-        if(Array.isArray(child)) element.append(...child);
-        else element.append(child);
-    }
+    children.forEach(child => Array.isArray(child)
+        ? element.append(...child)
+        : element.append(child));
 
     return element;
 }
 
-export function createFragment({
+export function Fragment({
     children
 }: {
     children: any[]

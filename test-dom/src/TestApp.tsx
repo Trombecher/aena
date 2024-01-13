@@ -53,7 +53,6 @@ export default function TestApp() {
                 There should be a counter: {box}
 
                 <h2>Insert With Transform</h2>
-
                 <p>This is the performant alternative to <code>Box.derive</code></p>
                 <div>{box} * 100 = {insertBox(box, value => `${value * 100}`)}</div>
 
@@ -88,6 +87,9 @@ export default function TestApp() {
 
                 <h2>Adding</h2>
                 <button onClick={() => boxSet.add(Math.random())}>Add random number</button>
+
+                <h2>Replacing</h2>
+                <button onclick={() => boxSet.replace(boxSet.keys().next().value, 10)}>Replace one key with 10</button>
 
                 <h2>Deleting</h2>
                 <button onclick={() => boxSet.delete(boxSet[Symbol.iterator]().next().value)}>Delete one key</button>

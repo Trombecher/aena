@@ -84,28 +84,38 @@ export function insertBoxArrayAsText(boxArray: BoxArray<any>) {
 
 export function insertBoxSet<T>(set: BoxSet<T>, mapper: (value: T) => JSX.Element) {
     const anchor = document.createTextNode("");
+
+    // Map each value of the set to a node (through `mapper`).
     const nodeMap = new Map<T, Node>();
     set.forEach(value => nodeMap.set(value, toNodeUnsupported(mapper(value))));
 
-    let previousSize = set.size;
-
     set.onAdd(value => {
-        let prev: ChildNode = anchor;
-        while(previousSize--)
-            prev = prev.nextSibling!;
+        let lastChild: ChildNode = anchor;
+        let setSize = set.size - 1;
+        while(setSize--)
+            lastChild = lastChild.nextSibling!;
 
-        const node = toNodeUnsupported(mapper(value))
+        const node = toNodeUnsupported(mapper(value));
         nodeMap.set(value, node);
 
-        prev.after(node);
-        previousSize = set.size;
+        lastChild.after(node);
     });
 
     set.onDelete(value => {
-        const node = nodeMap.get(value) as ChildNode;
+        (nodeMap.get(value) as ChildNode).remove();
         nodeMap.delete(value);
-        node.remove();
-        previousSize = set.size;
+    });
+
+    set.onReplace((oldValue, newValue) => {
+        const oldNode = nodeMap.get(oldValue) as ChildNode;
+        let newNode;
+        if(nodeMap.has(newValue)) {
+            newNode = nodeMap.get(newValue)!;
+        } else {
+            newNode = toNodeUnsupported(mapper(newValue));
+            nodeMap.set(newValue, newNode);
+        }
+        oldNode.replaceWith(newNode);
     });
 
     return [anchor, ...nodeMap.values()];
@@ -116,6 +126,8 @@ export function insertBoxSetAsText(boxSet: BoxSet<any>) {
     const update = () => textNode.textContent = boxSet.toString();
     boxSet.onAdd(update);
     boxSet.onDelete(update);
+    boxSet.onReplace(update);
+
     return textNode;
 }
 
@@ -131,7 +143,7 @@ export function insertBoxMap<K, V>(map: BoxMap<K, V>, mapper: (key: K, value: V)
         while(previousSize--)
             prev = prev.nextSibling!;
 
-        const node = toNodeUnsupported(mapper(key, value))
+        const node = toNodeUnsupported(mapper(key, value));
         nodeMap.set(key, node);
 
         prev.after(node);

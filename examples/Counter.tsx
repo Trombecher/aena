@@ -1,4 +1,4 @@
-import {Box} from "aena";
+import {Box} from "aena/box";
 
 export default function App() {
     const counter = new Box(0);

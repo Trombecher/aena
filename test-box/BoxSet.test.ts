@@ -71,23 +71,38 @@ test("toString", () => {
 
 test("onAdd", () => {
     const set = create012BoxSet();
-    let newValue: number | null = null;
+    let newValue: number | undefined = undefined;
     set.onAdd(value => newValue = value);
     set.add(3);
     expect(newValue).toBe(3);
 });
 
-test("onAdd", () => {
+test("onReplace", () => {
     const set = create012BoxSet();
-    let newValue: number | null = null;
-    set.onAdd(value => newValue = value);
-    set.add(3);
-    expect(newValue).toBe(3);
+    let replacedOldValue: number | undefined = undefined;
+    let replacedNewValue: number | undefined = undefined;
+    set.onReplace((oldValue, newValue) => {
+        replacedOldValue = oldValue;
+        replacedNewValue = newValue;
+    });
+
+    set.replace(0, 10);
+    expect(replacedOldValue).toBe(0);
+    expect(replacedNewValue).toBe(10);
+
+    set.replace(1, 2);
+    expect(replacedOldValue).toBe(1);
+    expect(replacedNewValue).toBe(2); // Still if `2` was in the set previously.
+
+    set.replace(44, 10);
+    // Nothing should have changed because `44` does not exist.
+    expect(replacedOldValue).toBe(1);
+    expect(replacedNewValue).toBe(2);
 });
 
 test("onDelete", () => {
     const set = create012BoxSet();
-    let newValue: number | null = null;
+    let newValue: number | undefined = undefined;
     set.onDelete(value => newValue = value);
     set.delete(0);
     expect(newValue).toBe(0);
@@ -99,4 +114,11 @@ test("deriveBoxMap", () => {
     expect(double.get(2)).toBe(4);
     set.add(20);
     expect(double.get(20)).toBe(40);
+});
+
+test("replace", () => {
+    const set = create012BoxSet();
+    set.replace(0, 10);
+    expect(set.has(0)).toBeFalsy();
+    expect(set.has(10)).toBeTruthy();
 });
