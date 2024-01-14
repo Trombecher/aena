@@ -1,5 +1,5 @@
-import {Box, BoxArray, BoxMap, BoxSet} from "./box";
 import {JSX} from "./jsx-runtime";
+import {Box, BoxArray, BoxMap, BoxSet} from "./box/index";
 
 export function insertBoxAsText(box: Box<any>): Node {
     const textNode = document.createTextNode(box.value + "");
@@ -106,7 +106,7 @@ export function insertBoxSet<T>(set: BoxSet<T>, mapper: (value: T) => JSX.Elemen
         nodeMap.delete(value);
     });
 
-    set.onReplace((oldValue, newValue) => {
+    set.onReplace((_, oldValue, newValue) => {
         const oldNode = nodeMap.get(oldValue) as ChildNode;
         let newNode;
         if(nodeMap.has(newValue)) {

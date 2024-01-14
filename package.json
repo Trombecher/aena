@@ -14,7 +14,8 @@
         "state"
     ],
     "scripts": {
-        "test": "vitest run"
+        "test": "vitest run",
+        "docs": "typedoc --entryPointStrategy expand ./src && .\\docs\\index.html"
     },
     "author": "Tobias Hillemanns",
     "license": "ISC",
@@ -34,8 +35,9 @@
         }
     },
     "devDependencies": {
+        "typedoc": "^0.25.7",
         "typescript": "^5.3.3",
-        "vitest": "^1.1.3"
+        "vitest": "^1.2.0"
     },
     "repository": "https://github.com/trombecher/aena"
 }

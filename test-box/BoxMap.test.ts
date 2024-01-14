@@ -1,4 +1,3 @@
-// @ts-ignore
 import {expect, test} from "vitest";
 import {BoxMap} from "../src/box";
 

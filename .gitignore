@@ -1,8 +1,6 @@
-.vscode
-dist
-.idea
-node_modules
-pnpm-lock.yaml
-test-suite/node_modules
-test-suite/dist
-test-suite/pnpm-lock.yaml
+**/.vscode
+**/dist
+**/docs
+**/.idea
+**/node_modules
+**/pnpm-lock.yaml

@@ -1,4 +1,3 @@
-// @ts-ignore - cannot look up vitest but vitest still works
 import {expect, test} from "vitest";
 import {Box} from "../src/box";
 
@@ -10,8 +9,13 @@ test("value", () => {
 test("onChange", () => {
     const box = new Box("");
     let newValue: string | null = null;
-    box.onChange(value => newValue = value);
+    const unsubscribe = box.onChange(value => newValue = value);
+
     box.value = "Test";
+    expect(newValue).toBe("Test");
+
+    unsubscribe();
+
     expect(newValue).toBe("Test");
 });
 
