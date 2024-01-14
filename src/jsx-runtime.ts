@@ -1,5 +1,12 @@
 import {Box, BoxArray, BoxMap, BoxSet} from "./box";
-import {insertBoxArrayAsText, insertBoxAsText, insertBoxJSX, insertBoxMapAsText, insertBoxSetAsText} from "./glue";
+import {
+    insertBoxArrayAsText,
+    insertBoxAsText,
+    insertBoxMapAsText,
+    insertBoxNode,
+    insertBoxNodes,
+    insertBoxSetAsText
+} from "./glue";
 import {svgElements} from "./constants";
 
 export namespace JSX {
@@ -20,8 +27,10 @@ function flatChildren(target: JSX.Element[], children: any[]) {
         if(child instanceof Node) target.push(child);
         else if(child instanceof Array) flatChildren(target, child);
         else if(child instanceof Box) {
-            if(child.value instanceof Array || child.value instanceof Node)
-                target.push(insertBoxJSX(child));
+            if(child.value instanceof Node)
+                target.push(insertBoxNode(child))
+            else if(child.value instanceof Array)
+                target.push(insertBoxNodes(child));
             else target.push(insertBoxAsText(child));
         } else if(child instanceof BoxArray) target.push(insertBoxArrayAsText(child));
         else if(child instanceof BoxSet) target.push(insertBoxSetAsText(child));

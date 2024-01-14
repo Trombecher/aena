@@ -13,30 +13,30 @@ export function insertBox<T>(box: Box<T>, transform: (value: T) => string): Node
     return textNode;
 }
 
-export function insertBoxJSX(box: Box<Node> | Box<Node[]>): Node[] {
-    let len = Array.isArray(box.value) ? box.value.length : 1;
-    const anchor = document.createTextNode("");
-    const nodes = new Array(len + 1);
-    nodes[0] = anchor;
-
-    if(Array.isArray(box.value))
-        for(let i = 0; i < len; ++i)
-            nodes[i + 1] = box.value[i];
-    else nodes[1] = box.value;
-
-    box.onChange(jsx => {
-        while(len--) anchor.nextSibling!.remove();
-
-        if(jsx instanceof Node) {
-            len = 1;
-            anchor.after(jsx);
-        } else {
-            len = jsx.length;
-            while(len--) anchor.after(...jsx);
-            len = jsx.length;
-        }
+export function insertBoxNode(box: Box<Node>) {
+    let previousNode = box.value;
+    box.onChange(node => {
+        previousNode.parentNode!.replaceChild(node, previousNode);
+        previousNode = node;
     });
-    return nodes;
+    return [previousNode];
+}
+
+export function insertBoxNodes(box: Box<Iterable<Node>>) {
+    const anchor = document.createTextNode("");
+    let previousLength = 0;
+    for(const _ of box.value) previousLength += 1;
+    box.onChange(nodes => {
+        while(previousLength--) anchor.nextSibling!.remove();
+        previousLength = 0;
+        let lastNode: Node = anchor;
+        for(const currentNode of nodes) {
+            (lastNode as ChildNode).after(currentNode);
+            lastNode = currentNode;
+            previousLength += 1;
+        }
+    })
+    return [anchor, ...box.value];
 }
 
 function toNodeUnsupported(jsx: JSX.Element): Node {

@@ -1,6 +1,14 @@
 import {JSX} from "../../src/jsx-runtime";
 import {Box, BoxArray, BoxMap, BoxSet} from "../../src/box";
-import {insertBoxArray, insertBox, insertBoxJSX, insertBoxSetAsText, insertBoxSet, insertBoxMap} from "../../src/glue";
+import {
+    insertBoxArray,
+    insertBox,
+    insertBoxSetAsText,
+    insertBoxSet,
+    insertBoxMap,
+    insertBoxNode,
+    insertBoxNodes
+} from "../../src/glue";
 
 export default function TestApp() {
     const box = new Box(0);
@@ -25,7 +33,7 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/jsx-runtime</code></h1>
                 <div>
                     By seeing this text, aena/jsx-runtime has successfully passed createElement(...) and
-                    createFragment(...) tests
+                    Fragment(...) tests
                 </div>
                 <div>
                     There should be a number: <Number/>
@@ -59,8 +67,13 @@ export default function TestApp() {
                 <h2>Insert With Deriving</h2>
                 <div>{box} * {box} = {box.derive(count => count * count)}</div>
 
-                <h2>Insert JSX</h2>
-                <div>{insertBoxJSX(box.derive(value => document.createTextNode(value + "") as Node))}</div>
+                <h2>Insert Node</h2>
+                <div>{insertBoxNode(box.derive(value => document.createTextNode(value + "") as Node))}</div>
+
+                <h2>Insert Nodes</h2>
+                <div>{insertBoxNodes(box.derive<Iterable<Node>>(value => (new Array(Math.abs(value))).fill(0).map((_, i) => (
+                    <div>{i}</div> as Node
+                ))))}</div>
             </section>
             <section>
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxArray</code></h1>
