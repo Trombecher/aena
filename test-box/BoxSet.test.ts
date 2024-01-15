@@ -1,6 +1,6 @@
 import {expect, test} from "vitest";
 import {BoxSet} from "../src/box";
-import {ReplaceErrorCode, ReplaceSuccessCode} from "../src/box/set";
+import {ReplaceInfoCode} from "../src/box/set";
 
 function create012BoxSet() {
     const boxSet = new BoxSet<number>();
@@ -26,36 +26,43 @@ test("onReplace", () => {
     const set = create012BoxSet();
     let replacedOldValue: number | undefined = undefined;
     let replacedNewValue: number | undefined = undefined;
-    let replaceCode: ReplaceErrorCode | ReplaceSuccessCode | undefined = undefined;
+    let replaceNewValueDidExist: boolean | undefined = undefined;
 
-    set.onReplace((code, oldValue, newValue) => {
-        replaceCode = code;
+    set.onReplace((oldValue, newValue, newValueDidExist) => {
         replacedOldValue = oldValue;
         replacedNewValue = newValue;
+        replaceNewValueDidExist = newValueDidExist;
     });
 
     // Replace call should fail because 44 is not part of the set.
     expect(set.replace(44, 22))
-        .toBe(ReplaceErrorCode.OldValueDoesNotExist);
-    expect(replaceCode).toBe(undefined);
+        .toBe(ReplaceInfoCode.FailOldValueDoesNotExist);
     expect(replacedOldValue).toBe(undefined);
     expect(replacedNewValue).toBe(undefined);
+    expect(replaceNewValueDidExist).toBe(undefined);
+
+    // Replace call should fail because trying to replace 0 with 0 should do nothing.
+    expect(set.replace(0, 0))
+        .toBe(ReplaceInfoCode.FailSameValues);
+    expect(replacedOldValue).toBe(undefined);
+    expect(replacedNewValue).toBe(undefined);
+    expect(replaceNewValueDidExist).toBe(undefined);
 
     // Replace call should succeed with `ReplaceSuccessCode.NewValueHasNotExisted`
     // because 10 is not part of the set.
     expect(set.replace(0, 10))
-        .toBe(ReplaceSuccessCode.NewValueHasNotExisted);
-    expect(replaceCode).toBe(ReplaceSuccessCode.NewValueHasNotExisted);
+        .toBe(ReplaceInfoCode.SuccessNewValueDidNotExist);
     expect(replacedOldValue).toBe(0);
     expect(replacedNewValue).toBe(10);
+    expect(replaceNewValueDidExist).toBeFalsy();
 
     // Replace call should succeed with `ReplaceSuccessCode.NewValueHasExisted`
     // because 2 is part of the set.
     expect(set.replace(1, 2))
-        .toBe(ReplaceSuccessCode.NewValueHasExisted);
-    expect(replaceCode).toBe(ReplaceSuccessCode.NewValueHasExisted);
+        .toBe(ReplaceInfoCode.SuccessNewValueDidExist);
     expect(replacedOldValue).toBe(1);
     expect(replacedNewValue).toBe(2);
+    expect(replaceNewValueDidExist).toBeTruthy();
 });
 
 test("onDelete", () => {

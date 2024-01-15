@@ -1,5 +1,6 @@
 import {expect, test} from "vitest";
 import {BoxMap} from "../src/box";
+import {ReplaceInfoCode} from "../src/box/map";
 
 function createNumberBoxMap() {
     const boxMap = new BoxMap<string, number>();
@@ -11,25 +12,6 @@ function createNumberBoxMap() {
 
 test("new", () => {
     new BoxMap();
-});
-
-test("set", () => {
-    createNumberBoxMap();
-});
-
-test("delete", () => {
-    const map = createNumberBoxMap();
-    map.delete("one");
-
-    expect(map.has("one")).toBe(false); // build-in function
-    expect(map.size).toBe(2); // build-in function
-});
-
-test("clear", () => {
-    const map = createNumberBoxMap();
-    map.clear();
-
-    expect(map.size).toBe(0);
 });
 
 test("onSet", () => {
@@ -56,6 +38,74 @@ test("onSet", () => {
     expect(lastSetValue).toBe(4);
 });
 
+test("replace / onReplace", () => {
+    const map = createNumberBoxMap();
+
+    let replacedOldKey: string | undefined = undefined;
+    let replacedOldValue: number | undefined = undefined;
+    let replacedNewKey: string | undefined = undefined;
+    let replacedNewValue: number | undefined = undefined;
+    let replaceNewValueDidExist: boolean | undefined = undefined;
+
+    map.onReplace((
+        oldKey,
+        oldValue,
+        newKey,
+        newValue,
+        newKeyDidExist
+    ) => {
+        replacedOldKey = oldKey;
+        replacedOldValue = oldValue;
+        replacedNewKey = newKey;
+        replacedNewValue = newValue;
+        replaceNewValueDidExist = newKeyDidExist;
+    });
+
+    // Replace should fail because the key `"four"` does not exist.
+    expect(map.replace("four", "five", 5))
+        .toBe(ReplaceInfoCode.FailOldKeyDoesNotExist);
+    expect(map.get("four")).toBe(undefined);
+    expect(map.get("five")).toBe(undefined);
+
+    expect(replacedOldKey).toBe(undefined);
+    expect(replacedOldValue).toBe(undefined);
+    expect(replacedNewKey).toBe(undefined);
+    expect(replacedNewValue).toBe(undefined);
+    expect(replaceNewValueDidExist).toBe(undefined);
+
+    // Replace should fail because the keys and values are identical.
+    expect(map.replace("one", "one", 1))
+        .toBe(ReplaceInfoCode.FailSameKeysSameValues);
+    expect(replacedOldKey).toBe(undefined);
+    expect(replacedOldValue).toBe(undefined);
+    expect(replacedNewKey).toBe(undefined);
+    expect(replacedNewValue).toBe(undefined);
+    expect(replaceNewValueDidExist).toBe(undefined);
+
+    // Replace should succeed because the keys are identical but the values are different.
+    expect(map.replace("one", "one", 1.1))
+        .toBe(ReplaceInfoCode.SuccessNewKeyDidExist);
+    expect(map.get("one")).toBe(1.1);
+
+    expect(replacedOldKey).toBe("one");
+    expect(replacedOldValue).toBe(1);
+    expect(replacedNewKey).toBe("one");
+    expect(replacedNewValue).toBe(1.1);
+    expect(replaceNewValueDidExist).toBeTruthy();
+
+    // Replace should succeed because the keys are different but the value are identical.
+    expect(map.replace("two", "newTwo", 2))
+        .toBe(ReplaceInfoCode.SuccessNewKeyDidNotExist);
+    expect(map.get("two")).toBe(undefined);
+    expect(map.get("newTwo")).toBe(2);
+
+    expect(replacedOldKey).toBe("two");
+    expect(replacedOldValue).toBe(2);
+    expect(replacedNewKey).toBe("newTwo");
+    expect(replacedNewValue).toBe(2);
+    expect(replaceNewValueDidExist).toBeFalsy();
+});
+
 test("onDelete", () => {
     const map = createNumberBoxMap();
 
@@ -78,4 +128,19 @@ test("onDelete", () => {
 
     expect(lastDeletedKey).toBe("three");
     expect(lastDeletedValue).toBe(3);
+});
+
+test("clear", () => {
+    const map = createNumberBoxMap();
+    map.clear();
+
+    expect(map.size).toBe(0);
+});
+
+test("delete", () => {
+    const map = createNumberBoxMap();
+    map.delete("one");
+
+    expect(map.has("one")).toBe(false); // build-in function
+    expect(map.size).toBe(2); // build-in function
 });

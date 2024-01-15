@@ -1,5 +1,5 @@
 import {JSX} from "./jsx-runtime";
-import {Box, BoxArray, BoxMap, BoxSet} from "./box/index";
+import {Box, BoxArray, BoxMap, BoxSet} from "./box";
 
 export function insertBoxAsText(box: Box<any>): Node {
     const textNode = document.createTextNode(box.value + "");
@@ -106,8 +106,10 @@ export function insertBoxSet<T>(set: BoxSet<T>, mapper: (value: T) => JSX.Elemen
         nodeMap.delete(value);
     });
 
-    set.onReplace((_, oldValue, newValue) => {
+    set.onReplace((oldValue, newValue) => {
         const oldNode = nodeMap.get(oldValue) as ChildNode;
+        nodeMap.delete(oldValue);
+
         let newNode;
         if(nodeMap.has(newValue)) {
             newNode = nodeMap.get(newValue)!;
@@ -125,8 +127,8 @@ export function insertBoxSetAsText(boxSet: BoxSet<any>) {
     const textNode = document.createTextNode(boxSet.toString());
     const update = () => textNode.textContent = boxSet.toString();
     boxSet.onAdd(update);
-    boxSet.onDelete(update);
     boxSet.onReplace(update);
+    boxSet.onDelete(update);
 
     return textNode;
 }
@@ -134,7 +136,8 @@ export function insertBoxSetAsText(boxSet: BoxSet<any>) {
 export function insertBoxMap<K, V>(map: BoxMap<K, V>, mapper: (key: K, value: V) => JSX.Element) {
     const anchor = document.createTextNode("");
     const nodeMap = new Map<K, Node>();
-    map.forEach((value, key) => nodeMap.set(key, toNodeUnsupported(mapper(key, value))));
+    map.forEach((value, key) =>
+        nodeMap.set(key, toNodeUnsupported(mapper(key, value))));
 
     let previousSize = map.size;
 
@@ -148,6 +151,19 @@ export function insertBoxMap<K, V>(map: BoxMap<K, V>, mapper: (key: K, value: V)
 
         prev.after(node);
         previousSize = map.size;
+    });
+
+    map.onReplace((
+        oldKey,
+        _oldValue,
+        newKey,
+        newValue,
+    ) => {
+        const oldNode = nodeMap.get(oldKey)!;
+        const newNode = toNodeUnsupported(mapper(newKey, newValue));
+        oldNode.parentNode!.replaceChild(newNode, oldNode);
+        nodeMap.delete(oldKey);
+        nodeMap.set(newKey, newNode);
     });
 
     map.onDelete(key => {
@@ -164,6 +180,7 @@ export function insertBoxMapAsText(boxMap: BoxMap<any, any>) {
     const textNode = document.createTextNode(boxMap.toString());
     const update = () => textNode.textContent = boxMap.toString();
     boxMap.onSet(update);
+    boxMap.onReplace(update);
     boxMap.onDelete(update);
     return textNode;
 }

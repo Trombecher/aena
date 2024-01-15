@@ -1,25 +1,19 @@
 import {Unlistener} from "./index";
 
-export enum ReplaceErrorCode {
-    OldKeyDoesNotExist = 0,
-    SameKeysSameValues,
+export enum ReplaceInfoCode {
+    FailOldKeyDoesNotExist,
+    FailSameKeysSameValues,
+    SuccessNewKeyDidExist,
+    SuccessNewKeyDidNotExist
 }
-
-export enum ReplaceSuccessCode {
-    SameKeysDifferentValues = 2,
-    DifferentKeysDifferentValues,
-    DifferentKeysSameValues,
-}
-
-export type ReplaceInfoCode = ReplaceErrorCode | ReplaceSuccessCode;
 
 export type OnSetListener<K, V> = (key: K, value: V) => void;
 export type OnReplaceListener<K, V> = (
-    code: ReplaceSuccessCode,
     oldKey: K,
     oldValue: V,
     newKey: K,
-    newValue: V
+    newValue: V,
+    newKeyDidExist: boolean
 ) => void;
 export type OnDeleteListener<K, V> = (key: K, value: V) => void;
 
@@ -43,35 +37,53 @@ export class BoxMap<K, V> extends Map<K, V> {
         return () => this.#onDeleteListeners.delete(listener);
     }
 
+    override set(key: K, value: V): this {
+        if(!this.has(key)) {
+            super.set(key, value);
+            this.#onSetListeners.forEach(listener =>
+                listener(key, value));
+        }
+        return this;
+    }
+
     /**
      * On `BoxMapReplaceCode.OldKeyDoesNotExist` and `BoxMapReplaceCode.SameKeysSameValues` the listeners will not be called, and it is a no-op.
      */
     replace(oldKey: K, newKey: K, newValue: V): ReplaceInfoCode {
-        if(!this.has(oldKey)) return ReplaceErrorCode.OldKeyDoesNotExist;
-        const oldValue = this.get(oldKey);
-        if(oldKey === newKey) {
-            if(oldValue === newValue) return ReplaceErrorCode.SameKeysSameValues;
-            else {
-                super.delete(oldKey);
-                super.set(newKey, newValue);
-                return ReplaceSuccessCode.SameKeysDifferentValues;
-            }
+        if(!this.has(oldKey)) return ReplaceInfoCode.FailOldKeyDoesNotExist;
+        const oldValue = this.get(oldKey)!;
+        if(oldKey === newKey && oldValue === newValue) return ReplaceInfoCode.FailSameKeysSameValues;
+
+        if(super.has(newKey)) {
+            super.delete(oldKey);
+            super.set(newKey, newValue);
+            this.#onReplaceListeners.forEach(listener => listener(
+                oldKey,
+                oldValue,
+                newKey,
+                newValue,
+                true
+            ));
+            return ReplaceInfoCode.SuccessNewKeyDidExist
         } else {
-            if(oldValue === newValue) {
-                return ReplaceSuccessCode.DifferentKeysSameValues;
-            } else {
-                return ReplaceSuccessCode.DifferentKeysDifferentValues;
-            }
+            super.delete(oldKey);
+            super.set(newKey, newValue);
+            this.#onReplaceListeners.forEach(listener => listener(
+                oldKey,
+                oldValue,
+                newKey,
+                newValue,
+                false
+            ));
+            return ReplaceInfoCode.SuccessNewKeyDidNotExist;
         }
     }
 
     override clear() {
-        const entries = super.entries();
-        super.clear();
-
-        for(const [key, value] of entries)
+        this.forEach((value, key) =>
             this.#onDeleteListeners.forEach(listener =>
-                listener(key, value));
+                listener(key, value)))
+        super.clear();
     }
 
     override delete(key: K): boolean {
@@ -80,15 +92,6 @@ export class BoxMap<K, V> extends Map<K, V> {
         this.#onDeleteListeners.forEach(listener =>
             listener(key, value!));
         return true;
-    }
-
-    override set(key: K, value: V): this {
-        if(!this.has(key)) {
-            super.set(key, value);
-            this.#onSetListeners.forEach(listener =>
-                listener(key, value));
-        }
-        return this;
     }
 
     override toString() {

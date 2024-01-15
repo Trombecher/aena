@@ -1,19 +1,17 @@
 import {BoxMap, Unlistener} from "./index";
 
-export enum ReplaceErrorCode {
-    OldValueDoesNotExist = 0
-}
-
-export enum ReplaceSuccessCode {
-    NewValueHasNotExisted = 1,
-    NewValueHasExisted,
+export enum ReplaceInfoCode {
+    FailOldValueDoesNotExist,
+    FailSameValues,
+    SuccessNewValueDidExist,
+    SuccessNewValueDidNotExist
 }
 
 export type OnAddListener<T> = (value: T) => void;
 export type OnReplaceListener<T> = (
-    infoCode: ReplaceSuccessCode,
     newValue: T,
-    oldValue: T
+    oldValue: T,
+    newValueDidExist: boolean
 ) => void;
 export type OnDeleteListener<T> = (value: T) => void;
 
@@ -66,25 +64,28 @@ export class BoxSet<T> extends Set<T> {
      *
      * Therefore, this function guarantees `onReplace` listeners an existent old value but not a previously non-existent new value.
      */
-    replace(oldValue: T, newValue: T): ReplaceErrorCode | ReplaceSuccessCode {
-        if(!super.delete(oldValue))
-            return ReplaceErrorCode.OldValueDoesNotExist;
+    replace(oldValue: T, newValue: T): ReplaceInfoCode {
+        if(!super.has(oldValue)) return ReplaceInfoCode.FailOldValueDoesNotExist;
+        if(oldValue === newValue) return ReplaceInfoCode.FailSameValues;
+
+        super.delete(oldValue);
+
         if(super.has(newValue)) {
             super.add(newValue);
             this.#onReplaceListeners.forEach(listener => listener(
-                ReplaceSuccessCode.NewValueHasExisted,
                 oldValue,
-                newValue
+                newValue,
+                true
             ));
-            return ReplaceSuccessCode.NewValueHasExisted;
+            return ReplaceInfoCode.SuccessNewValueDidExist;
         } else {
             super.add(newValue);
             this.#onReplaceListeners.forEach(listener => listener(
-                ReplaceSuccessCode.NewValueHasNotExisted,
                 oldValue,
-                newValue
+                newValue,
+                false
             ));
-            return ReplaceSuccessCode.NewValueHasNotExisted;
+            return ReplaceInfoCode.SuccessNewValueDidNotExist;
         }
     }
 
@@ -136,10 +137,8 @@ export class BoxSet<T> extends Set<T> {
 
         this.onAdd(value => map.set(value, mapper(value)));
         this.onDelete(value => map.delete(value));
-        this.onReplace((_, oldValue, newValue) => {
-            map.delete(oldValue);
-            if(!map.has(newValue))
-                map.set(newValue, mapper(newValue));
+        this.onReplace((oldValue, newValue) => {
+            map.replace(oldValue, newValue, mapper(newValue));
         });
 
         return map;

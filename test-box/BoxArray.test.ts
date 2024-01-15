@@ -35,6 +35,11 @@ test("add & at", () => {
     expect(boxArray.length).toBe(3);
 });
 
+test("static from", () => {
+    const array = BoxArray.from(3, index => index);
+    expect(array.toString()).toBe("[0,1,2]");
+});
+
 test("set", () => {
     const boxArray = new BoxArray<number>(3);
     boxArray.set(0, 0);

@@ -121,6 +121,9 @@ export default function TestApp() {
                 <h2>Adding</h2>
                 <button onclick={() => boxMap.set("three", 3)}>Add three</button>
 
+                <h2>Replacing</h2>
+                <button onclick={() => boxMap.replace("one", "four", 4)}>Replace one with four</button>
+
                 <h2>Deleting</h2>
                 <button onclick={() => boxMap.delete("three")}>Delete three</button>
 
