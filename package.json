@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "description": "A lightweight javascript framework.",
     "main": "./src/index.ts",
     "keywords": [
@@ -31,7 +31,10 @@
             "default": "./src/index.ts"
         },
         "./*": {
-            "default": "./src/*.ts"
+            "default": [
+                "./src/*.ts",
+                "./src/*/index.ts"
+            ]
         }
     },
     "devDependencies": {
