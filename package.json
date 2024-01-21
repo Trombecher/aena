@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "description": "Your next SPA TypeScript framework.",
     "main": "./src/index.ts",
     "keywords": [
@@ -27,8 +27,9 @@
     ],
     "exports": {
         ".": "./src/index.ts",
-        "./box": "./src/box/index.ts",
-        "./*": "./src/*.ts"
+        "./*": "./src/*.ts",
+        "./state": "./src/state/index.ts",
+        "./state/*": "./src/state/*.ts"
     },
     "devDependencies": {
         "typedoc": "^0.25.7",
