@@ -1,5 +1,5 @@
 import {JSX} from "../../src/jsx-runtime";
-import {Box, BoxArray, BoxMap, BoxSet} from "../../src/box";
+import {BoxArray, BoxMap, BoxSet, WritableBox} from "../../src/state";
 import {
     insertBoxArray,
     insertBox,
@@ -11,7 +11,7 @@ import {
 } from "../../src/glue";
 
 export default function TestApp() {
-    const box = new Box(0);
+    const box = new WritableBox(0);
     const boxArray = new BoxArray<number>();
     boxArray.add(0);
     boxArray.add(1);
@@ -84,8 +84,8 @@ export default function TestApp() {
                 <h2>Swapping</h2>
                 <button onClick={() => boxArray.swapIndices(0, -1)}>Swap first and last element</button>
 
-                <h2>Removing</h2>
-                <button onClick={() => boxArray.removeAt(0)}>Remove the first element</button>
+                <h2>Deleting</h2>
+                <button onClick={() => boxArray.deleteAt(0)}>Remove the first element</button>
 
                 <h2>Insert As Text</h2>
                 <div>{boxArray}</div>
@@ -101,8 +101,8 @@ export default function TestApp() {
                 <h2>Adding</h2>
                 <button onClick={() => boxSet.add(Math.random())}>Add random number</button>
 
-                <h2>Replacing</h2>
-                <button onclick={() => boxSet.replace(boxSet.keys().next().value, 10)}>Replace one key with 10</button>
+                {/* <h2>Replacing</h2>
+                <button onclick={() => boxSet.replace(boxSet.keys().next().value, 10)}>Replace one key with 10</button> */}
 
                 <h2>Deleting</h2>
                 <button onclick={() => boxSet.delete(boxSet[Symbol.iterator]().next().value)}>Delete one key</button>
@@ -121,8 +121,8 @@ export default function TestApp() {
                 <h2>Adding</h2>
                 <button onclick={() => boxMap.set("three", 3)}>Add three</button>
 
-                <h2>Replacing</h2>
-                <button onclick={() => boxMap.replace("one", "four", 4)}>Replace one with four</button>
+                {/* <h2>Replacing</h2>
+                <button onclick={() => boxMap.replace("one", "four", 4)}>Replace one with four</button> */}
 
                 <h2>Deleting</h2>
                 <button onclick={() => boxMap.delete("three")}>Delete three</button>

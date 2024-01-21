@@ -1,13 +1,12 @@
 {
     "name": "aena",
-    "version": "0.9.6",
-    "description": "A lightweight javascript framework.",
+    "version": "0.10.0",
+    "description": "Your next SPA TypeScript framework.",
     "main": "./src/index.ts",
     "keywords": [
         "aena",
-        "aenajs",
         "ui",
-        "jsx",
+        "tsx",
         "reactive",
         "components",
         "performance",
@@ -34,7 +33,7 @@
     "devDependencies": {
         "typedoc": "^0.25.7",
         "typescript": "^5.3.3",
-        "vitest": "^1.2.0"
+        "vitest": "^1.2.1"
     },
     "repository": "https://github.com/trombecher/aena"
 }

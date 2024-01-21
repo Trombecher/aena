@@ -10,4 +10,4 @@ function LOC($Path)
     return $Total
 }
 
-(LOC -Path ./src) + (LOC -Path ./test-box) + (LOC -Path ./test-dom/src)
+(LOC -Path ./src) + (LOC -Path ./test-state) + (LOC -Path ./test-dom/src)

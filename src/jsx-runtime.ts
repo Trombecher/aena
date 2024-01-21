@@ -1,4 +1,4 @@
-import {Box, BoxArray, BoxMap, BoxSet} from "./box";
+import {Box, BoxArray, BoxMap, BoxSet} from "./state";
 import {
     insertBoxArrayAsText,
     insertBoxAsText,
@@ -87,12 +87,12 @@ export function createElement(
         if(isWritable(element, translatedKey)) { // idl attribute
             if(value instanceof Box) {
                 element[translatedKey] = value.value;
-                value.onChange(value => element[translatedKey] = value);
+                value.addListener(value => element[translatedKey] = value);
             } else element[translatedKey] = value;
         } else { // html attribute
             if(value instanceof Box) {
                 element.setAttribute(key, value.value);
-                value.onChange(value => element.setAttribute(key, value));
+                value.addListener(value => element.setAttribute(key, value));
             } else element.setAttribute(key, value);
         }
     });
