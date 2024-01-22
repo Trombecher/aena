@@ -42,15 +42,14 @@ export function insertBoxNodes(box: Box<Iterable<Node>>) {
     return [anchor, ...box.value];
 }
 
-function toNodeUnsupported(jsx: JSX.Element): Node {
-    if(jsx instanceof Array)
-        throw new Error("Cannot map value to fragment because multiple `Node`s per value are not supported");
+function toNode(jsx: JSX.Element): Node {
+    if(jsx instanceof Array) return jsx[0]!;
     return jsx;
 }
 
 export function insertBoxArray<T>(boxArray: BoxArray<T>, mapper: (value: T) => JSX.Element): Node[] {
     const anchor = document.createTextNode("");
-    const nodes = boxArray.map(value => toNodeUnsupported(mapper(value)));
+    const nodes = boxArray.map(value => toNode(mapper(value)));
     nodes.splice(0, 0, anchor);
 
     boxArray.addListener(change => {
@@ -58,7 +57,7 @@ export function insertBoxArray<T>(boxArray: BoxArray<T>, mapper: (value: T) => J
             case BoxArrayAction.Insert: {
                 let target: ChildNode = anchor;
                 for(let i = 0; i < change.index; ++i) target = target.nextSibling!;
-                target.after(toNodeUnsupported(mapper(change.value)));
+                target.after(toNode(mapper(change.value)));
                 break;
             }
             case BoxArrayAction.Swap: {
@@ -95,7 +94,7 @@ export function insertBoxSet<T>(set: BoxSet<T>, mapper: (value: T) => JSX.Elemen
 
     // Map each value of the set to a node (through `mapper`).
     const nodeMap = new Map<T, Node>();
-    set.forEach(value => nodeMap.set(value, toNodeUnsupported(mapper(value))));
+    set.forEach(value => nodeMap.set(value, toNode(mapper(value))));
 
     set.addListener(change => {
         switch(change.action) {
@@ -105,7 +104,7 @@ export function insertBoxSet<T>(set: BoxSet<T>, mapper: (value: T) => JSX.Elemen
                 while(setSize--)
                     lastChild = lastChild.nextSibling!;
 
-                const node = toNodeUnsupported(mapper(change.value));
+                const node = toNode(mapper(change.value));
                 nodeMap.set(change.value, node);
 
                 lastChild.after(node);
@@ -143,7 +142,7 @@ export function insertBoxMap<K, V>(map: BoxMap<K, V>, mapper: (key: K, value: V)
     const anchor = document.createTextNode("");
     const nodeMap = new Map<K, Node>();
     map.forEach((value, key) =>
-        nodeMap.set(key, toNodeUnsupported(mapper(key, value))));
+        nodeMap.set(key, toNode(mapper(key, value))));
 
     let previousSize = map.size;
 
@@ -154,7 +153,7 @@ export function insertBoxMap<K, V>(map: BoxMap<K, V>, mapper: (key: K, value: V)
                 while(previousSize--)
                     prev = prev.nextSibling!;
 
-                const node = toNodeUnsupported(mapper(change.key, change.value));
+                const node = toNode(mapper(change.key, change.value));
                 nodeMap.set(change.key, node);
 
                 prev.after(node);

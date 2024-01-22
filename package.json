@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "description": "Your next SPA TypeScript framework.",
     "main": "./src/index.ts",
     "keywords": [

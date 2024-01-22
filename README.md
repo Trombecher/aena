@@ -15,7 +15,7 @@ export default function App() {
 ```
 
 > [!WARNING]
-> Still ín beta. Do not use in production. Inherently unstable api, no guarantees made.
+> Still in beta. Do not use in production. Inherently unstable api, no guarantees made.
 
 Aena is your next SPA TypeScript framework. It comes with components, flexible built-in state management and TSX support.
 
@@ -28,6 +28,11 @@ npm i aena
 ```shell
 pnpm i aena
 ```
+
+## This Package Does _Not_ Throw!
+
+There are no throw expressions in `aena` because I believe that errors should be handled via returns types.
+Also `try-catch` blocks have the worst syntax.
 
 ## State Management
 

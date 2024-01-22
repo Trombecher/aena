@@ -187,7 +187,13 @@ test("`Boxed` implementation", () => {
     expect(lastDeletedIndex).toBe(0);
     expect(lastDeletedValue).toBe(20);
 
+    array.set(0, 42);
+    expect(lastDeletedIndex).toBe(0);
+    expect(lastDeletedValue).toBe(10);
+    expect(lastInsertedIndex).toBe(0);
+    expect(lastInsertedValue).toBe(42);
+
     array.removeListener(listener);
 
-    // I could test `removeListener(...)` but I am too lazy.
+    // TODO: Test `removeListener(...)` and `BoxedParent`
 });
