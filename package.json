@@ -27,20 +27,7 @@
         "dist"
     ],
     "exports": {
-        ".": {
-            "default": "./dist/index.js",
-            "types": "./dist/index.d.ts"
-        },
-        "./*": [
-            {
-                "default": "./dist/*.js",
-                "types": "./dist/*.d.ts"
-            },
-            {
-                "default": "./dist/*/index.js",
-                "types": "./dist/*/index.d.ts"
-            }
-        ]
+        "./*": "./dist/*"
     },
     "devDependencies": {
         "typedoc": "^0.25.7",
