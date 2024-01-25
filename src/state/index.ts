@@ -10,14 +10,14 @@ import {Box, WritableBox} from "./box";
  */
 export type Unbox<B> = B extends Box<infer T> ? T : never;
 
-export type UnboxArray<T extends Box<any>[]> = {
-    [K in keyof T]: T[K] extends Box<infer U> ? U : never;
+export type UnboxArray<A extends Box<any>[]> = {
+    [K in keyof A]: A[K] extends Box<infer U> ? U : never;
 };
 
 /**
  * Maps a tuple `T` to an array of boxes of each tuple element.
  */
-export type TupleToBoxedTuple<T extends any[]> = {
+export type IntoBoxArray<T extends any[]> = {
     [K in keyof T]: Box<T[K]>;
 };
 
@@ -39,7 +39,7 @@ export type TupleToBoxedTuple<T extends any[]> = {
  * ```
  */
 export function reduce<V extends any[], T>(
-    dependencies: Readonly<TupleToBoxedTuple<V>>,
+    dependencies: Readonly<IntoBoxArray<V>>,
     reducer: (values: V) => T
 ): Box<T> {
     const values = dependencies.map(d => d!.value) as V;
@@ -57,7 +57,7 @@ export function reduce<V extends any[], T>(
  *
  * More precisely, it checks if the prototype of `o` has the two required functions.
  */
-export function isInstanceOfBoxed<T extends Function>(o: object): o is Boxed<T> {
+export function isInstanceOfListen<L extends Function>(o: object): o is Listen<L> {
     return "addListener" in o && "removeListener" in o;
 }
 
@@ -66,7 +66,7 @@ export function isInstanceOfBoxed<T extends Function>(o: object): o is Boxed<T> 
  *
  * More precisely, it checks if the prototype of `o` has the two required functions.
  */
-export function isInstanceOfBoxedParent<L extends Function>(o: object): o is BoxedParent<L> {
+export function isInstanceOfListenDeep<L extends Function>(o: object): o is ListenDeep<L> {
     return "addListener" in o
         && "removeListener" in o
         && "addDeepListener" in o
@@ -97,18 +97,18 @@ export type DeepListener = () => void;
  * boxed.removeListener(listener);
  * ```
  */
-export interface Boxed<L extends Function> {
+export interface Listen<L extends Function> {
     /**
      * Add a listener.
      *
      * @returns The parameter `listener` for lazy typing.
      */
-    addListener(listener: L): L,
+    addListener(listener: L): L;
 
     /**
      * Remove a listener.
      */
-    removeListener(listener: L): void
+    removeListener(listener: L): void;
 }
 
 /**
@@ -133,18 +133,18 @@ export interface Boxed<L extends Function> {
  * boxedParent.removeDeepListener(listener);
  * ```
  */
-export interface BoxedParent<L extends Function> extends Boxed<L> {
+export interface ListenDeep<L extends Function> extends Listen<L> {
     /**
      * Add a deep listener.
      *
      * @returns The parameter `listener` for lazy typing.
      */
-    addDeepListener(listener: DeepListener): DeepListener,
+    addDeepListener(listener: DeepListener): DeepListener;
 
     /**
      * Remove a deep listener.
      */
-    removeDeepListener(listener: DeepListener): void
+    removeDeepListener(listener: DeepListener): void;
 }
 
 /**
@@ -153,8 +153,8 @@ export interface BoxedParent<L extends Function> extends Boxed<L> {
 export function addListenerRecursive(value: any, listener: () => void): void {
     if(!isObject(value)) return;
 
-    if(isInstanceOfBoxedParent(value)) value.addDeepListener(listener);
-    else if(isInstanceOfBoxed(value)) value.addListener(listener);
+    if(isInstanceOfListenDeep(value)) value.addDeepListener(listener);
+    else if(isInstanceOfListen(value)) value.addListener(listener);
     else Object.keys(value).forEach(key =>
             addListenerRecursive(value[key as keyof typeof value], listener));
 }
@@ -165,8 +165,8 @@ export function addListenerRecursive(value: any, listener: () => void): void {
 export function removeListenerRecursive(value: any, listener: () => void): void {
     if(!isObject(value)) return;
 
-    if(isInstanceOfBoxedParent(value)) value.removeDeepListener(listener);
-    else if(isInstanceOfBoxed(value)) value.removeListener(listener);
+    if(isInstanceOfListenDeep(value)) value.removeDeepListener(listener);
+    else if(isInstanceOfListen(value)) value.removeListener(listener);
     else Object.keys(value).forEach(key =>
             removeListenerRecursive(value[key as keyof typeof value], listener));
 }

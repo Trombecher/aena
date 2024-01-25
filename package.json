@@ -1,8 +1,9 @@
 {
     "name": "aena",
-    "version": "0.10.2",
+    "version": "0.10.3",
     "description": "Your next SPA TypeScript framework.",
-    "main": "./src/index.ts",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "keywords": [
         "aena",
         "ui",
@@ -19,17 +20,27 @@
     "author": "Tobias Hillemanns",
     "license": "ISC",
     "type": "module",
-    "types": "./src/index.ts",
     "files": [
         "README.md",
-        "src/*",
-        "LICENSE"
+        "src",
+        "LICENSE",
+        "dist"
     ],
     "exports": {
-        ".": "./src/index.ts",
-        "./*": "./src/*.ts",
-        "./state": "./src/state/index.ts",
-        "./state/*": "./src/state/*.ts"
+        ".": {
+            "default": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        },
+        "./*": [
+            {
+                "default": "./dist/*.js",
+                "types": "./dist/*.d.ts"
+            },
+            {
+                "default": "./dist/*/index.js",
+                "types": "./dist/*/index.d.ts"
+            }
+        ]
     },
     "devDependencies": {
         "typedoc": "^0.25.7",

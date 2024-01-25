@@ -1,34 +1,15 @@
 import {
     addListenerRecursive,
-    BoxedParent,
     DeepListener,
-    isObject,
+    isObject, ListenDeep,
     removeListenerRecursive
 } from "./index";
-
-// export enum ReplaceInfoCode {
-//     FailOldKeyDoesNotExist,
-//     FailSameKeysSameValues,
-//     SuccessNewKeyDidExist,
-//     SuccessNewKeyDidNotExist
-// }
 
 export const enum Action {
     Set,
     // Replace,
     Delete
 }
-
-/*
-{
-    action: Action.Replace,
-    oldKey: K,
-    oldValue: V,
-    newKey: V,
-    newValue: V,
-    newKeyDidExist: boolean
-} |
-*/
 
 export type Change<K, V> = Readonly<{
     action: Action.Set,
@@ -42,10 +23,7 @@ export type Change<K, V> = Readonly<{
 
 export type Listener<K, V> = (change: Change<K, V>) => void;
 
-export class BoxMap<K, V> extends Map<K, V> implements BoxedParent<Listener<K, V>> {
-    readonly #listeners = new Set<Listener<K, V>>();
-    readonly #deepListeners = new Set<DeepListener>();
-
+export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Listener<K, V>> {
     override set(key: K, value: V): this {
         if(this.has(key)) return this;
         super.set(key, value);
@@ -66,40 +44,6 @@ export class BoxMap<K, V> extends Map<K, V> implements BoxedParent<Listener<K, V
 
         return this;
     }
-
-    /*
-     * On `BoxMapReplaceCode.OldKeyDoesNotExist` and `BoxMapReplaceCode.SameKeysSameValues` the listeners will not be called, and it is a no-op.
-
-    replace(oldKey: K, newKey: K, newValue: V): ReplaceInfoCode {
-        if(!this.has(oldKey)) return ReplaceInfoCode.FailOldKeyDoesNotExist;
-        const oldValue = this.get(oldKey)!;
-        if(oldKey === newKey && oldValue === newValue) return ReplaceInfoCode.FailSameKeysSameValues;
-
-        if(super.has(newKey)) {
-            super.delete(oldKey);
-            super.set(newKey, newValue);
-            this.#onReplaceListeners.forEach(listener => listener(
-                oldKey,
-                oldValue,
-                newKey,
-                newValue,
-                true
-            ));
-            return ReplaceInfoCode.SuccessNewKeyDidExist
-        } else {
-            super.delete(oldKey);
-            super.set(newKey, newValue);
-            this.#onReplaceListeners.forEach(listener => listener(
-                oldKey,
-                oldValue,
-                newKey,
-                newValue,
-                false
-            ));
-            return ReplaceInfoCode.SuccessNewKeyDidNotExist;
-        }
-    }
-     */
 
     /**
      * Clears the set by deleting each key and value.
@@ -141,21 +85,27 @@ export class BoxMap<K, V> extends Map<K, V> implements BoxedParent<Listener<K, V
         return `{${s.substring(1)}}`;
     }
 
+    // The following code may repeat across files; but there is no other option.
+    readonly #listeners = new Set<Listener<K, V>>();
+    readonly #deepListeners = new Set<DeepListener>();
+
+    addDeepListener(listener: DeepListener): DeepListener {
+        this.#deepListeners.add(listener);
+        this.forEach(value => addListenerRecursive(value, listener));
+        return listener;
+    }
+
     removeDeepListener(listener: DeepListener) {
         this.#deepListeners.delete(listener);
+        this.forEach(value => removeListenerRecursive(value, listener));
+    }
+
+    addListener(listener: Listener<K, V>) {
+        this.#listeners.add(listener);
+        return listener;
     }
 
     removeListener(listener: Listener<K, V>) {
         this.#listeners.delete(listener);
-    }
-
-    addDeepListener(listener: DeepListener): DeepListener {
-        this.#deepListeners.add(listener);
-        return listener;
-    }
-
-    addListener(listener: Listener<K, V>): Listener<K, V> {
-        this.#listeners.add(listener);
-        return listener;
     }
 }

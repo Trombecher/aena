@@ -1,4 +1,4 @@
-import {Boxed} from "./index";
+import {Listen} from "./index";
 
 export type OnChangeListener<T> = (value: T) => void;
 
@@ -21,9 +21,8 @@ export type OnChangeListener<T> = (value: T) => void;
  *
  * Whenever `count` gets updated, `square` gets updated with the square.
  */
-export class Box<T> implements Boxed<OnChangeListener<T>> {
+export class Box<T> implements Listen<OnChangeListener<T>> {
     protected _value: T;
-    protected readonly _listeners = new Set<OnChangeListener<T>>();
 
     constructor(value: T) {
         this._value = value;
@@ -35,9 +34,12 @@ export class Box<T> implements Boxed<OnChangeListener<T>> {
 
     derive<U>(transform: (value: T) => U) {
         const box = new WritableBox(transform(this._value));
-        this._listeners.add(value => box.value = transform(value));
+        this.addListener(value => box.value = transform(value));
         return box.readonly();
     }
+
+    // The following code may repeat across files.
+    protected readonly _listeners = new Set<OnChangeListener<T>>();
 
     addListener(listener: OnChangeListener<T>): OnChangeListener<T> {
         this._listeners.add(listener);

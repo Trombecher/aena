@@ -1,35 +1,14 @@
 import {BoxMap} from "./map";
 import {
-    addListenerRecursive,
-    BoxedParent,
-    DeepListener,
-    isObject,
+    addListenerRecursive, DeepListener,
+    isObject, ListenDeep,
     removeListenerRecursive
 } from "./index";
 
-/*
-export enum ReplaceInfoCode {
-    FailOldValueDoesNotExist,
-    FailSameValues,
-    SuccessNewValueDidExist,
-    SuccessNewValueDidNotExist
-}
- */
-
 export const enum Action {
     Add,
-    // Replace,
     Delete
 }
-
-/*
-{
-    action: Action.Replace,
-    newValue: T,
-    oldValue: T,
-    newValueDidExist: boolean
-} |
- */
 
 export type Change<T> = Readonly<{
     action: Action.Add,
@@ -79,14 +58,7 @@ export type Listener<T> = (change: Change<T>) => void;
  * set.removeDeepListener(deepListener);
  * ```
  */
-export class BoxSet<T> extends Set<T> implements BoxedParent<Listener<T>> {
-    readonly #listeners = new Set<Listener<T>>();
-    /**
-     * All children of this `BoxSet` should have these listeners.
-     * @private
-     */
-    readonly #deepListeners = new Set<() => void>();
-
+export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
     override add(value: T): this {
         if(this.has(value)) return this;
         super.add(value);
@@ -103,45 +75,6 @@ export class BoxSet<T> extends Set<T> implements BoxedParent<Listener<T>> {
 
         return this;
     }
-
-    /*
-
-     * Replaces the old value with a new one and calls the `onReplace` listeners.
-     * If the set does not contain the old value, it cannot be removed and the function does nothing.
-     *
-     * Therefore, this function guarantees `onReplace` listeners an existent old value but not a previously non-existent new value.
-
-    replace(oldValue: T, newValue: T): ReplaceInfoCode {
-        if(!super.has(oldValue)) return ReplaceInfoCode.FailOldValueDoesNotExist;
-        if(oldValue === newValue) return ReplaceInfoCode.FailSameValues;
-
-        super.delete(oldValue);
-
-        const change = {
-            action: Action.Replace,
-            newValue,
-            oldValue,
-            newValueDidExist: true
-        } satisfies Change<T>;
-
-        if(super.has(newValue)) {
-            super.add(newValue);
-            this.#listeners.forEach(listener => listener(change));
-            this.#deepListeners.forEach(listener => listener());
-
-            return ReplaceInfoCode.SuccessNewValueDidExist;
-        } else {
-            super.add(newValue);
-            // @ts-ignore TYPESCRIPT IS WRONG ABOUT THIS.
-            change.newValueDidExist = false;
-
-            this.#listeners.forEach(listener => listener(change));
-            this.#deepListeners.forEach(listener => listener());
-
-            return ReplaceInfoCode.SuccessNewValueDidNotExist;
-        }
-    }
-    */
 
     /**
      * Clears the set by deleting each value.
@@ -221,21 +154,27 @@ export class BoxSet<T> extends Set<T> implements BoxedParent<Listener<T>> {
         return map;
     }
 
+    // The following code may repeat across files; but there is no other option.
+    readonly #listeners = new Set<Listener<T>>();
+    readonly #deepListeners = new Set<DeepListener>();
+
+    addDeepListener(listener: DeepListener): DeepListener {
+        this.#deepListeners.add(listener);
+        this.forEach(value => addListenerRecursive(value, listener));
+        return listener;
+    }
+
     removeDeepListener(listener: DeepListener) {
         this.#deepListeners.delete(listener);
+        this.forEach(value => removeListenerRecursive(value, listener));
+    }
+
+    addListener(listener: Listener<T>) {
+        this.#listeners.add(listener);
+        return listener;
     }
 
     removeListener(listener: Listener<T>) {
         this.#listeners.delete(listener);
-    }
-
-    addDeepListener(listener: DeepListener): DeepListener {
-        this.#deepListeners.add(listener);
-        return listener;
-    }
-
-    addListener(listener: Listener<T>): Listener<T> {
-        this.#listeners.add(listener);
-        return listener;
     }
 }

@@ -1,4 +1,4 @@
-import {BoxedParent, DeepListener} from "./index";
+import {addListenerRecursive, DeepListener, ListenDeep, removeListenerRecursive} from "./index";
 
 export const enum SwapIndicesInfoCode {
     Success,
@@ -66,10 +66,8 @@ export type Listener<T> = (change: Change<T>) => void;
  * const booleans = new BoxArray([true, false]);
  * ```
  */
-export class BoxArray<T> implements BoxedParent<Listener<T>> {
+export class BoxArray<T> implements ListenDeep<Listener<T>> {
     readonly #array;
-    readonly #listeners = new Set<Listener<T>>();
-    readonly #deepListeners = new Set<DeepListener>();
 
     /**
      * Creates a `BoxArray` from the given `length` and a function, generating the elements.
@@ -90,6 +88,10 @@ export class BoxArray<T> implements BoxedParent<Listener<T>> {
 
     [Symbol.iterator]() {
         return this.#array[Symbol.iterator]();
+    }
+
+    forEach(handler: (value: T, index: number) => void) {
+        this.#array.forEach(handler);
     }
 
     /**
@@ -290,21 +292,27 @@ export class BoxArray<T> implements BoxedParent<Listener<T>> {
         return `[${this.join(",")}]`;
     }
 
+    // The following code may repeat across files.
+    readonly #listeners = new Set<Listener<T>>();
+    readonly #deepListeners = new Set<DeepListener>();
+
     addDeepListener(listener: DeepListener): DeepListener {
         this.#deepListeners.add(listener);
-        return listener;
-    }
-
-    addListener(listener: Listener<T>): Listener<T> {
-        this.#listeners.add(listener);
+        this.forEach(value => addListenerRecursive(value, listener));
         return listener;
     }
 
     removeDeepListener(listener: DeepListener) {
         this.#deepListeners.delete(listener);
+        this.forEach(value => removeListenerRecursive(value, listener));
     }
 
-    removeListener(listener:Listener<T>) {
+    addListener(listener: Listener<T>) {
+        this.#listeners.add(listener);
+        return listener;
+    }
+
+    removeListener(listener: Listener<T>) {
         this.#listeners.delete(listener);
     }
 }

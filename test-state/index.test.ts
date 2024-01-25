@@ -2,8 +2,8 @@ import {expect, test} from "vitest";
 import {
     addListenerRecursive,
     BoxSet,
-    isInstanceOfBoxed,
-    isInstanceOfBoxedParent,
+    isInstanceOfListen,
+    isInstanceOfListenDeep,
     isObject,
     reduce, removeListenerRecursive,
     WritableBox
@@ -23,16 +23,16 @@ test("reduce", () => {
     expect(boxC.value).toBe("13World");
 });
 
-test("isInstanceOfBoxed", () => {
-    expect(isInstanceOfBoxed({})).toBeFalsy();
-    expect(isInstanceOfBoxed(new WritableBox(0))).toBeTruthy();
-    expect(isInstanceOfBoxed(new BoxSet())).toBeTruthy();
+test("isInstanceOfListen", () => {
+    expect(isInstanceOfListen({})).toBeFalsy();
+    expect(isInstanceOfListen(new WritableBox(0))).toBeTruthy();
+    expect(isInstanceOfListen(new BoxSet())).toBeTruthy();
 });
 
-test("isInstanceOfBoxedParent", () => {
-    expect(isInstanceOfBoxedParent({})).toBeFalsy();
-    expect(isInstanceOfBoxedParent(new WritableBox(0))).toBeFalsy();
-    expect(isInstanceOfBoxedParent(new BoxSet())).toBeTruthy();
+test("isInstanceOfListenDeep", () => {
+    expect(isInstanceOfListenDeep({})).toBeFalsy();
+    expect(isInstanceOfListenDeep(new WritableBox(0))).toBeFalsy();
+    expect(isInstanceOfListenDeep(new BoxSet())).toBeTruthy();
 });
 
 test("isObject", () => {
