@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.10.7",
+    "version": "0.10.8",
     "description": "Your next SPA TypeScript framework.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
