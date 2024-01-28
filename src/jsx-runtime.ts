@@ -280,17 +280,15 @@ function flatChildren(target: JSX.Element[], children: any[]) {
 
 function translateKey(key: string): string {
     if(key in keyMap) return keyMap[key]!;
-    if(key.startsWith("on") && key.toLowerCase() in window)
-        return key.toLowerCase();
     return key;
 }
 
 // /**
 //  * Maps the prototypes to sets. If a key is writable it is in the set mapped by the prototype.
 //  */
-// const writableCache = new Map<Object, Set<string>>();
+// const writableCache = new Map<object, Map<string, boolean>>();
 
-function isWritable<T extends Object>(obj: T, key: keyof T) {
+function isWritable(obj: object, key: string) {
     while(true) {
         const desc = Object.getOwnPropertyDescriptor(obj, key);
         if(desc) return desc.writable || !!desc.set;
@@ -340,6 +338,8 @@ export function createElement(
     children.forEach(child => Array.isArray(child)
         ? element.append(...child)
         : element.append(child));
+
+    if(props["ref"]) props.ref(element);
 
     return element;
 }
