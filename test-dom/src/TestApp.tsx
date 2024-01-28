@@ -53,9 +53,9 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/glue</code> integration for <code>Box</code></h1>
 
                 <h2>Updating</h2>
-                <button onClick={() => box.value++}>Increment</button>
+                <button onclick={() => box.value++}>Increment</button>
                 {" and "}
-                <button onClick={() => box.value--}>Decrement</button>
+                <button onclick={() => box.value--}>Decrement</button>
 
                 <h2>Insert As Text</h2>
                 There should be a counter: {box}
@@ -79,13 +79,13 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxArray</code></h1>
 
                 <h2>Adding</h2>
-                <button onClick={() => boxArray.add(Math.round(Math.random() * 10))}>Add random number</button>
+                <button onclick={() => boxArray.add(Math.round(Math.random() * 10))}>Add random number</button>
 
                 <h2>Swapping</h2>
-                <button onClick={() => boxArray.swapIndices(0, -1)}>Swap first and last element</button>
+                <button onclick={() => boxArray.swapIndices(0, -1)}>Swap first and last element</button>
 
                 <h2>Deleting</h2>
-                <button onClick={() => boxArray.deleteAt(0)}>Remove the first element</button>
+                <button onclick={() => boxArray.deleteAt(0)}>Remove the first element</button>
 
                 <h2>Insert As Text</h2>
                 <div>{boxArray}</div>
@@ -99,7 +99,7 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxSet</code></h1>
 
                 <h2>Adding</h2>
-                <button onClick={() => boxSet.add(Math.random())}>Add random number</button>
+                <button onclick={() => boxSet.add(Math.random())}>Add random number</button>
 
                 {/* <h2>Replacing</h2>
                 <button onclick={() => boxSet.replace(boxSet.keys().next().value, 10)}>Replace one key with 10</button> */}
@@ -120,9 +120,6 @@ export default function TestApp() {
 
                 <h2>Adding</h2>
                 <button onclick={() => boxMap.set("three", 3)}>Add three</button>
-
-                {/* <h2>Replacing</h2>
-                <button onclick={() => boxMap.replace("one", "four", 4)}>Replace one with four</button> */}
 
                 <h2>Deleting</h2>
                 <button onclick={() => boxMap.delete("three")}>Delete three</button>

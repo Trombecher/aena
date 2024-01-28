@@ -20,6 +20,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
+        "strictFunctionTypes": true,
         "jsx": "preserve",
         "jsxFactory": "_0",
         "jsxFragmentFactory": "_1",
