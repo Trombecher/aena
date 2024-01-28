@@ -318,6 +318,8 @@ export function createElement(
         : document.createElement(tag);
 
     Object.keys(props).forEach(key => {
+        if(key === "ref") return;
+
         const value = props![key];
         const translatedKey = translateKey(key);
 
