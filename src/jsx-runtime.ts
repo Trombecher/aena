@@ -9,12 +9,14 @@ import {
 } from "./glue";
 import {svgElements} from "./constants";
 
-type IntrinsicToElement<O extends Element> = {
+type Alternatives<T> = T | Box<T>;
+
+type Attributes<O extends Element> = {
     ref?: (element: O) => void
 } & (O extends SVGSVGElement ? {xmlns?: string} : {}) & {
-    [K in keyof O]?: (O extends SVGElement ? string : O[K])
+    [K in keyof O]?: Alternatives<O extends SVGElement ? string : O[K]>
 } & (O extends SVGElement ? {
-    [K in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[K]
+    [K in keyof CSSStyleDeclaration]?: Alternatives<CSSStyleDeclaration[K]>
 } : {});
 
 type WebElement = Element;
@@ -248,11 +250,11 @@ export namespace JSX {
     };
 
     export type IntrinsicElements = {
-        [tagName: string]: IntrinsicToElement<WebElement>;
+        [tagName: string]: Attributes<WebElement>;
     } & {
-        [Key in keyof HTMLElements]: IntrinsicToElement<HTMLElements[Key]>
+        [Key in keyof HTMLElements]: Attributes<HTMLElements[Key]>
     } & {
-        [Key in keyof SVGElements]: IntrinsicToElement<SVGElements[Key]>
+        [Key in keyof SVGElements]: Attributes<SVGElements[Key]>
     }
 }
 
