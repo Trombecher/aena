@@ -7,7 +7,7 @@ import {
     isObject,
     reduce, removeListenerRecursive,
     WritableBox
-} from "../src/state";
+} from "../src";
 
 test("reduce", () => {
     const boxA = new WritableBox(10);

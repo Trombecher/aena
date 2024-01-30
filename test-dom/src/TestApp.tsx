@@ -1,5 +1,5 @@
-import {JSX} from "../../src/jsx-runtime";
-import {BoxArray, BoxMap, BoxSet, WritableBox} from "../../src/state";
+import {JSX} from "../../src";
+import {BoxArray, BoxMap, BoxSet, WritableBox} from "../../src";
 import {
     insertBoxArray,
     insertBox,
@@ -100,9 +100,6 @@ export default function TestApp() {
 
                 <h2>Adding</h2>
                 <button onclick={() => boxSet.add(Math.random())}>Add random number</button>
-
-                {/* <h2>Replacing</h2>
-                <button onclick={() => boxSet.replace(boxSet.keys().next().value, 10)}>Replace one key with 10</button> */}
 
                 <h2>Deleting</h2>
                 <button onclick={() => boxSet.delete(boxSet[Symbol.iterator]().next().value)}>Delete one key</button>

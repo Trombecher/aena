@@ -34,6 +34,10 @@ pnpm i aena
 There are no throw expressions in `aena` because I believe that errors should be handled via returns types.
 Also `try-catch` blocks have the worst syntax.
 
+## Types
+
+Huge thanks to [SolidJS](https://github.com/solidjs/solid/tree/main/packages/solid) for the types because extracting the types from specifications is very tedious.
+
 ## State Management
 
 All state is located in `aena/state`. It is decoupled from any dependencies and incorporated into the DOM using the `aena/glue` module, so it is fine to use on its own.

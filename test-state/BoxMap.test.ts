@@ -1,6 +1,6 @@
 import {expect, test} from "vitest";
-import {BoxMap, WritableBox} from "../src/state";
-import {Action} from "../src/state/map";
+import {BoxMap, WritableBox} from "../src";
+import {Action} from "../src/map";
 
 function createNumberBoxMap() {
     const boxMap = new BoxMap<string, number>();

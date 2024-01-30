@@ -1,5 +1,5 @@
 import {expect, test} from "vitest";
-import {WritableBox} from "../src/state";
+import {WritableBox} from "../src";
 
 test("value", () => {
     const box = new WritableBox(10);

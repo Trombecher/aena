@@ -1,8 +1,8 @@
 import {JSX} from "./jsx-runtime";
-import {Box, BoxArray, BoxMap, BoxSet} from "./state";
-import {Action as BoxArrayAction} from "./state/array";
-import {Action as BoxSetAction} from "./state/set";
-import {Action as BoxMapAction} from "./state/map";
+import {Box, BoxArray, BoxMap, BoxSet} from "./index";
+import {Action as BoxArrayAction} from "./array";
+import {Action as BoxSetAction} from "./set";
+import {Action as BoxMapAction} from "./map";
 
 export function insertBoxAsText(box: Box<any>): Node {
     const textNode = document.createTextNode(box.value + "");

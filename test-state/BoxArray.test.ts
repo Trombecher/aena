@@ -1,6 +1,6 @@
 import {expect, test} from "vitest";
-import {BoxArray} from "../src/state";
-import {Action, IndexInfoCode, SetInfoCode, SwapIndicesInfoCode, SwapInfoCode} from "../src/state/array";
+import {BoxArray} from "../src";
+import {Action, IndexInfoCode, SetInfoCode, SwapIndicesInfoCode, SwapInfoCode} from "../src/array";
 
 function create012BoxArray(): BoxArray<number> {
     const boxArray = new BoxArray<number>();

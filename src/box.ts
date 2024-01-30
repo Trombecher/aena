@@ -38,7 +38,6 @@ export class Box<T> implements Listen<OnChangeListener<T>> {
         return box.readonly();
     }
 
-    // The following code may repeat across files.
     protected readonly _listeners = new Set<OnChangeListener<T>>();
 
     addListener(listener: OnChangeListener<T>): OnChangeListener<T> {

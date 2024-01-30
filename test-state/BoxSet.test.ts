@@ -1,6 +1,6 @@
 import {expect, test} from "vitest";
-import {BoxSet, WritableBox} from "../src/state";
-import {Action} from "../src/state/set";
+import {BoxSet, WritableBox} from "../src";
+import {Action} from "../src/set";
 
 function create012BoxSet() {
     const boxSet = new BoxSet<number>();
