@@ -1,8 +1,10 @@
-import {JSX} from "./jsx-runtime";
+import {JSX, renderToNode, traverseAndRender} from "./jsx-runtime";
 import {Box, BoxArray, BoxMap, BoxSet} from "./index";
 import {Action as BoxArrayAction} from "./array";
 import {Action as BoxSetAction} from "./set";
 import {Action as BoxMapAction} from "./map";
+
+const createAnchor = () => document.createTextNode("");
 
 export function insertBoxAsText(box: Box<any>): Node {
     const textNode = document.createTextNode(box.value + "");
@@ -10,12 +12,23 @@ export function insertBoxAsText(box: Box<any>): Node {
     return textNode;
 }
 
-export function insertBox<T>(box: Box<T>, transform: (value: T) => string): Node {
+export function insertBoxToString<T>(box: Box<T>, transform: (value: T) => string): Node {
     const textNode = document.createTextNode(transform(box.value));
     box.addListener(value => textNode.textContent = transform(value));
     return textNode;
 }
 
+export function insertBox<T>(box: Box<T>, transform: (value: T) => JSX.Element) {
+    const start = createAnchor();
+    const end = createAnchor();
+    box.addListener(element => {
+        while(start.nextSibling !== end) start.nextSibling!.remove();
+        traverseAndRender(transform(element), node => end.before(node));
+    });
+    return [start, transform(box.value), end];
+}
+
+/*
 export function insertBoxNode(box: Box<Node>) {
     let previousNode = box.value;
     box.addListener(node => {
@@ -41,45 +54,44 @@ export function insertBoxNodes(box: Box<Iterable<Node>>) {
     });
     return [anchor, ...box.value];
 }
+ */
 
-function toNode(jsx: JSX.Element): Node {
-    if(jsx instanceof Array) return jsx[0]!;
-    return jsx;
-}
+export function insertBoxArray<T>(array: BoxArray<T>, transform: (value: T) => JSX.Element): JSX.Element[] {
+    const start = createAnchor();
+    const nodes = array.map(value => renderToNode(transform(value)));
+    nodes.unshift(start);
 
-export function insertBoxArray<T>(boxArray: BoxArray<T>, mapper: (value: T) => JSX.Element): Node[] {
-    const anchor = document.createTextNode("");
-    const nodes = boxArray.map(value => toNode(mapper(value)));
-    nodes.splice(0, 0, anchor);
-
-    boxArray.addListener(change => {
+    array.addListener(change => {
         switch(change.action) {
             case BoxArrayAction.Insert: {
-                let target: ChildNode = anchor;
-                for(let i = 0; i < change.index; ++i) target = target.nextSibling!;
-                target.after(toNode(mapper(change.value)));
+                const node = renderToNode(transform(change.value));
+                (nodes[change.index] as ChildNode).after(node);
+                nodes.splice(change.index + 1, 0, node);
                 break;
             }
             case BoxArrayAction.Swap: {
-                let a: ChildNode = anchor.nextSibling!;
-                for(let i = 0; i < change.indexA; ++i) a = a.nextSibling!;
+                const a = nodes[change.indexA + 1]!;
+                const b = nodes[change.indexB + 1]!;
 
-                let b: ChildNode = anchor.nextSibling!;
-                for(let i = 0; i < change.indexB; ++i) b = b.nextSibling!;
+                nodes.splice(change.indexA + 1, 1, b);
+                nodes.splice(change.indexB + 1, 1, a);
 
-                const nodeBeforeA = a.previousSibling!;
-                b.after(a);
-                nodeBeforeA.after(b);
+                // DOM Swap:
+
+                // There is always a `previousSilbling` because of the `start` anchor.
+                const prevA = a.previousSibling!;
+                (b as ChildNode).replaceWith(a);
+                prevA.after(b);
                 break;
             }
             case BoxArrayAction.Delete: {
-                let target: ChildNode = anchor;
-                for(let i = 0; i < change.index + 1; ++i) target = target.nextSibling!;
-                target.remove();
+                (nodes[change.index + 1] as ChildNode).remove();
+                nodes.splice(change.index + 1, 1);
                 break;
             }
         }
     });
+
     return nodes;
 }
 
@@ -89,25 +101,25 @@ export function insertBoxArrayAsText(boxArray: BoxArray<any>) {
     return textNode;
 }
 
-export function insertBoxSet<T>(set: BoxSet<T>, mapper: (value: T) => JSX.Element) {
-    const anchor = document.createTextNode("");
-
-    // Map each value of the set to a node (through `mapper`).
+export function insertBoxSet<T>(set: BoxSet<T>, transform: (value: T) => JSX.Element) {
+    const end = createAnchor();
+    // Preallocate for nodes of rendered transformed values of set and end anchor.
+    const initialNodes = new Array<Node>(set.size + 1);
     const nodeMap = new Map<T, Node>();
-    set.forEach(value => nodeMap.set(value, toNode(mapper(value))));
+    let i = 0;
+
+    set.forEach(value => {
+        const node = renderToNode(transform(value));
+        nodeMap.set(value, node);
+        initialNodes[i++] = node;
+    });
 
     set.addListener(change => {
         switch(change.action) {
             case BoxSetAction.Add: {
-                let lastChild: ChildNode = anchor;
-                let setSize = set.size - 1;
-                while(setSize--)
-                    lastChild = lastChild.nextSibling!;
-
-                const node = toNode(mapper(change.value));
+                const node = renderToNode(transform(change.value));
                 nodeMap.set(change.value, node);
-
-                lastChild.after(node);
+                end.before(node);
                 break;
             }
             case BoxSetAction.Delete: {
@@ -118,18 +130,8 @@ export function insertBoxSet<T>(set: BoxSet<T>, mapper: (value: T) => JSX.Elemen
         }
     });
 
-    // const oldNode = nodeMap.get(oldValue) as ChildNode;
-    // nodeMap.delete(oldValue);
-    // let newNode;
-    // if(nodeMap.has(newValue)) {
-    //     newNode = nodeMap.get(newValue)!;
-    // } else {
-    //     newNode = toNodeUnsupported(mapper(newValue));
-    //     nodeMap.set(newValue, newNode);
-    // }
-    // oldNode.replaceWith(newNode);
-
-    return [anchor, ...nodeMap.values()];
+    initialNodes[set.size] = end;
+    return initialNodes;
 }
 
 export function insertBoxSetAsText(boxSet: BoxSet<any>) {
@@ -138,47 +140,36 @@ export function insertBoxSetAsText(boxSet: BoxSet<any>) {
     return textNode;
 }
 
-export function insertBoxMap<K, V>(map: BoxMap<K, V>, mapper: (key: K, value: V) => JSX.Element) {
-    const anchor = document.createTextNode("");
+export function insertBoxMap<K, V>(map: BoxMap<K, V>, transform: (key: K, value: V) => JSX.Element): JSX.Element[] {
+    const end = createAnchor();
+    const initialNodes = new Array<Node>(map.size + 1);
     const nodeMap = new Map<K, Node>();
-    map.forEach((value, key) =>
-        nodeMap.set(key, toNode(mapper(key, value))));
+    let i = 0;
 
-    let previousSize = map.size;
+    map.forEach((value, key) => {
+        const node = renderToNode(transform(key, value));
+        nodeMap.set(key, node);
+        initialNodes[i++] = node;
+    });
 
     map.addListener(change => {
         switch(change.action) {
             case BoxMapAction.Set: {
-                let prev: ChildNode = anchor;
-                while(previousSize--)
-                    prev = prev.nextSibling!;
-
-                const node = toNode(mapper(change.key, change.value));
+                const node = renderToNode(transform(change.key, change.value));
                 nodeMap.set(change.key, node);
-
-                prev.after(node);
-                previousSize = map.size;
+                end.after(node);
                 break;
             }
             case BoxMapAction.Delete: {
-                const node = nodeMap.get(change.key) as ChildNode;
+                (nodeMap.get(change.key) as ChildNode).remove();
                 nodeMap.delete(change.key);
-                node.remove();
-                previousSize = map.size;
                 break;
             }
         }
     });
 
-    // Old replace code:
-
-    // const oldNode = nodeMap.get(oldKey)!;
-    // const newNode = toNodeUnsupported(mapper(newKey, newValue));
-    // oldNode.parentNode!.replaceChild(newNode, oldNode);
-    // nodeMap.delete(oldKey);
-    // nodeMap.set(newKey, newNode);
-
-    return [anchor, ...nodeMap.values()];
+    initialNodes[map.size] = end;
+    return initialNodes;
 }
 
 export function insertBoxMapAsText(boxMap: BoxMap<any, any>) {

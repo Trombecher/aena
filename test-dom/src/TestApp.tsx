@@ -1,13 +1,19 @@
-import {JSX} from "../../src";
-import {BoxArray, BoxMap, BoxSet, WritableBox} from "../../src";
+import {
+    BoxArray,
+    BoxMap,
+    BoxSet,
+    JSX,
+    WritableBox
+} from "../../src";
 import {
     insertBoxArray,
     insertBox,
-    insertBoxSetAsText,
     insertBoxSet,
     insertBoxMap,
-    insertBoxNode,
-    insertBoxNodes
+    insertBoxAsText,
+    insertBoxArrayAsText,
+    insertBoxSetAsText,
+    insertBoxMapAsText, insertBoxToString,
 } from "../../src/glue";
 
 export default function TestApp() {
@@ -58,22 +64,21 @@ export default function TestApp() {
                 <button onclick={() => box.value--}>Decrement</button>
 
                 <h2>Insert As Text</h2>
-                There should be a counter: {box}
+                <div>There should be two counters: {insertBoxAsText(box)}</div>
 
-                <h2>Insert With Transform</h2>
-                <p>This is the performant alternative to <code>Box.derive</code></p>
-                <div>{box} * 100 = {insertBox(box, value => `${value * 100}`)}</div>
+                <h2>Insert As Custom Text</h2>
+                <div>{insertBoxAsText(box)} * {insertBoxAsText(box)} = {insertBoxToString(box, value => String(value * value))}</div>
 
-                <h2>Insert With Deriving</h2>
-                <div>{box} * {box} = {box.derive(count => count * count)}</div>
+                <h2>Insert With Transform (AIO)</h2>
+                <div>{insertBoxAsText(box)} * 100 = {insertBox(box, value => `${value * 100}`)}</div>
 
-                <h2>Insert Node</h2>
-                <div>{insertBoxNode(box.derive(value => document.createTextNode(value + "") as Node))}</div>
+                <h2>Insert With Transform To Node(s)</h2>
+                <div>{insertBox(box, value => (new Array(Math.abs(value))).fill(0).map((_, i) => (
+                    <div>{i}</div>
+                )))}</div>
 
-                <h2>Insert Nodes</h2>
-                <div>{insertBoxNodes(box.derive<Iterable<Node>>(value => (new Array(Math.abs(value))).fill(0).map((_, i) => (
-                    <div>{i}</div> as Node
-                ))))}</div>
+                <h2>Insert With Transform To Undefined (Only Even)</h2>
+                <div>{insertBox(box, value => value % 2 === 0 ? <div>{value}</div> : undefined)}</div>
             </section>
             <section>
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxArray</code></h1>
@@ -88,7 +93,7 @@ export default function TestApp() {
                 <button onclick={() => boxArray.deleteAt(0)}>Remove the first element</button>
 
                 <h2>Insert As Text</h2>
-                <div>{boxArray}</div>
+                <div>{insertBoxArrayAsText(boxArray)}</div>
 
                 <h2>Insert With Transform</h2>
                 <div>{insertBoxArray(boxArray, value => (
@@ -122,7 +127,7 @@ export default function TestApp() {
                 <button onclick={() => boxMap.delete("three")}>Delete three</button>
 
                 <h2>Insert As Text</h2>
-                <div>{boxMap}</div>
+                <div>{insertBoxMapAsText(boxMap)}</div>
 
                 <h2>Insert</h2>
                 <div>{insertBoxMap(boxMap, (key, value) => (

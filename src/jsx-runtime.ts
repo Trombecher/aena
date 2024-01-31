@@ -1,12 +1,4 @@
-import {Box, BoxArray, BoxMap, BoxSet} from "./index";
-import {
-    insertBoxArrayAsText,
-    insertBoxAsText,
-    insertBoxMapAsText,
-    insertBoxNode,
-    insertBoxNodes,
-    insertBoxSetAsText
-} from "./glue";
+import {Box} from "./box";
 import {svgElements} from "./constants";
 import {PropertiesHyphen} from "csstype";
 
@@ -16,7 +8,10 @@ type DOMElement = Element;
  * Adapted from [SolidJS](https://github.com/solidjs/solid/tree/main/packages/solid).
  */
 export namespace JSX {
-    export type Element = Node | Node[] | number | boolean | null | undefined | string;
+    export type Element = Node
+        | Element[]
+        | ElementPrimitive;
+    export type ElementPrimitive = number | object | string | boolean | symbol | null | undefined;
 
     type BoxedOr<T> = Box<T> | T;
 
@@ -1245,7 +1240,8 @@ export namespace JSX {
                 | "visibility"
                 | "color-interpolation"
                 | "color-rendering"
-            > {}
+            > {
+    }
 
     interface LightSourceElementSVGAttributes<T> extends CoreSVGAttributes<T> {
     }
@@ -2104,22 +2100,50 @@ const keyMap: {[key: string]: string} = {
     "class": "className"
 };
 
-function flatChildren(target: JSX.Element[], children: any[]) {
-    for(let i = 0; i < children.length; ++i) {
-        const child = children[i];
-        if(child instanceof Node) target.push(child);
-        else if(child instanceof Array) flatChildren(target, child);
-        else if(child instanceof Box) {
-            if(child.value instanceof Node)
-                target.push(insertBoxNode(child));
-            else if(child.value instanceof Array)
-                target.push(insertBoxNodes(child));
-            else target.push(insertBoxAsText(child));
-        } else if(child instanceof BoxArray) target.push(insertBoxArrayAsText(child));
-        else if(child instanceof BoxSet) target.push(insertBoxSetAsText(child));
-        else if(child instanceof BoxMap) target.push(insertBoxMapAsText(child));
-        else target.push(document.createTextNode(child));
-    }
+/**
+ * Iterates over all `JSX.ElementPrimitive`s while rendering.
+ *
+ * **Does not auto-insert `Box`, `BoxArray`, `BoxMap` nor `BoxSet`.**
+ * This is so that the `asText` implementations can be bundled when needed.
+ */
+export function traverseAndRender(
+    element: JSX.Element,
+    callback: (node: Node) => void
+) {
+    if(element instanceof Node) callback(element);
+    else if(element instanceof Array) element.forEach(element => traverseAndRender(element, callback));
+    else if(element !== null && element !== undefined && element !== false) callback(document.createTextNode(String(element)));
+}
+
+/**
+ * Renders the `element` to be a node.
+ * If `element` is an array, a transparent shell is wrapping it.
+ * If `element` does not represent a node, it renders to an empty `<div/>`.
+ */
+export function renderToNode(element: JSX.Element): Node {
+    let firstNode: Node | undefined;
+    let shell: HTMLDivElement | undefined;
+    traverseAndRender(element, node => {
+        if(!firstNode) {
+            firstNode = node;
+            return;
+        }
+
+        if(!shell) {
+            shell = document.createElement("div");
+            shell.style.display = "contents";
+        }
+
+        shell.append(node);
+    });
+    return shell || firstNode || document.createElement("div");
+}
+
+/**
+ * Appends the `elements` to `target`.
+ */
+export function mount(target: Element, element: JSX.Element) {
+    traverseAndRender(element, node => target.append(node));
 }
 
 function translateKey(key: string): string {
@@ -2145,11 +2169,8 @@ function isWritable(obj: object, key: string) {
 export function createElement(
     tag: string | Function,
     props: {[index: string]: any} | null,
-    ...givenChildren: any[]
-): JSX.Element {
-    const children: JSX.Element[] = [];
-    flatChildren(children, givenChildren);
-
+    ...children: JSX.Element[]
+): Node {
     props = props || {};
 
     if(typeof tag === "function") {
@@ -2181,7 +2202,7 @@ export function createElement(
         }
     });
 
-    children.forEach(child => mount(element, child));
+    mount(element, children);
 
     if("ref" in props) props.ref(element);
 
@@ -2191,18 +2212,7 @@ export function createElement(
 export function Fragment({
     children
 }: {
-    children: any[]
+    children: JSX.Element[]
 }): JSX.Element[] {
-    const flattenChildren = new Array<JSX.Element>(children.length);
-    flatChildren(flattenChildren, children);
     return children;
-}
-
-/**
- * Appends the JSX element to the target.
- */
-export function mount(target: Element, element: JSX.Element) {
-    if(Array.isArray(element)) target.append(...element);
-    else if(typeof element === "string" || element instanceof Node) target.append(element);
-    else if(typeof element === "number" || element === true) target.append(String(element));
 }
