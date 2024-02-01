@@ -11,6 +11,17 @@ export {
 } from "./jsx-runtime";
 
 import {Box, WritableBox} from "./box";
+import {BoxMap} from "./map";
+import {BoxSet} from "./set";
+import {BoxArray} from "./array";
+
+export enum BoxIdentifier {
+    WritableBox = 0,
+    Box = 1,
+    BoxSet = 2,
+    BoxMap = 3,
+    BoxArray = 4
+}
 
 /**
  * Infers the type `T` of `Box<T>`.
@@ -27,6 +38,50 @@ export type UnboxArray<A extends Box<any>[]> = {
 export type IntoBoxArray<T extends any[]> = {
     [K in keyof T]: Box<T[K]>;
 };
+
+/**
+ * Assumes that `obj` does not have a `""` property.
+ * @param obj
+ */
+export function serialize<O extends Omit<object, "">>(obj: O) {
+    return JSON.stringify(obj, (_, value) => {
+        if(value instanceof WritableBox) return {"": BoxIdentifier.WritableBox, v: value.value};
+        if(value instanceof Box) return {"": BoxIdentifier.Box, v: value.value};
+        if(value instanceof BoxSet) return {"": BoxIdentifier.BoxSet, v: value.map(x => x)};
+        if(value instanceof BoxMap) return {"": BoxIdentifier.BoxMap, v: Array.from(value.entries())}
+        if(value instanceof BoxArray) return {"": BoxIdentifier.BoxArray, v: value.toArray()};
+        return value;
+    });
+}
+
+export function deserialize<O extends Omit<object, "">>(s: string): O {
+    return JSON.parse(s, (_, value: {
+        "": BoxIdentifier,
+        v: any
+    } | {
+        [_: string | number | symbol]: any
+    }) => {
+        if(!isObject(value)) return value;
+        switch(value[""]) {
+            case BoxIdentifier.WritableBox:
+                return new WritableBox(value.v);
+            case BoxIdentifier.Box:
+                return new Box(value.v);
+            case BoxIdentifier.BoxSet:
+                const set = new BoxSet();
+                (value.v as unknown[]).forEach(v => set.add(v));
+                return set;
+            case BoxIdentifier.BoxMap:
+                const map = new BoxMap();
+                (value.v as [unknown, unknown][]).forEach(([k, v]) => map.set(k, v));
+                return map;
+            case BoxIdentifier.BoxArray:
+                return new BoxArray(value.v);
+            default:
+                return value;
+        }
+    }) as O;
+}
 
 /**
  * Derives a single `Box` from multiple `Box`es (dependencies).

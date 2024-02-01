@@ -1,11 +1,11 @@
 import {expect, test} from "vitest";
 import {
-    addListenerRecursive,
-    BoxSet,
+    addListenerRecursive, Box, BoxArray, BoxMap,
+    BoxSet, deserialize,
     isInstanceOfListen,
     isInstanceOfListenDeep,
     isObject,
-    reduce, removeListenerRecursive,
+    reduce, removeListenerRecursive, serialize,
     WritableBox
 } from "../src";
 
@@ -77,3 +77,41 @@ test("removeListenerRecursive", () => {
 
     expect(callCount).toBe(0);
 })
+
+const createState = () => ({
+    number: 10,
+    boolean: true,
+    undefined: undefined,
+    null: null,
+    string: "yo",
+    writableBox: new WritableBox("Hello"),
+    box: new Box(0),
+    boxSet: new BoxSet().add(0).add(1).add(20),
+    boxMap: new BoxMap<string, string>().set("Hello", "World"),
+    boxArray: new BoxArray([10])
+});
+
+test("serialize / deserialize", () => {
+    const state = createState();
+    const state2 = deserialize(serialize(state)) as typeof state;
+
+    expect(state.undefined).toBe(state2.undefined);
+    expect(state.number).toBe(state2.number);
+    expect(state.boolean).toBe(state2.boolean);
+    expect(state.null).toBe(state2.null);
+    expect(state.string).toBe(state2.string);
+
+    expect(state2.box).toBeInstanceOf(Box);
+    expect(state.box.value).toBe(state2.box.value);
+
+    expect(state2.boxSet).toBeInstanceOf(BoxSet);
+    expect(state2.boxSet.map(x => state.boxSet.has(x)).every(x => x)).toBeTruthy();
+
+    expect(state2.boxMap).toBeInstanceOf(BoxMap);
+    expect(Array
+        .from(state2.boxMap.entries())
+        .every(([key, value]) => state.boxMap.get(key) === value)).toBeTruthy();
+
+    expect(state2.boxArray).toBeInstanceOf(BoxArray);
+    expect(state2.boxArray.map(x => x).every(x => state.boxArray.indexOf(x) !== -1)).toBeTruthy();
+});

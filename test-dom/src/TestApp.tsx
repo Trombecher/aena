@@ -1,8 +1,9 @@
 import {
+    addListenerRecursive,
     BoxArray,
     BoxMap,
-    BoxSet,
-    JSX,
+    BoxSet, deserialize,
+    JSX, serialize,
     WritableBox
 } from "../../src";
 import {
@@ -16,23 +17,52 @@ import {
     insertBoxMapAsText, insertBoxToString,
 } from "../../src/glue";
 
+type State = {
+    box: WritableBox<number>,
+    array: BoxArray<number>,
+    set: BoxSet<number>,
+    map: BoxMap<string, number>
+}
+
 export default function TestApp() {
-    const box = new WritableBox(0);
-    const boxArray = new BoxArray<number>();
-    boxArray.add(0);
-    boxArray.add(1);
-    boxArray.add(2);
-
-    const boxSet = new BoxSet<number>();
-    boxSet.add(0);
-    boxSet.add(1);
-    boxSet.add(2);
-
-    const boxMap = new BoxMap<string, number>();
-    boxMap.set("zero", 0);
-    boxMap.set("one", 1);
-    boxMap.set("two", 2);
-
+    const url = new URL(location.href);
+    
+    let state: State;
+    if(url.searchParams.has("state")) {
+        state = deserialize<State>(decodeURIComponent(url.searchParams.get("state")!));
+    } else {
+        state = {
+            box: new WritableBox(0),
+            array: new BoxArray(),
+            set: new BoxSet(),
+            map: new BoxMap()
+        };
+        
+        state.array.add(0);
+        state.array.add(1);
+        state.array.add(2);
+        
+        state.set.add(0);
+        state.set.add(1);
+        state.set.add(2);
+        
+        state.map.set("zero", 0);
+        state.map.set("one", 1);
+        state.map.set("two", 2);
+    }
+    
+    addListenerRecursive(state, () => {
+        url.searchParams.set("state", encodeURIComponent(serialize(state)));
+        history.replaceState(null, "", url.toString());
+    });
+    
+    const {
+        box,
+        map,
+        set,
+        array
+    } = state;
+    
     return (
         <>
             <section>
@@ -84,19 +114,19 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxArray</code></h1>
 
                 <h2>Adding</h2>
-                <button onclick={() => boxArray.add(Math.round(Math.random() * 10))}>Add random number</button>
+                <button onclick={() => array.add(Math.round(Math.random() * 10))}>Add random number</button>
 
                 <h2>Swapping</h2>
-                <button onclick={() => boxArray.swapIndices(0, -1)}>Swap first and last element</button>
+                <button onclick={() => array.swapIndices(0, -1)}>Swap first and last element</button>
 
                 <h2>Deleting</h2>
-                <button onclick={() => boxArray.deleteAt(0)}>Remove the first element</button>
+                <button onclick={() => array.deleteAt(0)}>Remove the first element</button>
 
                 <h2>Insert As Text</h2>
-                <div>{insertBoxArrayAsText(boxArray)}</div>
+                <div>{insertBoxArrayAsText(array)}</div>
 
                 <h2>Insert With Transform</h2>
-                <div>{insertBoxArray(boxArray, value => (
+                <div>{insertBoxArray(array, value => (
                     <span>{value} * 100 = {value * 100}, </span>
                 ))}</div>
             </section>
@@ -104,16 +134,16 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxSet</code></h1>
 
                 <h2>Adding</h2>
-                <button onclick={() => boxSet.add(Math.random())}>Add random number</button>
+                <button onclick={() => set.add(Math.random())}>Add random number</button>
 
                 <h2>Deleting</h2>
-                <button onclick={() => boxSet.delete(boxSet[Symbol.iterator]().next().value)}>Delete one key</button>
+                <button onclick={() => set.delete(set[Symbol.iterator]().next().value)}>Delete one key</button>
 
                 <h2>Insert As Text</h2>
-                <div>{insertBoxSetAsText(boxSet)}</div>
+                <div>{insertBoxSetAsText(set)}</div>
 
                 <h2>Insert With Transform</h2>
-                <div>{insertBoxSet(boxSet, n => (
+                <div>{insertBoxSet(set, n => (
                     <div>{n} * {n} = {n * n}</div>
                 ))}</div>
             </section>
@@ -121,16 +151,16 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxMap</code></h1>
 
                 <h2>Adding</h2>
-                <button onclick={() => boxMap.set("three", 3)}>Add three</button>
+                <button onclick={() => map.set("three", 3)}>Add three</button>
 
                 <h2>Deleting</h2>
-                <button onclick={() => boxMap.delete("three")}>Delete three</button>
+                <button onclick={() => map.delete("three")}>Delete three</button>
 
                 <h2>Insert As Text</h2>
-                <div>{insertBoxMapAsText(boxMap)}</div>
+                <div>{insertBoxMapAsText(map)}</div>
 
                 <h2>Insert</h2>
-                <div>{insertBoxMap(boxMap, (key, value) => (
+                <div>{insertBoxMap(map, (key, value) => (
                     <div>{key}: {value}</div>
                 ))}</div>
             </section>

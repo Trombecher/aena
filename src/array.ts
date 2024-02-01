@@ -292,6 +292,10 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
         return `[${this.join(",")}]`;
     }
 
+    toArray(): readonly T[] {
+        return this.#array;
+    }
+
     // The following code may repeat across files.
     readonly #listeners = new Set<Listener<T>>();
     readonly #deepListeners = new Set<DeepListener>();
