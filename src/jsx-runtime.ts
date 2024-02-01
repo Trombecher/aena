@@ -1,6 +1,5 @@
 import {Box} from "./box";
 import {svgElements} from "./constants";
-import {PropertiesHyphen} from "csstype";
 
 type DOMElement = Element;
 
@@ -237,11 +236,6 @@ export namespace JSX {
         onvolumechange?: EventHandlerUnion<T, Event>;
         onwaiting?: EventHandlerUnion<T, Event>;
         onwheel?: EventHandlerUnion<T, WheelEvent>;
-    }
-
-    interface CSSProperties extends PropertiesHyphen {
-        // Override
-        [key: `-${string}`]: string | number | undefined;
     }
 
     type HTMLAutocapitalize = "off" | "none" | "on" | "sentences" | "words" | "characters";
@@ -586,317 +580,317 @@ export namespace JSX {
     }
 
     interface BaseHTMLAttributes<T> extends HTMLAttributes<T> {
-        href?: string;
-        target?: string;
+        href?: BoxedOr<string>;
+        target?: BoxedOr<string>;
     }
 
     interface BlockquoteHTMLAttributes<T> extends HTMLAttributes<T> {
-        cite?: string;
+        cite?: BoxedOr<string>;
     }
 
     interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
-        autofocus?: boolean;
-        disabled?: boolean;
-        form?: string;
-        formaction?: string | SerializableAttributeValue;
-        formenctype?: HTMLFormEncType;
-        formmethod?: HTMLFormMethod;
-        formnovalidate?: boolean;
-        formtarget?: string;
-        popovertarget?: string;
-        popovertargetaction?: "hide" | "show" | "toggle";
-        name?: string;
-        type?: "submit" | "reset" | "button";
-        value?: string;
+        autofocus?: BoxedOr<boolean>;
+        disabled?: BoxedOr<boolean>;
+        form?: BoxedOr<string>;
+        formaction?: BoxedOr<string | SerializableAttributeValue>;
+        formenctype?: BoxedOr<HTMLFormEncType>;
+        formmethod?: BoxedOr<HTMLFormMethod>;
+        formnovalidate?: BoxedOr<boolean>;
+        formtarget?: BoxedOr<string>;
+        popovertarget?: BoxedOr<string>;
+        popovertargetaction?: BoxedOr<"hide" | "show" | "toggle">;
+        name?: BoxedOr<string>;
+        type?: BoxedOr<"submit" | "reset" | "button">;
+        value?: BoxedOr<string>;
     }
 
     interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
-        width?: number | string;
-        height?: number | string;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
     }
 
     interface ColHTMLAttributes<T> extends HTMLAttributes<T> {
-        span?: number | string;
-        width?: number | string;
+        span?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
     }
 
     interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
-        span?: number | string;
+        span?: BoxedOr<number | string>;
     }
 
     interface DataHTMLAttributes<T> extends HTMLAttributes<T> {
-        value?: string | string[] | number;
+        value?: BoxedOr<string | string[] | number>;
     }
 
     interface DetailsHtmlAttributes<T> extends HTMLAttributes<T> {
-        open?: boolean;
-        ontoggle?: EventHandlerUnion<T, Event>;
+        open?: BoxedOr<boolean>;
+        ontoggle?: BoxedOr<EventHandlerUnion<T, Event>>;
     }
 
     interface DialogHtmlAttributes<T> extends HTMLAttributes<T> {
-        open?: boolean;
-        onclose?: EventHandlerUnion<T, Event>;
-        oncancel?: EventHandlerUnion<T, Event>;
+        open?: BoxedOr<boolean>;
+        onclose?: BoxedOr<EventHandlerUnion<T, Event>>;
+        oncancel?: BoxedOr<EventHandlerUnion<T, Event>>;
     }
 
     interface EmbedHTMLAttributes<T> extends HTMLAttributes<T> {
-        height?: number | string;
-        src?: string;
-        type?: string;
-        width?: number | string;
+        height?: BoxedOr<number | string>;
+        src?: BoxedOr<string>;
+        type?: BoxedOr<string>;
+        width?: BoxedOr<number | string>;
     }
 
     interface FieldsetHTMLAttributes<T> extends HTMLAttributes<T> {
-        disabled?: boolean;
-        form?: string;
-        name?: string;
+        disabled?: BoxedOr<boolean>;
+        form?: BoxedOr<string>;
+        name?: BoxedOr<string>;
     }
 
     interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
-        "accept-charset"?: string;
-        action?: string | SerializableAttributeValue;
-        autocomplete?: string;
-        encoding?: HTMLFormEncType;
-        enctype?: HTMLFormEncType;
-        method?: HTMLFormMethod;
-        name?: string;
-        novalidate?: boolean;
-        target?: string;
+        "accept-charset"?: BoxedOr<string>;
+        action?: BoxedOr<string | SerializableAttributeValue>;
+        autocomplete?: BoxedOr<string>;
+        encoding?: BoxedOr<HTMLFormEncType>;
+        enctype?: BoxedOr<HTMLFormEncType>;
+        method?: BoxedOr<HTMLFormMethod>;
+        name?: BoxedOr<string>;
+        novalidate?: BoxedOr<boolean>;
+        target?: BoxedOr<string>;
     }
 
     interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
-        allow?: string;
-        allowfullscreen?: boolean;
-        height?: number | string;
-        loading?: "eager" | "lazy";
-        name?: string;
-        referrerpolicy?: HTMLReferrerPolicy;
-        sandbox?: HTMLIframeSandbox | string;
-        src?: string;
-        srcdoc?: string;
-        width?: number | string;
+        allow?: BoxedOr<string>;
+        allowfullscreen?: BoxedOr<boolean>;
+        height?: BoxedOr<number | string>;
+        loading?: BoxedOr<"eager" | "lazy">;
+        name?: BoxedOr<string>;
+        referrerpolicy?: BoxedOr<HTMLReferrerPolicy>;
+        sandbox?: BoxedOr<HTMLIframeSandbox | string>;
+        src?: BoxedOr<string>;
+        srcdoc?: BoxedOr<string>;
+        width?: BoxedOr<number | string>;
     }
 
     interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
-        alt?: string;
-        crossorigin?: HTMLCrossorigin;
-        decoding?: "sync" | "async" | "auto";
-        height?: number | string;
-        ismap?: boolean;
-        isMap?: boolean;
-        loading?: "eager" | "lazy";
-        referrerpolicy?: HTMLReferrerPolicy;
-        referrerPolicy?: HTMLReferrerPolicy;
-        sizes?: string;
-        src?: string;
-        srcset?: string;
-        srcSet?: string;
-        usemap?: string;
-        useMap?: string;
-        width?: number | string;
+        alt?: BoxedOr<string>;
+        crossorigin?: BoxedOr<HTMLCrossorigin>;
+        decoding?: BoxedOr<"sync" | "async" | "auto">;
+        height?: BoxedOr<number | string>;
+        ismap?: BoxedOr<boolean>;
+        isMap?: BoxedOr<boolean>;
+        loading?: BoxedOr<"eager" | "lazy">;
+        referrerpolicy?: BoxedOr<HTMLReferrerPolicy>;
+        referrerPolicy?: BoxedOr<HTMLReferrerPolicy>;
+        sizes?: BoxedOr<string>;
+        src?: BoxedOr<string>;
+        srcset?: BoxedOr<string>;
+        srcSet?: BoxedOr<string>;
+        usemap?: BoxedOr<string>;
+        useMap?: BoxedOr<string>;
+        width?: BoxedOr<number | string>;
     }
 
     interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
-        accept?: string;
-        alt?: string;
-        autocomplete?: string;
-        autocorrect?: "on" | "off";
-        autofocus?: boolean;
-        capture?: boolean | string;
-        checked?: boolean;
-        crossorigin?: HTMLCrossorigin;
-        disabled?: boolean;
-        enterkeyhint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
-        form?: string;
-        formaction?: string | SerializableAttributeValue;
-        formenctype?: HTMLFormEncType;
-        formmethod?: HTMLFormMethod;
-        formnovalidate?: boolean;
-        formtarget?: string;
-        height?: number | string;
-        incremental?: boolean;
-        list?: string;
-        max?: number | string;
-        maxlength?: number | string;
-        min?: number | string;
-        minlength?: number | string;
-        multiple?: boolean;
-        name?: string;
-        pattern?: string;
-        placeholder?: string;
-        readonly?: boolean;
-        results?: number;
-        required?: boolean;
-        size?: number | string;
-        src?: string;
-        step?: number | string;
-        type?: string;
-        value?: string | string[] | number;
-        width?: number | string;
+        accept?: BoxedOr<string>;
+        alt?: BoxedOr<string>;
+        autocomplete?: BoxedOr<string>;
+        autocorrect?: BoxedOr<"on" | "off">;
+        autofocus?: BoxedOr<boolean>;
+        capture?: BoxedOr<boolean | string>;
+        checked?: BoxedOr<boolean>;
+        crossorigin?: BoxedOr<HTMLCrossorigin>;
+        disabled?: BoxedOr<boolean>;
+        enterkeyhint?: BoxedOr<"enter" | "done" | "go" | "next" | "previous" | "search" | "send">;
+        form?: BoxedOr<string>;
+        formaction?: BoxedOr<string | SerializableAttributeValue>;
+        formenctype?: BoxedOr<HTMLFormEncType>;
+        formmethod?: BoxedOr<HTMLFormMethod>;
+        formnovalidate?: BoxedOr<boolean>;
+        formtarget?: BoxedOr<string>;
+        height?: BoxedOr<number | string>;
+        incremental?: BoxedOr<boolean>;
+        list?: BoxedOr<string>;
+        max?: BoxedOr<number | string>;
+        maxlength?: BoxedOr<number | string>;
+        min?: BoxedOr<number | string>;
+        minlength?: BoxedOr<number | string>;
+        multiple?: BoxedOr<boolean>;
+        name?: BoxedOr<string>;
+        pattern?: BoxedOr<string>;
+        placeholder?: BoxedOr<string>;
+        readonly?: BoxedOr<boolean>;
+        results?: BoxedOr<number>;
+        required?: BoxedOr<boolean>;
+        size?: BoxedOr<number | string>;
+        src?: BoxedOr<string>;
+        step?: BoxedOr<number | string>;
+        type?: BoxedOr<string>;
+        value?: BoxedOr<string | string[] | number>;
+        width?: BoxedOr<number | string>;
     }
 
     interface InsHTMLAttributes<T> extends HTMLAttributes<T> {
-        cite?: string;
-        dateTime?: string;
+        cite?: BoxedOr<string>;
+        dateTime?: BoxedOr<string>;
     }
 
     interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
-        for?: string;
-        form?: string;
+        for?: BoxedOr<string>;
+        form?: BoxedOr<string>;
     }
 
     interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
-        value?: number | string;
+        value?: BoxedOr<number | string>;
     }
 
     interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
-        as?: HTMLLinkAs;
-        crossorigin?: HTMLCrossorigin;
-        disabled?: boolean;
-        fetchpriority?: "high" | "low" | "auto";
-        href?: string;
-        hreflang?: string;
-        imagesizes?: string;
-        imagesrcset?: string;
-        integrity?: string;
-        media?: string;
-        referrerpolicy?: HTMLReferrerPolicy;
-        rel?: string;
-        sizes?: string;
-        type?: string;
+        as?: BoxedOr<HTMLLinkAs>;
+        crossorigin?: BoxedOr<HTMLCrossorigin>;
+        disabled?: BoxedOr<boolean>;
+        fetchpriority?: BoxedOr<"high" | "low" | "auto">;
+        href?: BoxedOr<string>;
+        hreflang?: BoxedOr<string>;
+        imagesizes?: BoxedOr<string>;
+        imagesrcset?: BoxedOr<string>;
+        integrity?: BoxedOr<string>;
+        media?: BoxedOr<string>;
+        referrerpolicy?: BoxedOr<HTMLReferrerPolicy>;
+        rel?: BoxedOr<string>;
+        sizes?: BoxedOr<string>;
+        type?: BoxedOr<string>;
     }
 
     interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
-        name?: string;
+        name?: BoxedOr<string>;
     }
 
     interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
-        autoplay?: boolean;
-        controls?: boolean;
-        crossorigin?: HTMLCrossorigin;
-        loop?: boolean;
-        mediagroup?: string;
-        muted?: boolean;
-        preload?: "none" | "metadata" | "auto" | "";
-        src?: string;
-        crossOrigin?: HTMLCrossorigin;
-        mediaGroup?: string;
+        autoplay?: BoxedOr<boolean>;
+        controls?: BoxedOr<boolean>;
+        crossorigin?: BoxedOr<HTMLCrossorigin>;
+        loop?: BoxedOr<boolean>;
+        mediagroup?: BoxedOr<string>;
+        muted?: BoxedOr<boolean>;
+        preload?: BoxedOr<"none" | "metadata" | "auto" | "">;
+        src?: BoxedOr<string>;
+        crossOrigin?: BoxedOr<HTMLCrossorigin>;
+        mediaGroup?: BoxedOr<string>;
     }
 
     interface MenuHTMLAttributes<T> extends HTMLAttributes<T> {
-        label?: string;
-        type?: "context" | "toolbar";
+        label?: BoxedOr<string>;
+        type?: BoxedOr<"context" | "toolbar">;
     }
 
     interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
-        charset?: string;
-        content?: string;
-        "http-equiv"?: string;
-        name?: string;
-        media?: string;
+        charset?: BoxedOr<string>;
+        content?: BoxedOr<string>;
+        "http-equiv"?: BoxedOr<string>;
+        name?: BoxedOr<string>;
+        media?: BoxedOr<string>;
     }
 
     interface MeterHTMLAttributes<T> extends HTMLAttributes<T> {
-        form?: string;
-        high?: number | string;
-        low?: number | string;
-        max?: number | string;
-        min?: number | string;
-        optimum?: number | string;
-        value?: string | string[] | number;
+        form?: BoxedOr<string>;
+        high?: BoxedOr<number | string>;
+        low?: BoxedOr<number | string>;
+        max?: BoxedOr<number | string>;
+        min?: BoxedOr<number | string>;
+        optimum?: BoxedOr<number | string>;
+        value?: BoxedOr<string | string[] | number>;
     }
 
     interface QuoteHTMLAttributes<T> extends HTMLAttributes<T> {
-        cite?: string;
+        cite?: BoxedOr<string>;
     }
 
     interface ObjectHTMLAttributes<T> extends HTMLAttributes<T> {
-        data?: string;
-        form?: string;
-        height?: number | string;
-        name?: string;
-        type?: string;
-        usemap?: string;
-        width?: number | string;
+        data?: BoxedOr<string>;
+        form?: BoxedOr<string>;
+        height?: BoxedOr<number | string>;
+        name?: BoxedOr<string>;
+        type?: BoxedOr<string>;
+        usemap?: BoxedOr<string>;
+        width?: BoxedOr<number | string>;
     }
 
     interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
-        reversed?: boolean;
-        start?: number | string;
-        type?: "1" | "a" | "A" | "i" | "I";
+        reversed?: BoxedOr<boolean>;
+        start?: BoxedOr<number | string>;
+        type?: BoxedOr<"1" | "a" | "A" | "i" | "I">;
     }
 
     interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
-        disabled?: boolean;
-        label?: string;
+        disabled?: BoxedOr<boolean>;
+        label?: BoxedOr<string>;
     }
 
     interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
-        disabled?: boolean;
-        label?: string;
-        selected?: boolean;
-        value?: string | string[] | number;
+        disabled?: BoxedOr<boolean>;
+        label?: BoxedOr<string>;
+        selected?: BoxedOr<boolean>;
+        value?: BoxedOr<string | string[] | number>;
     }
 
     interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
-        form?: string;
-        for?: string;
-        name?: string;
+        form?: BoxedOr<string>;
+        for?: BoxedOr<string>;
+        name?: BoxedOr<string>;
     }
 
     interface ProgressHTMLAttributes<T> extends HTMLAttributes<T> {
-        max?: number | string;
-        value?: string | string[] | number;
+        max?: BoxedOr<number | string>;
+        value?: BoxedOr<string | string[] | number>;
     }
 
     interface ScriptHTMLAttributes<T> extends HTMLAttributes<T> {
-        async?: boolean;
-        charset?: string;
-        crossorigin?: HTMLCrossorigin;
-        defer?: boolean;
-        integrity?: string;
-        nomodule?: boolean;
-        nonce?: string;
-        referrerpolicy?: HTMLReferrerPolicy;
-        src?: string;
-        type?: string;
+        async?: BoxedOr<boolean>;
+        charset?: BoxedOr<string>;
+        crossorigin?: BoxedOr<HTMLCrossorigin>;
+        defer?: BoxedOr<boolean>;
+        integrity?: BoxedOr<string>;
+        nomodule?: BoxedOr<boolean>;
+        nonce?: BoxedOr<string>;
+        referrerpolicy?: BoxedOr<HTMLReferrerPolicy>;
+        src?: BoxedOr<string>;
+        type?: BoxedOr<string>;
     }
 
     interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
-        autocomplete?: string;
-        autofocus?: boolean;
-        disabled?: boolean;
-        form?: string;
-        multiple?: boolean;
-        name?: string;
-        required?: boolean;
-        size?: number | string;
-        value?: string | string[] | number;
+        autocomplete?: BoxedOr<string>;
+        autofocus?: BoxedOr<boolean>;
+        disabled?: BoxedOr<boolean>;
+        form?: BoxedOr<string>;
+        multiple?: BoxedOr<boolean>;
+        name?: BoxedOr<string>;
+        required?: BoxedOr<boolean>;
+        size?: BoxedOr<number | string>;
+        value?: BoxedOr<string | string[] | number>;
     }
 
     interface HTMLSlotElementAttributes<T = HTMLSlotElement> extends HTMLAttributes<T> {
-        name?: string;
+        name?: BoxedOr<string>;
     }
 
     interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
-        media?: string;
-        sizes?: string;
-        src?: string;
-        srcset?: string;
-        type?: string;
+        media?: BoxedOr<string>;
+        sizes?: BoxedOr<string>;
+        src?: BoxedOr<string>;
+        srcset?: BoxedOr<string>;
+        type?: BoxedOr<string>;
     }
 
     interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
-        media?: string;
-        nonce?: string;
-        scoped?: boolean;
-        type?: string;
+        media?: BoxedOr<string>;
+        nonce?: BoxedOr<string>;
+        scoped?: BoxedOr<boolean>;
+        type?: BoxedOr<string>;
     }
 
     interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
-        colspan?: number | string;
-        headers?: string;
-        rowspan?: number | string;
+        colspan?: BoxedOr<number | string>;
+        headers?: BoxedOr<string>;
+        rowspan?: BoxedOr<number | string>;
     }
 
     interface TemplateHTMLAttributes<T extends HTMLTemplateElement> extends HTMLAttributes<T> {
@@ -904,48 +898,48 @@ export namespace JSX {
     }
 
     interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
-        autocomplete?: string;
-        autofocus?: boolean;
-        cols?: number | string;
-        dirname?: string;
-        disabled?: boolean;
-        enterkeyhint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
-        form?: string;
-        maxlength?: number | string;
-        minlength?: number | string;
-        name?: string;
-        placeholder?: string;
-        readonly?: boolean;
-        required?: boolean;
-        rows?: number | string;
-        value?: string | string[] | number;
-        wrap?: "hard" | "soft" | "off";
+        autocomplete?: BoxedOr<string>;
+        autofocus?: BoxedOr<boolean>;
+        cols?: BoxedOr<number | string>;
+        dirname?: BoxedOr<string>;
+        disabled?: BoxedOr<boolean>;
+        enterkeyhint?: BoxedOr<"enter" | "done" | "go" | "next" | "previous" | "search" | "send">;
+        form?: BoxedOr<string>;
+        maxlength?: BoxedOr<number | string>;
+        minlength?: BoxedOr<number | string>;
+        name?: BoxedOr<string>;
+        placeholder?: BoxedOr<string>;
+        readonly?: BoxedOr<boolean>;
+        required?: BoxedOr<boolean>;
+        rows?: BoxedOr<number | string>;
+        value?: BoxedOr<string | string[] | number>;
+        wrap?: BoxedOr<"hard" | "soft" | "off">;
     }
 
     interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
-        colspan?: number | string;
-        headers?: string;
-        rowspan?: number | string;
-        scope?: "col" | "row" | "rowgroup" | "colgroup";
+        colspan?: BoxedOr<number | string>;
+        headers?: BoxedOr<string>;
+        rowspan?: BoxedOr<number | string>;
+        scope?: BoxedOr<"col" | "row" | "rowgroup" | "colgroup">;
     }
 
     interface TimeHTMLAttributes<T> extends HTMLAttributes<T> {
-        datetime?: string;
+        datetime?: BoxedOr<string>;
     }
 
     interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
-        default?: boolean;
-        kind?: "subtitles" | "captions" | "descriptions" | "chapters" | "metadata";
-        label?: string;
-        src?: string;
-        srclang?: string;
+        default?: BoxedOr<boolean>;
+        kind?: BoxedOr<"subtitles" | "captions" | "descriptions" | "chapters" | "metadata">;
+        label?: BoxedOr<string>;
+        src?: BoxedOr<string>;
+        srclang?: BoxedOr<string>;
     }
 
     interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
-        height?: number | string;
-        playsinline?: boolean;
-        poster?: string;
-        width?: number | string;
+        height?: BoxedOr<number | string>;
+        playsinline?: BoxedOr<boolean>;
+        poster?: BoxedOr<string>;
+        width?: BoxedOr<number | string>;
     }
 
     type SVGPreserveAspectRatio =
@@ -1017,7 +1011,7 @@ export namespace JSX {
 
     interface StylableSVGAttributes {
         class?: string | undefined;
-        style?: CSSProperties | string;
+        style?: string;
     }
 
     interface TransformableSVGAttributes {
@@ -1777,7 +1771,7 @@ export namespace JSX {
         height?: number | string;
         contentScriptType?: string;
         contentStyleType?: string;
-        xmlns?: string;
+        xmlns?: "http://www.w3.org/2000/svg" | string;
     }
 
     interface SwitchSVGAttributes<T>
@@ -1889,7 +1883,7 @@ export namespace JSX {
         inert?: BoxedOr<boolean>;
         lang?: BoxedOr<string>;
         spellcheck?: BoxedOr<boolean>;
-        style?: CSSProperties | string;
+        style?: string;
         tabindex?: BoxedOr<number | string>;
         title?: BoxedOr<string>;
         translate?: BoxedOr<"yes" | "no">;
