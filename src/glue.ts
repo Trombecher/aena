@@ -28,34 +28,6 @@ export function insertBox<T>(box: Box<T>, transform: (value: T) => JSX.Element) 
     return [start, transform(box.value), end];
 }
 
-/*
-export function insertBoxNode(box: Box<Node>) {
-    let previousNode = box.value;
-    box.addListener(node => {
-        previousNode.parentNode!.replaceChild(node, previousNode);
-        previousNode = node;
-    });
-    return [previousNode];
-}
-
-export function insertBoxNodes(box: Box<Iterable<Node>>) {
-    const anchor = document.createTextNode("");
-    let previousLength = 0;
-    for(const _ of box.value) previousLength += 1;
-    box.addListener(nodes => {
-        while(previousLength--) anchor.nextSibling!.remove();
-        previousLength = 0;
-        let lastNode: Node = anchor;
-        for(const currentNode of nodes) {
-            (lastNode as ChildNode).after(currentNode);
-            lastNode = currentNode;
-            previousLength += 1;
-        }
-    });
-    return [anchor, ...box.value];
-}
- */
-
 export function insertBoxArray<T>(array: BoxArray<T>, transform: (value: T) => JSX.Element): JSX.Element[] {
     const start = createAnchor();
     const nodes = array.map(value => renderToNode(transform(value)));

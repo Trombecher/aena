@@ -1,7 +1,8 @@
-import {BoxMap} from "./map";
 import {
-    addListenerRecursive, DeepListener,
-    isObject, ListenDeep,
+    addListenerRecursive,
+    DeepListener,
+    isObject,
+    ListenDeep,
     removeListenerRecursive
 } from "./index";
 
@@ -26,8 +27,8 @@ export type Listener<T> = (change: Change<T>) => void;
  * # Example
  *
  * ```typescript
- * import {BoxSet} from "aena/state";
- * import {Action} from "aena/state/set";
+ * import {BoxSet} from "aena";
+ * import {Action} from "aena/set";
  *
  * const set = new BoxSet<number>();
  *
@@ -77,7 +78,7 @@ export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
     }
 
     /**
-     * Clears the set by deleting each value.
+     * Clears this {@link BoxSet} by deleting each value sequentially.
      *
      * This operation is overridden to be not O(1)
      * because otherwise it would introduce artifacts
@@ -88,7 +89,6 @@ export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
     }
 
     override delete(value: T) {
-        // If the value was not in the set.
         if(!super.delete(value)) return false;
 
         // Ensure that all listeners are removed from all descendants.
@@ -115,46 +115,32 @@ export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
     }
 
     /**
-     * Maps this set to an array using a `mapper` function.
+     * Returns `true` if every value in this {@link BoxSet} matches the given predicate; otherwise `false`.
      */
-    map<U>(mapper: (value: T) => U): U[] {
-        const array = new Array<U>(this.size);
+    every(predicate: (value: T) => boolean) {
+        for(const value of this)
+            if(!predicate(value))
+                return false;
+        return true;
+    }
+
+    /**
+     * Reduces this {@link BoxSet} to a `T`.
+     *
+     * This can be used to implement mapping behaviour.
+     */
+    reduce<U>(initialValue: U, reducer: (previousValue: U, value: T, index: number) => U) {
         let i = 0;
-        this.forEach(value => {
-            array[i] = mapper(value);
-            i++;
-        });
-        return array;
+        this.forEach(value => initialValue = reducer(initialValue, value, i++));
+        return initialValue;
     }
 
     override toString() {
-        let s = "";
-        this.forEach(value => s += "," + value);
-        return `{${s.substring(1)}}`;
+        return JSON.stringify(this.reduce(new Array<any>(this.size),
+            (array, v, i) => (array[i] = v, array)));
     }
 
-    deriveBoxMap<U>(mapper: (value: T) => U) {
-        const map = new BoxMap<T, U>();
-        this.forEach(value => map.set(value, mapper(value)));
-
-        this.addListener(change => {
-            switch(change.action) {
-                case Action.Add:
-                    map.set(change.value, mapper(change.value));
-                    break;
-                // case Action.Replace:
-                //     map.replace(change.oldValue, change.newValue, mapper(change.newValue));
-                //     break;
-                case Action.Delete:
-                    map.delete(change.value);
-                    break;
-            }
-        });
-
-        return map;
-    }
-
-    // The following code may repeat across files; but there is no other option.
+    // The following code may repeat across files but there is no other option.
     readonly #listeners = new Set<Listener<T>>();
     readonly #deepListeners = new Set<DeepListener>();
 

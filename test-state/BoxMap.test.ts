@@ -14,6 +14,32 @@ test("new", () => {
     new BoxMap();
 });
 
+test("set", () => createNumberBoxMap());
+
+test("clear", () => {
+    const map = createNumberBoxMap();
+    map.clear();
+
+    expect(map.size).toBe(0);
+});
+
+test("delete", () => {
+    const map = createNumberBoxMap();
+    map.delete("one");
+
+    expect(map.has("one")).toBe(false);
+    expect(map.size).toBe(2);
+});
+
+test("reduce", () => {
+    const map = createNumberBoxMap();
+    const squares = map.reduce(new Set<string>(),
+        (set, k, v) => (set.add(`${k} (${v})`), set));
+    expect(squares.has("one (1)")).toBeTruthy();
+    expect(squares.has("two (2)")).toBeTruthy();
+    expect(squares.has("three (3)")).toBeTruthy();
+});
+
 test("`Boxed` implementation", () => {
     const map = createNumberBoxMap();
 
@@ -77,7 +103,7 @@ test("`BoxedParent` implementation", () => {
     expect(callCount).toBe(5);
 
     map.delete("lee");
-    expect(callCount).toBe(6)
+    expect(callCount).toBe(6);
 
     // At this point, the listener should not be called.
 
@@ -89,19 +115,4 @@ test("`BoxedParent` implementation", () => {
     map.set("foo", foo);
     map.delete("foo");
     expect(callCount).toBe(6);
-});
-
-test("clear", () => {
-    const map = createNumberBoxMap();
-    map.clear();
-
-    expect(map.size).toBe(0);
-});
-
-test("delete", () => {
-    const map = createNumberBoxMap();
-    map.delete("one");
-
-    expect(map.has("one")).toBe(false);
-    expect(map.size).toBe(2);
 });

@@ -1,5 +1,13 @@
 import {Listen} from "./index";
 
+/**
+ * Infers the type `T` of {@link Box}.
+ */
+export type Unbox<B> = B extends Box<infer T> ? T : never;
+
+/**
+ * The listener for {@link Box} and {@link WritableBox} changes.
+ */
 export type OnChangeListener<T> = (value: T) => void;
 
 /**
@@ -8,7 +16,7 @@ export type OnChangeListener<T> = (value: T) => void;
  * # Example
  *
  * ```typescript
- * import {WritableBox, Box} from "aena/state";
+ * import {WritableBox, Box} from "aena";
  *
  * const count = new WritableBox(10);
  *
@@ -24,14 +32,25 @@ export type OnChangeListener<T> = (value: T) => void;
 export class Box<T> implements Listen<OnChangeListener<T>> {
     protected _value: T;
 
+    /**
+     * Creates a new {@link  Box} from an initialValue.
+     */
     constructor(value: T) {
         this._value = value;
     }
 
+    /**
+     * The value of this {@link Box}.
+     */
     get value() {
         return this._value;
     }
 
+    /**
+     * Derives a new {@link Box} from this, transforming the value in the process.
+     *
+     * Example {@link Box here}.
+     */
     derive<U>(transform: (value: T) => U) {
         const box = new WritableBox(transform(this._value));
         this.addListener(value => box.value = transform(value));
@@ -53,13 +72,7 @@ export class Box<T> implements Listen<OnChangeListener<T>> {
 /**
  * A writable store for immutable data.
  *
- * # Example
- *
- * ```ts
- * const box = new WritableBox(10);
- * box.onChange(value => console.log(value));
- * box.value = 10; // Logs `10`
- * ```
+ * Example at {@link Box} documentation.
  */
 export class WritableBox<T> extends Box<T> {
     constructor(value: T) {
@@ -76,6 +89,9 @@ export class WritableBox<T> extends Box<T> {
         return this._value;
     }
 
+    /**
+     * Casts this {@link WritableBox} to a {@link Box} (readonly).
+     */
     readonly() {
         return this as Box<T>;
     }

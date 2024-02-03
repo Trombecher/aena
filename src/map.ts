@@ -7,7 +7,6 @@ import {
 
 export const enum Action {
     Set,
-    // Replace,
     Delete
 }
 
@@ -23,6 +22,14 @@ export type Change<K, V> = Readonly<{
 
 export type Listener<K, V> = (change: Change<K, V>) => void;
 
+/**
+ * Turns an arbitrary key type `K` into an object key.
+ */
+export type ObjectKey<K> = K extends (string | number | symbol) ? K : string;
+
+/**
+ * A reactive map for immutable data.
+ */
 export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Listener<K, V>> {
     override set(key: K, value: V): this {
         if(this.has(key)) return this;
@@ -79,10 +86,29 @@ export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Listener<K, V>
         return true;
     }
 
+    /**
+     * Returns `true` if every value in this {@link BoxMap} matches the given predicate; otherwise `false`.
+     */
+    every(predicate: (key: K, value: V) => boolean) {
+        for(const [key, value] of this)
+            if(!predicate(key, value))
+                return false;
+        return true;
+    }
+
+    /**
+     * Reduces this {@link BoxMap} to a `T`.
+     *
+     * This can be used to implement mapping behaviour.
+     */
+    reduce<T>(initialValue: T, reducer: (previousValue: T, key: K, value: V, index: number) => T): T {
+        let i = 0;
+        this.forEach((value, key) => initialValue = reducer(initialValue, key, value, i++));
+        return initialValue;
+    }
+
     override toString() {
-        let s = "";
-        this.forEach((v, k) => s += `,${k}:${v}`);
-        return `{${s.substring(1)}}`;
+        return JSON.stringify(this.reduce({} as Record<any, any>, (o, k, v) => (o[k as any] = v as any, o)));
     }
 
     // The following code may repeat across files; but there is no other option.

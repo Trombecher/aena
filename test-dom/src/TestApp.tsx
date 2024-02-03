@@ -14,7 +14,8 @@ import {
     insertBoxAsText,
     insertBoxArrayAsText,
     insertBoxSetAsText,
-    insertBoxMapAsText, insertBoxToString,
+    insertBoxMapAsText,
+    insertBoxToString,
 } from "../../src/glue";
 
 type State = {
@@ -94,7 +95,7 @@ export default function TestApp() {
                 <button onclick={() => box.value--}>Decrement</button>
 
                 <h2>Insert As Text</h2>
-                <div>There should be two counters: {insertBoxAsText(box)}</div>
+                <div>There should be a counter: {insertBoxAsText(box)}</div>
 
                 <h2>Insert As Custom Text</h2>
                 <div>{insertBoxAsText(box)} * {insertBoxAsText(box)} = {insertBoxToString(box, value => String(value * value))}</div>

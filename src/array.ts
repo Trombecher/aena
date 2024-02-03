@@ -1,4 +1,9 @@
-import {addListenerRecursive, DeepListener, ListenDeep, removeListenerRecursive} from "./index";
+import {
+    addListenerRecursive,
+    DeepListener,
+    ListenDeep,
+    removeListenerRecursive
+} from "./index";
 
 export const enum SwapIndicesInfoCode {
     Success,
@@ -70,7 +75,7 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
     readonly #array;
 
     /**
-     * Creates a `BoxArray` from the given `length` and a function, generating the elements.
+     * Creates a {@link BoxArray} from the given `length` and a function which is generating the elements.
      */
     static from<T>(length: number, generate: (index: number) => T): BoxArray<T> {
         const array = new Array<T>(length);
@@ -96,7 +101,6 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
 
     /**
      * Returns the index of the provided `value` and `-1` if the value was not found.
-     * @param value
      */
     indexOf(value: T): number {
         return this.#array.indexOf(value);
@@ -151,8 +155,7 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
     }
 
     /**
-     * Removes the item at the specified index.
-     * @param index
+     * Removes the value at the specified index.
      */
     deleteAt(index: number): IndexInfoCode {
         index = this.#normalizeIndex(index);
@@ -187,10 +190,6 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
 
     at(index: number) {
         return this.#array.at(index);
-    }
-
-    map<U>(mapper: (value: T, index: number) => U): U[] {
-        return this.#array.map(mapper);
     }
 
     get length() {
@@ -269,12 +268,37 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
         return SetInfoCode.Success;
     }
 
-    join(separator: string) {
+    /**
+     * Converts all values of this {@link BoxArray} to strings and joins them via an optional separator.
+     */
+    join(separator?: string) {
         return this.#array.join(separator);
     }
 
-    reduce<U>(reducer: (accumulator: U, value: T, index: number) => U, initialValue: U): U {
+    /**
+     * @returns `true` if every value in this {@link BoxArray} matches the given predicate; otherwise `false`.
+     */
+    every(predicate: (value: T) => boolean) {
+        return this.#array.every(predicate);
+    }
+
+    /**
+     * Reduces this {@link BoxArray} to a `U`.
+     *
+     * Can be used to implement mapping behaviour.
+     */
+    reduce<U>(initialValue: U, reducer: (previousValue: U, value: T, index: number) => U): U {
         return this.#array.reduce(reducer, initialValue);
+    }
+
+    /**
+     * Maps this {@link BoxArray} to `U[]`.
+     *
+     * Similar mapping targets can be emulated using {@link BoxArray.reduce}
+     * but this function exists because it can be forwarded to a native {@link Array.map} call for speed.
+     */
+    map<U>(mapper: (value: T) => U): U[] {
+        return this.#array.map(mapper);
     }
 
     /**
