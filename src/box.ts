@@ -1,14 +1,9 @@
-import {Listen} from "./index";
+import {Listen, Listener} from "./index";
 
 /**
  * Infers the type `T` of {@link Box}.
  */
 export type Unbox<B> = B extends Box<infer T> ? T : never;
-
-/**
- * The listener for {@link Box} and {@link WritableBox} changes.
- */
-export type OnChangeListener<T> = (value: T) => void;
 
 /**
  * A readonly store for immutable data.
@@ -29,7 +24,7 @@ export type OnChangeListener<T> = (value: T) => void;
  *
  * Whenever `count` gets updated, `square` gets updated with the square.
  */
-export class Box<T> implements Listen<OnChangeListener<T>> {
+export class Box<T> implements Listen<T> {
     protected _value: T;
 
     /**
@@ -57,14 +52,14 @@ export class Box<T> implements Listen<OnChangeListener<T>> {
         return box.readonly();
     }
 
-    protected readonly _listeners = new Set<OnChangeListener<T>>();
+    protected readonly _listeners = new Set<Listener<T>>();
 
-    addListener(listener: OnChangeListener<T>): OnChangeListener<T> {
+    addListener(listener: Listener<T>): Listener<T> {
         this._listeners.add(listener);
         return listener;
     }
 
-    removeListener(listener: OnChangeListener<T>) {
+    removeListener(listener: Listener<T>) {
         this._listeners.delete(listener);
     }
 }

@@ -40,7 +40,7 @@ test("reduce", () => {
     expect(squares.has("three (3)")).toBeTruthy();
 });
 
-test("`Boxed` implementation", () => {
+test("`Listen` implementation", () => {
     const map = createNumberBoxMap();
 
     let lastSetKey: string | undefined = undefined;
@@ -76,7 +76,7 @@ test("`Boxed` implementation", () => {
     expect(lastDeletedValue).toBe(4);
 });
 
-test("`BoxedParent` implementation", () => {
+test("`ListenDeep` implementation", () => {
     type Item = {bar: WritableBox<number>};
 
     const map = new BoxMap<string, Item | WritableBox<number>>();

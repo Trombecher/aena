@@ -1,11 +1,15 @@
 import {expect, test} from "vitest";
 import {
-    addListenerRecursive, Box, BoxArray, BoxMap,
-    BoxSet, deserialize,
+    addListenerRecursively,
+    Box,
+    BoxArray,
+    BoxMap,
+    BoxSet,
+    deserialize,
     isInstanceOfListen,
     isInstanceOfListenDeep,
-    isObject,
-    reduce, removeListenerRecursive, serialize,
+    reduce, removeListenerRecursively,
+    serialize,
     WritableBox
 } from "../src";
 
@@ -35,12 +39,6 @@ test("isInstanceOfListenDeep", () => {
     expect(isInstanceOfListenDeep(new BoxSet())).toBeTruthy();
 });
 
-test("isObject", () => {
-    expect(isObject({})).toBeTruthy();
-    expect(isObject(100)).toBeFalsy();
-    expect(isObject(null)).toBeFalsy();
-});
-
 test("addListenerRecursive", () => {
     let callCount = 0;
 
@@ -51,7 +49,7 @@ test("addListenerRecursive", () => {
             lee: new WritableBox("World")
         }
     };
-    addListenerRecursive(target, listener);
+    addListenerRecursively(target, listener);
 
     target.bar.value = "yo";
     target.baz.lee.value = "yo";
@@ -69,8 +67,8 @@ test("removeListenerRecursive", () => {
             lee: new WritableBox("World")
         }
     };
-    addListenerRecursive(target, listener);
-    removeListenerRecursive(target, listener);
+    addListenerRecursively(target, listener);
+    removeListenerRecursively(target, listener);
 
     target.bar.value = "yo";
     target.baz.lee.value = "yo";

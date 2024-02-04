@@ -6,7 +6,7 @@ test("value", () => {
     expect(box.value).toBe(10);
 });
 
-test("`Boxed` implementation", () => {
+test("`Listen` implementation", () => {
     const box = new WritableBox("");
     let newValue: string | null = null;
 

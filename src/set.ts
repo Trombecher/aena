@@ -1,10 +1,5 @@
-import {
-    addListenerRecursive,
-    DeepListener,
-    isObject,
-    ListenDeep,
-    removeListenerRecursive
-} from "./index";
+import {addListenerRecursively, DeepListener, ListenDeep, Listener, removeListenerRecursively} from "./index";
+import {addListenersDeep, removeListenersDeep} from "./internal";
 
 export const enum Action {
     Add,
@@ -18,8 +13,6 @@ export type Change<T> = Readonly<{
     action: Action.Delete,
     value: T
 }>;
-
-export type Listener<T> = (change: Change<T>) => void;
 
 /**
  * A set store for immutable data.
@@ -59,20 +52,19 @@ export type Listener<T> = (change: Change<T>) => void;
  * set.removeDeepListener(deepListener);
  * ```
  */
-export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
+export class BoxSet<T> extends Set<T> implements ListenDeep<Change<T>> {
     override add(value: T): this {
         if(this.has(value)) return this;
         super.add(value);
 
         // Ensure that all deep listeners are attached to all boxed descendants of `value`.
-        if(isObject(value))
-            this.#deepListeners.forEach(listener =>
-                addListenerRecursive(value, listener));
+        addListenersDeep(this.#deepListeners, value);
 
         // Notify all listeners about the addition of this value.
-        const change = {action: Action.Add, value} satisfies Change<T>;
-        this.#listeners.forEach(listener => listener(change));
-        this.#deepListeners.forEach(listener => listener());
+        this.#notify({
+            action: Action.Add,
+            value
+        });
 
         return this;
     }
@@ -92,14 +84,13 @@ export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
         if(!super.delete(value)) return false;
 
         // Ensure that all listeners are removed from all descendants.
-        if(isObject(value))
-            this.#deepListeners.forEach(listener =>
-                removeListenerRecursive(value, listener));
+        removeListenersDeep(this.#deepListeners, value);
 
         // Notify all listeners about the deletion of this value.
-        const change = {action: Action.Delete, value} satisfies Change<T>;
-        this.#listeners.forEach(listener => listener(change));
-        this.#deepListeners.forEach(listener => listener());
+        this.#notify({
+            action: Action.Delete,
+            value
+        });
 
         return true;
     }
@@ -141,26 +132,31 @@ export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
     }
 
     // The following code may repeat across files but there is no other option.
-    readonly #listeners = new Set<Listener<T>>();
+    readonly #listeners = new Set<Listener<Change<T>>>();
     readonly #deepListeners = new Set<DeepListener>();
+
+    #notify(change: Change<T>) {
+        this.#listeners.forEach(listener => listener(change));
+        this.#deepListeners.forEach(listener => listener());
+    }
 
     addDeepListener(listener: DeepListener): DeepListener {
         this.#deepListeners.add(listener);
-        this.forEach(value => addListenerRecursive(value, listener));
+        this.forEach(value => addListenerRecursively(value, listener));
         return listener;
     }
 
     removeDeepListener(listener: DeepListener) {
         this.#deepListeners.delete(listener);
-        this.forEach(value => removeListenerRecursive(value, listener));
+        this.forEach(value => removeListenerRecursively(value, listener));
     }
 
-    addListener(listener: Listener<T>) {
+    addListener(listener: Listener<Change<T>>) {
         this.#listeners.add(listener);
         return listener;
     }
 
-    removeListener(listener: Listener<T>) {
+    removeListener(listener: Listener<Change<T>>) {
         this.#listeners.delete(listener);
     }
 }

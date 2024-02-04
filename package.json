@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.11.3",
+    "version": "0.12.0",
     "description": "Your next SPA TypeScript framework.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -31,15 +31,35 @@
             "default": "./dist/index.js",
             "types": "./dist/index.d.ts"
         },
-        "./*": {
-            "default": "./dist/*.js",
-            "types": "./dist/*.d.ts"
+        "./array": {
+            "default": "./dist/array.js",
+            "types": "./dist/array.d.ts"
+        },
+        "./box": {
+            "default": "./dist/box.js",
+            "types": "./dist/box.d.ts"
+        },
+        "./glue": {
+            "default": "./dist/glue.js",
+            "types": "./dist/glue.d.ts"
+        },
+        "./jsx-runtime": {
+            "default": "./dist/jsx-runtime.js",
+            "types": "./dist/jsx-runtime.d.ts"
+        },
+        "./map": {
+            "default": "./dist/map.js",
+            "types": "./dist/map.d.ts"
+        },
+        "./set": {
+            "default": "./dist/set.js",
+            "types": "./dist/set.d.ts"
         }
     },
     "devDependencies": {
         "typedoc": "^0.25.7",
         "typescript": "^5.3.3",
-        "vitest": "^1.2.1"
+        "vitest": "^1.2.2"
     },
     "repository": "https://github.com/trombecher/aena"
 }

@@ -1,9 +1,5 @@
-import {
-    addListenerRecursive,
-    DeepListener,
-    ListenDeep,
-    removeListenerRecursive
-} from "./index";
+import {addListenerRecursively, DeepListener, Listener, removeListenerRecursively} from "./index";
+import {addListenersDeep, removeListenersDeep} from "./internal";
 
 export const enum SwapIndicesInfoCode {
     Success,
@@ -56,8 +52,6 @@ export type Change<T> = {
     index: number
 };
 
-export type Listener<T> = (change: Change<T>) => void;
-
 /**
  * `BoxArray` is a signal based array designed for immutable values.
  *
@@ -71,7 +65,7 @@ export type Listener<T> = (change: Change<T>) => void;
  * const booleans = new BoxArray([true, false]);
  * ```
  */
-export class BoxArray<T> implements ListenDeep<Listener<T>> {
+export class BoxArray<T> {
     readonly #array;
 
     /**
@@ -149,9 +143,13 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
         this.#array[indexA] = b;
         this.#array[indexB] = a;
 
-        const change = {action: Action.Swap, a, b, indexA, indexB} satisfies Change<T>;
-        this.#listeners.forEach(listener => listener(change));
-        this.#deepListeners.forEach(listener => listener());
+        this.#notify({
+            action: Action.Swap,
+            a,
+            b,
+            indexA,
+            indexB
+        });
     }
 
     /**
@@ -180,12 +178,13 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
     #deleteAtUnchecked(index: number) {
         const value = this.#array.splice(index, 1)[0]!;
 
-        const change = {
+        removeListenersDeep(this.#deepListeners, value);
+
+        this.#notify({
             action: Action.Delete,
-            value, index
-        } satisfies Change<T>;
-        this.#listeners.forEach(listener => listener(change));
-        this.#deepListeners.forEach(listener => listener());
+            value,
+            index
+        });
     }
 
     at(index: number) {
@@ -196,17 +195,17 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
         return this.#array.length;
     }
 
-    add(value: T) {
-        const change = {
+    /**
+     * Appends a new value to the end of this {@link BoxArray}.
+     */
+    append(value: T) {
+        addListenersDeep(this.#deepListeners, value);
+
+        this.#notify({
             action: Action.Insert,
             value,
-            index: this.#array.length
-        } satisfies Change<T>;
-
-        this.#array.push(value);
-
-        this.#listeners.forEach(listener => listener(change));
-        this.#deepListeners.forEach(listener => listener());
+            index: this.#array.push(value) - 1
+        });
     }
 
     /**
@@ -230,10 +229,31 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
 
         this.#array.splice(index, 0, value);
 
-        const change = {action: Action.Insert, value, index} satisfies Change<T>;
-        this.#listeners.forEach(listener => listener(change));
-        this.#deepListeners.forEach(listener => listener());
+        addListenersDeep(this.#deepListeners, value);
+
+        this.#notify({
+            action: Action.Insert,
+            value,
+            index
+        });
+
         return IndexInfoCode.Success;
+    }
+
+    /**
+     * Prepends the `value` to the start of this {@link BoxArray}
+     */
+    prepend(value: T) {
+        this.#array.unshift(value);
+
+        // Ensure that the value has all deep listeners.
+        addListenersDeep(this.#deepListeners, value);
+
+        this.#notify({
+            action: Action.Insert,
+            value,
+            index: 0
+        });
     }
 
     /**
@@ -247,25 +267,33 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
         if(oldValue === value) return SetInfoCode.SameValue;
         this.#array[index] = value;
 
+        removeListenersDeep(this.#deepListeners, oldValue);
+
         // Simulate a remove change.
-        const removeChange = {
+        this.#notify({
             action: Action.Delete,
             value: oldValue,
             index
-        } satisfies Change<T>;
-        this.#listeners.forEach(listener => listener(removeChange));
-        this.#deepListeners.forEach(listener => listener());
+        });
+
+        addListenersDeep(this.#deepListeners, value);
 
         // Simulate an insert change.
-        const insertChange = {
+        this.#notify({
             action: Action.Insert,
             value,
             index
-        } satisfies Change<T>;
-        this.#listeners.forEach(listener => listener(insertChange));
-        this.#deepListeners.forEach(listener => listener());
+        });
 
         return SetInfoCode.Success;
+    }
+
+    /**
+     * Clears this {@link BoxArray} by sequentially deleting each value, starting at the end.
+     */
+    clear() {
+        let i = this.#array.length;
+        while(i--) this.#deleteAtUnchecked(i);
     }
 
     /**
@@ -320,27 +348,32 @@ export class BoxArray<T> implements ListenDeep<Listener<T>> {
         return this.#array;
     }
 
-    // The following code may repeat across files.
-    readonly #listeners = new Set<Listener<T>>();
+    // The following code may repeat across files but there is no other option.
+    readonly #listeners = new Set<Listener<Change<T>>>();
     readonly #deepListeners = new Set<DeepListener>();
+
+    #notify(change: Change<T>) {
+        this.#listeners.forEach(listener => listener(change));
+        this.#deepListeners.forEach(listener => listener());
+    }
 
     addDeepListener(listener: DeepListener): DeepListener {
         this.#deepListeners.add(listener);
-        this.forEach(value => addListenerRecursive(value, listener));
+        this.forEach(value => addListenerRecursively(value, listener));
         return listener;
     }
 
     removeDeepListener(listener: DeepListener) {
         this.#deepListeners.delete(listener);
-        this.forEach(value => removeListenerRecursive(value, listener));
+        this.forEach(value => removeListenerRecursively(value, listener));
     }
 
-    addListener(listener: Listener<T>) {
+    addListener(listener: Listener<Change<T>>) {
         this.#listeners.add(listener);
         return listener;
     }
 
-    removeListener(listener: Listener<T>) {
+    removeListener(listener: Listener<Change<T>>) {
         this.#listeners.delete(listener);
     }
 }

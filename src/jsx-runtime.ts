@@ -1005,66 +1005,66 @@ export namespace JSX {
     type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
 
     interface CoreSVGAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-        id?: string;
-        lang?: string;
-        tabindex?: number | string;
+        id?: BoxedOr<string>;
+        lang?: BoxedOr<string>;
+        tabindex?: BoxedOr<number | string>;
     }
 
+
     interface StylableSVGAttributes {
-        class?: string | undefined;
-        style?: string;
+        class?: BoxedOr<string | undefined>;
+        style?: BoxedOr<string>;
     }
 
     interface TransformableSVGAttributes {
-        transform?: string;
+        transform?: BoxedOr<string>;
     }
 
     interface ConditionalProcessingSVGAttributes {
-        requiredExtensions?: string;
-        requiredFeatures?: string;
-        systemLanguage?: string;
+        requiredExtensions?: BoxedOr<string>;
+        requiredFeatures?: BoxedOr<string>;
+        systemLanguage?: BoxedOr<string>;
     }
 
     interface ExternalResourceSVGAttributes {
-        externalResourcesRequired?: "true" | "false";
+        externalResourcesRequired?: BoxedOr<"true" | "false">;
     }
 
     interface AnimationTimingSVGAttributes {
-        begin?: string;
-        dur?: string;
-        end?: string;
-        min?: string;
-        max?: string;
-        restart?: "always" | "whenNotActive" | "never";
-        repeatCount?: number | "indefinite";
-        repeatDur?: string;
-        fill?: "freeze" | "remove";
+        begin?: BoxedOr<string>;
+        dur?: BoxedOr<string>;
+        end?: BoxedOr<string>;
+        min?: BoxedOr<string>;
+        max?: BoxedOr<string>;
+        restart?: BoxedOr<"always" | "whenNotActive" | "never">;
+        repeatCount?: BoxedOr<number | "indefinite">;
+        repeatDur?: BoxedOr<string>;
+        fill?: BoxedOr<"freeze" | "remove">;
     }
 
     interface AnimationValueSVGAttributes {
-        calcMode?: "discrete" | "linear" | "paced" | "spline";
-        values?: string;
-        keyTimes?: string;
-        keySplines?: string;
-        from?: number | string;
-        to?: number | string;
-        by?: number | string;
+        calcMode?: BoxedOr<"discrete" | "linear" | "paced" | "spline">;
+        values?: BoxedOr<string>;
+        keyTimes?: BoxedOr<string>;
+        keySplines?: BoxedOr<string>;
+        from?: BoxedOr<number | string>;
+        to?: BoxedOr<number | string>;
+        by?: BoxedOr<number | string>;
     }
 
     interface AnimationAdditionSVGAttributes {
-        attributeName?: string;
-        additive?: "replace" | "sum";
-        accumulate?: "none" | "sum";
+        attributeName?: BoxedOr<string>;
+        additive?: BoxedOr<"replace" | "sum">;
+        accumulate?: BoxedOr<"none" | "sum">;
     }
 
     interface AnimationAttributeTargetSVGAttributes {
-        attributeName?: string;
-        attributeType?: "CSS" | "XML" | "auto";
+        attributeName?: BoxedOr<string>;
+        attributeType?: BoxedOr<"CSS" | "XML" | "auto">;
     }
 
     interface PresentationSVGAttributes {
-        "alignment-baseline"?:
-            | "auto"
+        "alignment-baseline"?: BoxedOr<| "auto"
             | "baseline"
             | "before-edge"
             | "text-before-edge"
@@ -1076,21 +1076,20 @@ export namespace JSX {
             | "alphabetic"
             | "hanging"
             | "mathematical"
-            | "inherit";
-        "baseline-shift"?: number | string;
-        clip?: string;
-        "clip-path"?: string;
-        "clip-rule"?: "nonzero" | "evenodd" | "inherit";
-        color?: string;
-        "color-interpolation"?: "auto" | "sRGB" | "linearRGB" | "inherit";
-        "color-interpolation-filters"?: "auto" | "sRGB" | "linearRGB" | "inherit";
-        "color-profile"?: string;
-        "color-rendering"?: "auto" | "optimizeSpeed" | "optimizeQuality" | "inherit";
-        cursor?: string;
-        direction?: "ltr" | "rtl" | "inherit";
-        display?: string;
-        "dominant-baseline"?:
-            | "auto"
+            | "inherit">;
+        "baseline-shift"?: BoxedOr<number | string>;
+        clip?: BoxedOr<string>;
+        "clip-path"?: BoxedOr<string>;
+        "clip-rule"?: BoxedOr<"nonzero" | "evenodd" | "inherit">;
+        color?: BoxedOr<string>;
+        "color-interpolation"?: BoxedOr<"auto" | "sRGB" | "linearRGB" | "inherit">;
+        "color-interpolation-filters"?: BoxedOr<"auto" | "sRGB" | "linearRGB" | "inherit">;
+        "color-profile"?: BoxedOr<string>;
+        "color-rendering"?: BoxedOr<"auto" | "optimizeSpeed" | "optimizeQuality" | "inherit">;
+        cursor?: BoxedOr<string>;
+        direction?: BoxedOr<"ltr" | "rtl" | "inherit">;
+        display?: BoxedOr<string>;
+        "dominant-baseline"?: BoxedOr<| "auto"
             | "text-bottom"
             | "alphabetic"
             | "ideographic"
@@ -1099,36 +1098,35 @@ export namespace JSX {
             | "mathematical"
             | "hanging"
             | "text-top"
-            | "inherit";
-        "enable-background"?: string;
-        fill?: string;
-        "fill-opacity"?: number | string | "inherit";
-        "fill-rule"?: "nonzero" | "evenodd" | "inherit";
-        filter?: string;
-        "flood-color"?: string;
-        "flood-opacity"?: number | string | "inherit";
-        "font-family"?: string;
-        "font-size"?: string;
-        "font-size-adjust"?: number | string;
-        "font-stretch"?: string;
-        "font-style"?: "normal" | "italic" | "oblique" | "inherit";
-        "font-variant"?: string;
-        "font-weight"?: number | string;
-        "glyph-orientation-horizontal"?: string;
-        "glyph-orientation-vertical"?: string;
-        "image-rendering"?: "auto" | "optimizeQuality" | "optimizeSpeed" | "inherit";
-        kerning?: string;
-        "letter-spacing"?: number | string;
-        "lighting-color"?: string;
-        "marker-end"?: string;
-        "marker-mid"?: string;
-        "marker-start"?: string;
-        mask?: string;
-        opacity?: number | string | "inherit";
-        overflow?: "visible" | "hidden" | "scroll" | "auto" | "inherit";
-        pathLength?: string | number;
-        "pointer-events"?:
-            | "bounding-box"
+            | "inherit">;
+        "enable-background"?: BoxedOr<string>;
+        fill?: BoxedOr<string>;
+        "fill-opacity"?: BoxedOr<number | string | "inherit">;
+        "fill-rule"?: BoxedOr<"nonzero" | "evenodd" | "inherit">;
+        filter?: BoxedOr<string>;
+        "flood-color"?: BoxedOr<string>;
+        "flood-opacity"?: BoxedOr<number | string | "inherit">;
+        "font-family"?: BoxedOr<string>;
+        "font-size"?: BoxedOr<string>;
+        "font-size-adjust"?: BoxedOr<number | string>;
+        "font-stretch"?: BoxedOr<string>;
+        "font-style"?: BoxedOr<"normal" | "italic" | "oblique" | "inherit">;
+        "font-variant"?: BoxedOr<string>;
+        "font-weight"?: BoxedOr<number | string>;
+        "glyph-orientation-horizontal"?: BoxedOr<string>;
+        "glyph-orientation-vertical"?: BoxedOr<string>;
+        "image-rendering"?: BoxedOr<"auto" | "optimizeQuality" | "optimizeSpeed" | "inherit">;
+        kerning?: BoxedOr<string>;
+        "letter-spacing"?: BoxedOr<number | string>;
+        "lighting-color"?: BoxedOr<string>;
+        "marker-end"?: BoxedOr<string>;
+        "marker-mid"?: BoxedOr<string>;
+        "marker-start"?: BoxedOr<string>;
+        mask?: BoxedOr<string>;
+        opacity?: BoxedOr<number | string | "inherit">;
+        overflow?: BoxedOr<"visible" | "hidden" | "scroll" | "auto" | "inherit">;
+        pathLength?: BoxedOr<string | number>;
+        "pointer-events"?: BoxedOr<| "bounding-box"
             | "visiblePainted"
             | "visibleFill"
             | "visibleStroke"
@@ -1139,30 +1137,29 @@ export namespace JSX {
             | "stroke"
             | "all"
             | "none"
-            | "inherit";
-        "shape-rendering"?: "auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision" | "inherit";
-        "stop-color"?: string;
-        "stop-opacity"?: number | string | "inherit";
-        stroke?: string;
-        "stroke-dasharray"?: string;
-        "stroke-dashoffset"?: number | string;
-        "stroke-linecap"?: "butt" | "round" | "square" | "inherit";
-        "stroke-linejoin"?: "arcs" | "bevel" | "miter" | "miter-clip" | "round" | "inherit";
-        "stroke-miterlimit"?: number | string | "inherit";
-        "stroke-opacity"?: number | string | "inherit";
-        "stroke-width"?: number | string;
-        "text-anchor"?: "start" | "middle" | "end" | "inherit";
-        "text-decoration"?: "none" | "underline" | "overline" | "line-through" | "blink" | "inherit";
-        "text-rendering"?:
-            | "auto"
+            | "inherit">;
+        "shape-rendering"?: BoxedOr<"auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision" | "inherit">;
+        "stop-color"?: BoxedOr<string>;
+        "stop-opacity"?: BoxedOr<number | string | "inherit">;
+        stroke?: BoxedOr<string>;
+        "stroke-dasharray"?: BoxedOr<string>;
+        "stroke-dashoffset"?: BoxedOr<number | string>;
+        "stroke-linecap"?: BoxedOr<"butt" | "round" | "square" | "inherit">;
+        "stroke-linejoin"?: BoxedOr<"arcs" | "bevel" | "miter" | "miter-clip" | "round" | "inherit">;
+        "stroke-miterlimit"?: BoxedOr<number | string | "inherit">;
+        "stroke-opacity"?: BoxedOr<number | string | "inherit">;
+        "stroke-width"?: BoxedOr<number | string>;
+        "text-anchor"?: BoxedOr<"start" | "middle" | "end" | "inherit">;
+        "text-decoration"?: BoxedOr<"none" | "underline" | "overline" | "line-through" | "blink" | "inherit">;
+        "text-rendering"?: BoxedOr<| "auto"
             | "optimizeSpeed"
             | "optimizeLegibility"
             | "geometricPrecision"
-            | "inherit";
-        "unicode-bidi"?: string;
-        visibility?: "visible" | "hidden" | "collapse" | "inherit";
-        "word-spacing"?: number | string;
-        "writing-mode"?: "lr-tb" | "rl-tb" | "tb-rl" | "lr" | "rl" | "tb" | "inherit";
+            | "inherit">;
+        "unicode-bidi"?: BoxedOr<string>;
+        visibility?: BoxedOr<"visible" | "hidden" | "collapse" | "inherit">;
+        "word-spacing"?: BoxedOr<number | string>;
+        "writing-mode"?: BoxedOr<"lr-tb" | "rl-tb" | "tb-rl" | "lr" | "rl" | "tb" | "inherit">;
     }
 
     interface AnimationElementSVGAttributes<T>
@@ -1190,35 +1187,35 @@ export namespace JSX {
     interface FilterPrimitiveElementSVGAttributes<T>
         extends CoreSVGAttributes<T>,
             Pick<PresentationSVGAttributes, "color-interpolation-filters"> {
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
-        result?: string;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
+        result?: BoxedOr<string>;
     }
 
     interface SingleInputFilterSVGAttributes {
-        in?: string;
+        in?: BoxedOr<string>;
     }
 
     interface DoubleInputFilterSVGAttributes {
-        in?: string;
-        in2?: string;
+        in?: BoxedOr<string>;
+        in2?: BoxedOr<string>;
     }
 
     interface FitToViewBoxSVGAttributes {
-        viewBox?: string;
-        preserveAspectRatio?: SVGPreserveAspectRatio;
+        viewBox?: BoxedOr<string>;
+        preserveAspectRatio?: BoxedOr<SVGPreserveAspectRatio>;
     }
 
     interface GradientElementSVGAttributes<T>
         extends CoreSVGAttributes<T>,
             ExternalResourceSVGAttributes,
             StylableSVGAttributes {
-        gradientUnits?: SVGUnits;
-        gradientTransform?: string;
-        spreadMethod?: "pad" | "reflect" | "repeat";
-        href?: string;
+        gradientUnits?: BoxedOr<SVGUnits>;
+        gradientTransform?: BoxedOr<string>;
+        spreadMethod?: BoxedOr<"pad" | "reflect" | "repeat">;
+        href?: BoxedOr<string>;
     }
 
     interface GraphicsElementSVGAttributes<T>
@@ -1244,7 +1241,7 @@ export namespace JSX {
     interface NewViewportSVGAttributes<T>
         extends CoreSVGAttributes<T>,
             Pick<PresentationSVGAttributes, "overflow" | "clip"> {
-        viewBox?: string;
+        viewBox?: BoxedOr<string>;
     }
 
     interface ShapeElementSVGAttributes<T>
@@ -1305,7 +1302,7 @@ export namespace JSX {
     }
 
     interface ZoomAndPanSVGAttributes {
-        zoomAndPan?: "disable" | "magnify";
+        zoomAndPan?: BoxedOr<"disable" | "magnify">;
     }
 
     interface AnimateSVGAttributes<T>
@@ -1322,10 +1319,10 @@ export namespace JSX {
             AnimationTimingSVGAttributes,
             AnimationValueSVGAttributes,
             AnimationAdditionSVGAttributes {
-        path?: string;
-        keyPoints?: string;
-        rotate?: number | string | "auto" | "auto-reverse";
-        origin?: "default";
+        path?: BoxedOr<string>;
+        keyPoints?: BoxedOr<string>;
+        rotate?: BoxedOr<number | string | "auto" | "auto-reverse">;
+        origin?: BoxedOr<"default">;
     }
 
     interface AnimateTransformSVGAttributes<T>
@@ -1334,7 +1331,7 @@ export namespace JSX {
             AnimationTimingSVGAttributes,
             AnimationValueSVGAttributes,
             AnimationAdditionSVGAttributes {
-        type?: "translate" | "scale" | "rotate" | "skewX" | "skewY";
+        type?: BoxedOr<"translate" | "scale" | "rotate" | "skewX" | "skewY">;
     }
 
     interface CircleSVGAttributes<T>
@@ -1343,9 +1340,9 @@ export namespace JSX {
             ConditionalProcessingSVGAttributes,
             StylableSVGAttributes,
             TransformableSVGAttributes {
-        cx?: number | string;
-        cy?: number | string;
-        r?: number | string;
+        cx?: BoxedOr<number | string>;
+        cy?: BoxedOr<number | string>;
+        r?: BoxedOr<number | string>;
     }
 
     interface ClipPathSVGAttributes<T>
@@ -1355,7 +1352,7 @@ export namespace JSX {
             StylableSVGAttributes,
             TransformableSVGAttributes,
             Pick<PresentationSVGAttributes, "clip-path"> {
-        clipPathUnits?: SVGUnits;
+        clipPathUnits?: BoxedOr<SVGUnits>;
     }
 
     interface DefsSVGAttributes<T>
@@ -1376,25 +1373,25 @@ export namespace JSX {
             ExternalResourceSVGAttributes,
             StylableSVGAttributes,
             TransformableSVGAttributes {
-        cx?: number | string;
-        cy?: number | string;
-        rx?: number | string;
-        ry?: number | string;
+        cx?: BoxedOr<number | string>;
+        cy?: BoxedOr<number | string>;
+        rx?: BoxedOr<number | string>;
+        ry?: BoxedOr<number | string>;
     }
 
     interface FeBlendSVGAttributes<T>
         extends FilterPrimitiveElementSVGAttributes<T>,
             DoubleInputFilterSVGAttributes,
             StylableSVGAttributes {
-        mode?: "normal" | "multiply" | "screen" | "darken" | "lighten";
+        mode?: BoxedOr<"normal" | "multiply" | "screen" | "darken" | "lighten">;
     }
 
     interface FeColorMatrixSVGAttributes<T>
         extends FilterPrimitiveElementSVGAttributes<T>,
             SingleInputFilterSVGAttributes,
             StylableSVGAttributes {
-        type?: "matrix" | "saturate" | "hueRotate" | "luminanceToAlpha";
-        values?: string;
+        type?: BoxedOr<"matrix" | "saturate" | "hueRotate" | "luminanceToAlpha">;
+        values?: BoxedOr<string>;
     }
 
     interface FeComponentTransferSVGAttributes<T>
@@ -1407,26 +1404,26 @@ export namespace JSX {
         extends FilterPrimitiveElementSVGAttributes<T>,
             DoubleInputFilterSVGAttributes,
             StylableSVGAttributes {
-        operator?: "over" | "in" | "out" | "atop" | "xor" | "arithmetic";
-        k1?: number | string;
-        k2?: number | string;
-        k3?: number | string;
-        k4?: number | string;
+        operator?: BoxedOr<"over" | "in" | "out" | "atop" | "xor" | "arithmetic">;
+        k1?: BoxedOr<number | string>;
+        k2?: BoxedOr<number | string>;
+        k3?: BoxedOr<number | string>;
+        k4?: BoxedOr<number | string>;
     }
 
     interface FeConvolveMatrixSVGAttributes<T>
         extends FilterPrimitiveElementSVGAttributes<T>,
             SingleInputFilterSVGAttributes,
             StylableSVGAttributes {
-        order?: number | string;
-        kernelMatrix?: string;
-        divisor?: number | string;
-        bias?: number | string;
-        targetX?: number | string;
-        targetY?: number | string;
-        edgeMode?: "duplicate" | "wrap" | "none";
-        kernelUnitLength?: number | string;
-        preserveAlpha?: "true" | "false";
+        order?: BoxedOr<number | string>;
+        kernelMatrix?: BoxedOr<string>;
+        divisor?: BoxedOr<number | string>;
+        bias?: BoxedOr<number | string>;
+        targetX?: BoxedOr<number | string>;
+        targetY?: BoxedOr<number | string>;
+        edgeMode?: BoxedOr<"duplicate" | "wrap" | "none">;
+        kernelUnitLength?: BoxedOr<number | string>;
+        preserveAlpha?: BoxedOr<"true" | "false">;
     }
 
     interface FeDiffuseLightingSVGAttributes<T>
@@ -1434,23 +1431,23 @@ export namespace JSX {
             SingleInputFilterSVGAttributes,
             StylableSVGAttributes,
             Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
-        surfaceScale?: number | string;
-        diffuseConstant?: number | string;
-        kernelUnitLength?: number | string;
+        surfaceScale?: BoxedOr<number | string>;
+        diffuseConstant?: BoxedOr<number | string>;
+        kernelUnitLength?: BoxedOr<number | string>;
     }
 
     interface FeDisplacementMapSVGAttributes<T>
         extends FilterPrimitiveElementSVGAttributes<T>,
             DoubleInputFilterSVGAttributes,
             StylableSVGAttributes {
-        scale?: number | string;
-        xChannelSelector?: "R" | "G" | "B" | "A";
-        yChannelSelector?: "R" | "G" | "B" | "A";
+        scale?: BoxedOr<number | string>;
+        xChannelSelector?: BoxedOr<"R" | "G" | "B" | "A">;
+        yChannelSelector?: BoxedOr<"R" | "G" | "B" | "A">;
     }
 
     interface FeDistantLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-        azimuth?: number | string;
-        elevation?: number | string;
+        azimuth?: BoxedOr<number | string>;
+        elevation?: BoxedOr<number | string>;
     }
 
     interface FeDropShadowSVGAttributes<T>
@@ -1458,9 +1455,9 @@ export namespace JSX {
             FilterPrimitiveElementSVGAttributes<T>,
             StylableSVGAttributes,
             Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> {
-        dx?: number | string;
-        dy?: number | string;
-        stdDeviation?: number | string;
+        dx?: BoxedOr<number | string>;
+        dy?: BoxedOr<number | string>;
+        stdDeviation?: BoxedOr<number | string>;
     }
 
     interface FeFloodSVGAttributes<T>
@@ -1470,28 +1467,28 @@ export namespace JSX {
     }
 
     interface FeFuncSVGAttributes<T> extends CoreSVGAttributes<T> {
-        type?: "identity" | "table" | "discrete" | "linear" | "gamma";
-        tableValues?: string;
-        slope?: number | string;
-        intercept?: number | string;
-        amplitude?: number | string;
-        exponent?: number | string;
-        offset?: number | string;
+        type?: BoxedOr<"identity" | "table" | "discrete" | "linear" | "gamma">;
+        tableValues?: BoxedOr<string>;
+        slope?: BoxedOr<number | string>;
+        intercept?: BoxedOr<number | string>;
+        amplitude?: BoxedOr<number | string>;
+        exponent?: BoxedOr<number | string>;
+        offset?: BoxedOr<number | string>;
     }
 
     interface FeGaussianBlurSVGAttributes<T>
         extends FilterPrimitiveElementSVGAttributes<T>,
             SingleInputFilterSVGAttributes,
             StylableSVGAttributes {
-        stdDeviation?: number | string;
+        stdDeviation?: BoxedOr<number | string>;
     }
 
     interface FeImageSVGAttributes<T>
         extends FilterPrimitiveElementSVGAttributes<T>,
             ExternalResourceSVGAttributes,
             StylableSVGAttributes {
-        preserveAspectRatio?: SVGPreserveAspectRatio;
-        href?: string;
+        preserveAspectRatio?: BoxedOr<SVGPreserveAspectRatio>;
+        href?: BoxedOr<string>;
     }
 
     interface FeMergeSVGAttributes<T>
@@ -1508,22 +1505,22 @@ export namespace JSX {
         extends FilterPrimitiveElementSVGAttributes<T>,
             SingleInputFilterSVGAttributes,
             StylableSVGAttributes {
-        operator?: "erode" | "dilate";
-        radius?: number | string;
+        operator?: BoxedOr<"erode" | "dilate">;
+        radius?: BoxedOr<number | string>;
     }
 
     interface FeOffsetSVGAttributes<T>
         extends FilterPrimitiveElementSVGAttributes<T>,
             SingleInputFilterSVGAttributes,
             StylableSVGAttributes {
-        dx?: number | string;
-        dy?: number | string;
+        dx?: BoxedOr<number | string>;
+        dy?: BoxedOr<number | string>;
     }
 
     interface FePointLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-        x?: number | string;
-        y?: number | string;
-        z?: number | string;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        z?: BoxedOr<number | string>;
     }
 
     interface FeSpecularLightingSVGAttributes<T>
@@ -1531,21 +1528,21 @@ export namespace JSX {
             SingleInputFilterSVGAttributes,
             StylableSVGAttributes,
             Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
-        surfaceScale?: string;
-        specularConstant?: string;
-        specularExponent?: string;
-        kernelUnitLength?: number | string;
+        surfaceScale?: BoxedOr<string>;
+        specularConstant?: BoxedOr<string>;
+        specularExponent?: BoxedOr<string>;
+        kernelUnitLength?: BoxedOr<number | string>;
     }
 
     interface FeSpotLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-        x?: number | string;
-        y?: number | string;
-        z?: number | string;
-        pointsAtX?: number | string;
-        pointsAtY?: number | string;
-        pointsAtZ?: number | string;
-        specularExponent?: number | string;
-        limitingConeAngle?: number | string;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        z?: BoxedOr<number | string>;
+        pointsAtX?: BoxedOr<number | string>;
+        pointsAtY?: BoxedOr<number | string>;
+        pointsAtZ?: BoxedOr<number | string>;
+        specularExponent?: BoxedOr<number | string>;
+        limitingConeAngle?: BoxedOr<number | string>;
     }
 
     interface FeTileSVGAttributes<T>
@@ -1557,24 +1554,24 @@ export namespace JSX {
     interface FeTurbulanceSVGAttributes<T>
         extends FilterPrimitiveElementSVGAttributes<T>,
             StylableSVGAttributes {
-        baseFrequency?: number | string;
-        numOctaves?: number | string;
-        seed?: number | string;
-        stitchTiles?: "stitch" | "noStitch";
-        type?: "fractalNoise" | "turbulence";
+        baseFrequency?: BoxedOr<number | string>;
+        numOctaves?: BoxedOr<number | string>;
+        seed?: BoxedOr<number | string>;
+        stitchTiles?: BoxedOr<"stitch" | "noStitch">;
+        type?: BoxedOr<"fractalNoise" | "turbulence">;
     }
 
     interface FilterSVGAttributes<T>
         extends CoreSVGAttributes<T>,
             ExternalResourceSVGAttributes,
             StylableSVGAttributes {
-        filterUnits?: SVGUnits;
-        primitiveUnits?: SVGUnits;
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
-        filterRes?: number | string;
+        filterUnits?: BoxedOr<SVGUnits>;
+        primitiveUnits?: BoxedOr<SVGUnits>;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
+        filterRes?: BoxedOr<number | string>;
     }
 
     interface ForeignObjectSVGAttributes<T>
@@ -1584,10 +1581,10 @@ export namespace JSX {
             StylableSVGAttributes,
             TransformableSVGAttributes,
             Pick<PresentationSVGAttributes, "display" | "visibility"> {
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
     }
 
     interface GSVGAttributes<T>
@@ -1606,12 +1603,12 @@ export namespace JSX {
             StylableSVGAttributes,
             TransformableSVGAttributes,
             Pick<PresentationSVGAttributes, "color-profile" | "image-rendering"> {
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
-        preserveAspectRatio?: ImagePreserveAspectRatio;
-        href?: string;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
+        preserveAspectRatio?: BoxedOr<ImagePreserveAspectRatio>;
+        href?: BoxedOr<string>;
     }
 
     interface LineSVGAttributes<T>
@@ -1622,17 +1619,17 @@ export namespace JSX {
             StylableSVGAttributes,
             TransformableSVGAttributes,
             Pick<PresentationSVGAttributes, "marker-start" | "marker-mid" | "marker-end"> {
-        x1?: number | string;
-        y1?: number | string;
-        x2?: number | string;
-        y2?: number | string;
+        x1?: BoxedOr<number | string>;
+        y1?: BoxedOr<number | string>;
+        x2?: BoxedOr<number | string>;
+        y2?: BoxedOr<number | string>;
     }
 
     interface LinearGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
-        x1?: number | string;
-        x2?: number | string;
-        y1?: number | string;
-        y2?: number | string;
+        x1?: BoxedOr<number | string>;
+        x2?: BoxedOr<number | string>;
+        y1?: BoxedOr<number | string>;
+        y2?: BoxedOr<number | string>;
     }
 
     interface MarkerSVGAttributes<T>
@@ -1641,12 +1638,12 @@ export namespace JSX {
             StylableSVGAttributes,
             FitToViewBoxSVGAttributes,
             Pick<PresentationSVGAttributes, "overflow" | "clip"> {
-        markerUnits?: "strokeWidth" | "userSpaceOnUse";
-        refX?: number | string;
-        refY?: number | string;
-        markerWidth?: number | string;
-        markerHeight?: number | string;
-        orient?: string;
+        markerUnits?: BoxedOr<"strokeWidth" | "userSpaceOnUse">;
+        refX?: BoxedOr<number | string>;
+        refY?: BoxedOr<number | string>;
+        markerWidth?: BoxedOr<number | string>;
+        markerHeight?: BoxedOr<number | string>;
+        orient?: BoxedOr<string>;
     }
 
     interface MaskSVGAttributes<T>
@@ -1654,12 +1651,12 @@ export namespace JSX {
             ConditionalProcessingSVGAttributes,
             ExternalResourceSVGAttributes,
             StylableSVGAttributes {
-        maskUnits?: SVGUnits;
-        maskContentUnits?: SVGUnits;
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
+        maskUnits?: BoxedOr<SVGUnits>;
+        maskContentUnits?: BoxedOr<SVGUnits>;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
     }
 
     interface MetadataSVGAttributes<T> extends CoreSVGAttributes<T> {
@@ -1676,8 +1673,8 @@ export namespace JSX {
             StylableSVGAttributes,
             TransformableSVGAttributes,
             Pick<PresentationSVGAttributes, "marker-start" | "marker-mid" | "marker-end"> {
-        d?: string;
-        pathLength?: number | string;
+        d?: BoxedOr<string>;
+        pathLength?: BoxedOr<number | string>;
     }
 
     interface PatternSVGAttributes<T>
@@ -1687,14 +1684,14 @@ export namespace JSX {
             StylableSVGAttributes,
             FitToViewBoxSVGAttributes,
             Pick<PresentationSVGAttributes, "overflow" | "clip"> {
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
-        patternUnits?: SVGUnits;
-        patternContentUnits?: SVGUnits;
-        patternTransform?: string;
-        href?: string;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
+        patternUnits?: BoxedOr<SVGUnits>;
+        patternContentUnits?: BoxedOr<SVGUnits>;
+        patternTransform?: BoxedOr<string>;
+        href?: BoxedOr<string>;
     }
 
     interface PolygonSVGAttributes<T>
@@ -1705,7 +1702,7 @@ export namespace JSX {
             StylableSVGAttributes,
             TransformableSVGAttributes,
             Pick<PresentationSVGAttributes, "marker-start" | "marker-mid" | "marker-end"> {
-        points?: string;
+        points?: BoxedOr<string>;
     }
 
     interface PolylineSVGAttributes<T>
@@ -1716,15 +1713,15 @@ export namespace JSX {
             StylableSVGAttributes,
             TransformableSVGAttributes,
             Pick<PresentationSVGAttributes, "marker-start" | "marker-mid" | "marker-end"> {
-        points?: string;
+        points?: BoxedOr<string>;
     }
 
     interface RadialGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
-        cx?: number | string;
-        cy?: number | string;
-        r?: number | string;
-        fx?: number | string;
-        fy?: number | string;
+        cx?: BoxedOr<number | string>;
+        cy?: BoxedOr<number | string>;
+        r?: BoxedOr<number | string>;
+        fx?: BoxedOr<number | string>;
+        fy?: BoxedOr<number | string>;
     }
 
     interface RectSVGAttributes<T>
@@ -1734,12 +1731,12 @@ export namespace JSX {
             ExternalResourceSVGAttributes,
             StylableSVGAttributes,
             TransformableSVGAttributes {
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
-        rx?: number | string;
-        ry?: number | string;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
+        rx?: BoxedOr<number | string>;
+        ry?: BoxedOr<number | string>;
     }
 
     interface SetSVGAttributes<T>
@@ -1752,7 +1749,7 @@ export namespace JSX {
         extends CoreSVGAttributes<T>,
             StylableSVGAttributes,
             Pick<PresentationSVGAttributes, "color" | "stop-color" | "stop-opacity"> {
-        offset?: number | string;
+        offset?: BoxedOr<number | string>;
     }
 
     interface SvgSVGAttributes<T>
@@ -1764,15 +1761,15 @@ export namespace JSX {
             FitToViewBoxSVGAttributes,
             ZoomAndPanSVGAttributes,
             PresentationSVGAttributes {
-        version?: string;
-        baseProfile?: string;
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
-        contentScriptType?: string;
-        contentStyleType?: string;
-        xmlns?: "http://www.w3.org/2000/svg" | string;
+        version?: BoxedOr<string>;
+        baseProfile?: BoxedOr<string>;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
+        contentScriptType?: BoxedOr<string>;
+        contentStyleType?: BoxedOr<string>;
+        xmlns?: BoxedOr<"http://www.w3.org/2000/svg" | string>;
     }
 
     interface SwitchSVGAttributes<T>
@@ -1790,14 +1787,14 @@ export namespace JSX {
             ExternalResourceSVGAttributes,
             StylableSVGAttributes,
             FitToViewBoxSVGAttributes {
-        width?: number | string;
-        height?: number | string;
-        preserveAspectRatio?: SVGPreserveAspectRatio;
-        refX?: number | string;
-        refY?: number | string;
-        viewBox?: string;
-        x?: number | string;
-        y?: number | string;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
+        preserveAspectRatio?: BoxedOr<SVGPreserveAspectRatio>;
+        refX?: BoxedOr<number | string>;
+        refY?: BoxedOr<number | string>;
+        viewBox?: BoxedOr<string>;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
     }
 
     interface TextSVGAttributes<T>
@@ -1808,13 +1805,13 @@ export namespace JSX {
             StylableSVGAttributes,
             TransformableSVGAttributes,
             Pick<PresentationSVGAttributes, "writing-mode" | "text-rendering"> {
-        x?: number | string;
-        y?: number | string;
-        dx?: number | string;
-        dy?: number | string;
-        rotate?: number | string;
-        textLength?: number | string;
-        lengthAdjust?: "spacing" | "spacingAndGlyphs";
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        dx?: BoxedOr<number | string>;
+        dy?: BoxedOr<number | string>;
+        rotate?: BoxedOr<number | string>;
+        textLength?: BoxedOr<number | string>;
+        lengthAdjust?: BoxedOr<"spacing" | "spacingAndGlyphs">;
     }
 
     interface TextPathSVGAttributes<T>
@@ -1826,10 +1823,10 @@ export namespace JSX {
                 PresentationSVGAttributes,
                 "alignment-baseline" | "baseline-shift" | "display" | "visibility"
             > {
-        startOffset?: number | string;
-        method?: "align" | "stretch";
-        spacing?: "auto" | "exact";
-        href?: string;
+        startOffset?: BoxedOr<number | string>;
+        method?: BoxedOr<"align" | "stretch">;
+        spacing?: BoxedOr<"auto" | "exact">;
+        href?: BoxedOr<string>;
     }
 
     interface TSpanSVGAttributes<T>
@@ -1841,13 +1838,13 @@ export namespace JSX {
                 PresentationSVGAttributes,
                 "alignment-baseline" | "baseline-shift" | "display" | "visibility"
             > {
-        x?: number | string;
-        y?: number | string;
-        dx?: number | string;
-        dy?: number | string;
-        rotate?: number | string;
-        textLength?: number | string;
-        lengthAdjust?: "spacing" | "spacingAndGlyphs";
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        dx?: BoxedOr<number | string>;
+        dy?: BoxedOr<number | string>;
+        rotate?: BoxedOr<number | string>;
+        textLength?: BoxedOr<number | string>;
+        lengthAdjust?: BoxedOr<"spacing" | "spacingAndGlyphs">;
     }
 
     interface UseSVGAttributes<T>
@@ -1856,11 +1853,11 @@ export namespace JSX {
             ExternalResourceSVGAttributes,
             StylableSVGAttributes,
             TransformableSVGAttributes {
-        x?: number | string;
-        y?: number | string;
-        width?: number | string;
-        height?: number | string;
-        href?: string;
+        x?: BoxedOr<number | string>;
+        y?: BoxedOr<number | string>;
+        width?: BoxedOr<number | string>;
+        height?: BoxedOr<number | string>;
+        href?: BoxedOr<string>;
     }
 
     interface ViewSVGAttributes<T>
@@ -1868,7 +1865,7 @@ export namespace JSX {
             ExternalResourceSVGAttributes,
             FitToViewBoxSVGAttributes,
             ZoomAndPanSVGAttributes {
-        viewTarget?: string;
+        viewTarget?: BoxedOr<string>;
     }
 
     interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {

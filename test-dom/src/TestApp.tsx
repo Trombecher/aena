@@ -1,5 +1,5 @@
 import {
-    addListenerRecursive,
+    addListenerRecursively,
     BoxArray,
     BoxMap,
     BoxSet, deserialize,
@@ -39,9 +39,9 @@ export default function TestApp() {
             map: new BoxMap()
         };
         
-        state.array.add(0);
-        state.array.add(1);
-        state.array.add(2);
+        state.array.append(0);
+        state.array.append(1);
+        state.array.append(2);
         
         state.set.add(0);
         state.set.add(1);
@@ -52,7 +52,7 @@ export default function TestApp() {
         state.map.set("two", 2);
     }
     
-    addListenerRecursive(state, () => {
+    addListenerRecursively(state, () => {
         url.searchParams.set("state", encodeURIComponent(serialize(state)));
         history.replaceState(null, "", url.toString());
     });
@@ -115,7 +115,7 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxArray</code></h1>
 
                 <h2>Adding</h2>
-                <button onclick={() => array.add(Math.round(Math.random() * 10))}>Add random number</button>
+                <button onclick={() => array.append(Math.round(Math.random() * 10))}>Add random number</button>
 
                 <h2>Swapping</h2>
                 <button onclick={() => array.swapIndices(0, -1)}>Swap first and last element</button>

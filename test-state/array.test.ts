@@ -1,12 +1,12 @@
 import {expect, test} from "vitest";
-import {BoxArray} from "../src";
+import {BoxArray, WritableBox} from "../src";
 import {Action, IndexInfoCode, SetInfoCode, SwapIndicesInfoCode, SwapInfoCode} from "../src/array";
 
 function create012BoxArray(): BoxArray<number> {
     const boxArray = new BoxArray<number>();
-    boxArray.add(0);
-    boxArray.add(1);
-    boxArray.add(2);
+    boxArray.append(0);
+    boxArray.append(1);
+    boxArray.append(2);
     return boxArray;
 }
 
@@ -19,7 +19,7 @@ test("new(length)", () => {
     expect(boxArray.length).toBe(10);
 });
 
-test("add & at", () => {
+test("append & at", () => {
     const boxArray = create012BoxArray();
 
     expect(boxArray.at(0)).toBe(0);
@@ -32,6 +32,16 @@ test("add & at", () => {
 test("static from", () => {
     const array = BoxArray.from(3, index => index);
     expect(array.toString()).toBe("[0,1,2]");
+});
+
+test("prepend", () => {
+    const boxArray = new BoxArray<number>();
+    boxArray.prepend(0);
+    boxArray.prepend(1);
+
+    expect(boxArray.at(0)).toBe(1);
+    expect(boxArray.at(1)).toBe(0);
+    expect(boxArray.at(2)).toBe(undefined);
 });
 
 test("set", () => {
@@ -138,7 +148,14 @@ test("delete", () => {
     expect(boxArray.length).toBe(2);
 });
 
-test("`Boxed` implementation", () => {
+test("clear", () => {
+    const boxArray = create012BoxArray();
+    boxArray.clear();
+
+    expect(boxArray.length).toBe(0);
+});
+
+test("`Listen` implementation", () => {
     const array = new BoxArray<number>();
 
     let lastInsertedValue: number | undefined = undefined;
@@ -194,6 +211,45 @@ test("`Boxed` implementation", () => {
     expect(lastInsertedValue).toBe(42);
 
     array.removeListener(listener);
+});
 
-    // TODO: Test `removeListener(...)` and `BoxedParent`
+test("`ListenDeep` implementation", () => {
+    type Item = {bar: WritableBox<number>};
+
+    const array = new BoxArray<Item | WritableBox<number>>();
+    let callCount = 0;
+
+    const listener = array.addDeepListener(() => callCount++);
+
+    const foo = {bar: new WritableBox(0)} satisfies Item;
+    const baz = new WritableBox(0);
+
+    array.append(foo);
+    expect(callCount).toBe(1);
+
+    foo.bar.value = Math.random();
+    expect(callCount).toBe(2);
+
+    array.clear();
+    expect(callCount).toBe(3);
+
+    array.append(baz);
+    expect(callCount).toBe(4);
+
+    baz.value = Math.random();
+    expect(callCount).toBe(5);
+
+    array.clear();
+    expect(callCount).toBe(6);
+
+    // At this point the listener should not be called.
+
+    foo.bar.value = Math.random();
+    baz.value = Math.random();
+    array.removeDeepListener(listener);
+    array.append(foo);
+    expect(callCount).toBe(6);
+    array.clear();
+
+    expect(callCount).toBe(6);
 });

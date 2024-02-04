@@ -16,6 +16,7 @@ import {Box, WritableBox} from "./box";
 import {BoxMap} from "./map";
 import {BoxSet} from "./set";
 import {BoxArray} from "./array";
+import {isObject} from "./internal";
 
 export const enum BoxIdentifier {
     WritableBox = 0,
@@ -138,6 +139,11 @@ export function isInstanceOfListenDeep<L extends Function>(o: object): o is List
 }
 
 /**
+ * The standard listener type.
+ */
+export type Listener<C> = (change: C) => void;
+
+/**
  * The standard deep listener type.
  *
  * Extracted to a separate type due to flexibility.
@@ -161,18 +167,18 @@ export type DeepListener = () => void;
  * boxed.removeListener(listener);
  * ```
  */
-export interface Listen<L extends Function> {
+export interface Listen<C> {
     /**
      * Add a listener.
      *
      * @returns The parameter `listener` for lazy typing.
      */
-    addListener(listener: L): L;
+    addListener(listener: Listener<C>): Listener<C>;
 
     /**
      * Remove a listener.
      */
-    removeListener(listener: L): void;
+    removeListener(listener: Listener<C>): void;
 }
 
 /**
@@ -197,7 +203,7 @@ export interface Listen<L extends Function> {
  * boxedParent.removeDeepListener(listener);
  * ```
  */
-export interface ListenDeep<L extends Function> extends Listen<L> {
+export interface ListenDeep<C> extends Listen<C> {
     /**
      * Add a deep listener.
      *
@@ -214,30 +220,23 @@ export interface ListenDeep<L extends Function> extends Listen<L> {
 /**
  * If `value` is an object, it adds the given `listener` to all boxed descendants.
  */
-export function addListenerRecursive(value: any, listener: () => void): void {
+export function addListenerRecursively(value: any, listener: DeepListener): void {
     if(!isObject(value)) return;
 
     if(isInstanceOfListenDeep(value)) value.addDeepListener(listener);
     else if(isInstanceOfListen(value)) value.addListener(listener);
     else Object.keys(value).forEach(key =>
-            addListenerRecursive(value[key as keyof typeof value], listener));
+            addListenerRecursively(value[key as keyof typeof value], listener));
 }
 
 /**
  * If `value` is an object, it removes the given `listener` from all boxed descendants.
  */
-export function removeListenerRecursive(value: any, listener: () => void): void {
+export function removeListenerRecursively(value: any, listener: DeepListener): void {
     if(!isObject(value)) return;
 
     if(isInstanceOfListenDeep(value)) value.removeDeepListener(listener);
     else if(isInstanceOfListen(value)) value.removeListener(listener);
     else Object.keys(value).forEach(key =>
-            removeListenerRecursive(value[key as keyof typeof value], listener));
-}
-
-/**
- * Checks if the parameter `value` is an object and not null.
- */
-export function isObject(value: any): value is object {
-    return typeof value === "object" && value !== null;
+            removeListenerRecursively(value[key as keyof typeof value], listener));
 }

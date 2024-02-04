@@ -1,9 +1,5 @@
-import {
-    addListenerRecursive,
-    DeepListener,
-    isObject, ListenDeep,
-    removeListenerRecursive
-} from "./index";
+import {addListenerRecursively, DeepListener, ListenDeep, Listener, removeListenerRecursively,} from "./index";
+import {addListenersDeep, removeListenersDeep} from "./internal";
 
 export const enum Action {
     Set,
@@ -20,34 +16,23 @@ export type Change<K, V> = Readonly<{
     value: V
 }>;
 
-export type Listener<K, V> = (change: Change<K, V>) => void;
-
-/**
- * Turns an arbitrary key type `K` into an object key.
- */
-export type ObjectKey<K> = K extends (string | number | symbol) ? K : string;
-
 /**
  * A reactive map for immutable data.
  */
-export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Listener<K, V>> {
+export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Change<K, V>> {
     override set(key: K, value: V): this {
         if(this.has(key)) return this;
         super.set(key, value);
 
         // Ensure that all deep listeners are attached to all boxed descendants of `value`.
-        if(isObject(value))
-            this.#deepListeners.forEach(listener =>
-                addListenerRecursive(value, listener));
+        addListenersDeep(this.#deepListeners, value);
 
         // Notify all listeners about the addition of this value.
-        const change = {
+        this.#notify({
             action: Action.Set,
             key,
             value
-        } satisfies Change<K, V>;
-        this.#listeners.forEach(listener => listener(change));
-        this.#deepListeners.forEach(listener => listener());
+        });
 
         return this;
     }
@@ -70,18 +55,14 @@ export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Listener<K, V>
         if(!super.delete(key)) return false;
 
         // Ensure that all listeners are remove from all descendants.
-        if(isObject(value))
-            this.#deepListeners.forEach(listener =>
-                removeListenerRecursive(value, listener));
+        removeListenersDeep(this.#deepListeners, value);
 
         // Notify all listeners about the deletion of this value.
-        const change = {
+        this.#notify({
             action: Action.Delete,
             key,
             value
-        } satisfies Change<K, V>;
-        this.#listeners.forEach(listener => listener(change));
-        this.#deepListeners.forEach(listener => listener());
+        });
 
         return true;
     }
@@ -111,27 +92,32 @@ export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Listener<K, V>
         return JSON.stringify(this.reduce({} as Record<any, any>, (o, k, v) => (o[k as any] = v as any, o)));
     }
 
-    // The following code may repeat across files; but there is no other option.
-    readonly #listeners = new Set<Listener<K, V>>();
+    // The following code may repeat across files but there is no other option.
+    readonly #listeners = new Set<Listener<Change<K, V>>>();
     readonly #deepListeners = new Set<DeepListener>();
+
+    #notify(change: Change<K, V>) {
+        this.#listeners.forEach(listener => listener(change));
+        this.#deepListeners.forEach(listener => listener());
+    }
 
     addDeepListener(listener: DeepListener): DeepListener {
         this.#deepListeners.add(listener);
-        this.forEach(value => addListenerRecursive(value, listener));
+        this.forEach(value => addListenerRecursively(value, listener));
         return listener;
     }
 
     removeDeepListener(listener: DeepListener) {
         this.#deepListeners.delete(listener);
-        this.forEach(value => removeListenerRecursive(value, listener));
+        this.forEach(value => removeListenerRecursively(value, listener));
     }
 
-    addListener(listener: Listener<K, V>) {
+    addListener(listener: Listener<Change<K, V>>) {
         this.#listeners.add(listener);
         return listener;
     }
 
-    removeListener(listener: Listener<K, V>) {
+    removeListener(listener: Listener<Change<K, V>>) {
         this.#listeners.delete(listener);
     }
 }

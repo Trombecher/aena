@@ -72,7 +72,7 @@ test("toString", () => {
     expect(array.indexOf(2) !== -1).toBeTruthy();
 });
 
-test("`Boxed` implementation", () => {
+test("`Listen` implementation", () => {
     const set = create012BoxSet();
 
     let lastAdded: number | undefined = undefined;
@@ -102,7 +102,7 @@ test("`Boxed` implementation", () => {
     expect(lastDeleted).toBe(42);
 });
 
-test("`BoxedParent` implementation", () => {
+test("`ListenDeep` implementation", () => {
     type Item = {bar: WritableBox<number>};
 
     const set = new BoxSet<Item | WritableBox<number>>();
