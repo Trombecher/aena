@@ -1012,7 +1012,7 @@ export namespace JSX {
 
 
     interface StylableSVGAttributes {
-        class?: BoxedOr<string | undefined>;
+        class?: BoxedOr<string>;
         style?: BoxedOr<string>;
     }
 

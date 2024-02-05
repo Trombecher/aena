@@ -1,4 +1,4 @@
-import {addListenerRecursively, DeepListener, Listener, removeListenerRecursively} from "./index";
+import {addListenerRecursively, DeepListener, ListenDeep, Listener, removeListenerRecursively} from "./index";
 import {addListenersDeep, removeListenersDeep} from "./internal";
 
 export const enum SwapIndicesInfoCode {
@@ -65,7 +65,7 @@ export type Change<T> = {
  * const booleans = new BoxArray([true, false]);
  * ```
  */
-export class BoxArray<T> {
+export class BoxArray<T> implements ListenDeep<Change<T>> {
     readonly #array;
 
     /**
