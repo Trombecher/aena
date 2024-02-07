@@ -1,4 +1,4 @@
-import {addListenerRecursively, DeepListener, ListenDeep, Listener, removeListenerRecursively,} from "./index";
+import {addListenerRecursively, DeepListener, ListenDeep, Listener, removeListenerRecursively} from "./index";
 import {addListenersDeep, removeListenersDeep} from "./internal";
 
 export const enum Action {

@@ -107,11 +107,11 @@ export function deserialize<O extends Omit<object, "">>(s: string): O {
  * const repeated = reduce([boxedNumber, boxedString] as const, ([n, s]) => s.repeat(n));
  * ```
  */
-export function reduce<V extends any[], T>(
-    dependencies: Readonly<IntoBoxArray<V>>,
-    reducer: (values: V) => T
+export function reduce<V extends Box<any>[], T>(
+    dependencies: V,
+    reducer: (values: UnboxArray<V>) => T
 ): Box<T> {
-    const values = dependencies.map(d => d!.value) as V;
+    const values = dependencies.map(d => d!.value) as UnboxArray<V>;
 
     const reducedBox = new WritableBox(reducer(values));
     dependencies.forEach((box, index) => box!.addListener(value => {

@@ -85,10 +85,25 @@ export class BoxArray<T> implements ListenDeep<Change<T>> {
             : new Array<T>();
     }
 
+    /**
+     * Returns the iterator for this {@link BoxArray}.
+     * This is useful for iteration via a for-of loop, but {@link BoxArray.forEach} will be faster because it is running natively.
+     *
+     * # Example
+     *
+     * ```typescript
+     * const array = new BoxArray<number>();
+     * array.append(10);
+     * for(const value of array) console.log(value);
+     * ```
+     */
     [Symbol.iterator]() {
         return this.#array[Symbol.iterator]();
     }
 
+    /**
+     * Iterates over the values of this {@link BoxArray}.
+     */
     forEach(handler: (value: T, index: number) => void) {
         this.#array.forEach(handler);
     }
@@ -100,6 +115,9 @@ export class BoxArray<T> implements ListenDeep<Change<T>> {
         return this.#array.indexOf(value);
     }
 
+    /**
+     * Swaps the values at the given indices.
+     */
     swapIndices(indexA: number, indexB: number): SwapIndicesInfoCode {
         if(indexA < -this.#array.length)
             return SwapIndicesInfoCode.IndexAOutOfLowerBound;
@@ -123,7 +141,7 @@ export class BoxArray<T> implements ListenDeep<Change<T>> {
     }
 
     /**
-     * Swaps values a and b. If one value does not exist, nothing will be swapped.
+     * Swaps values a and b.
      */
     swap(a: T, b: T): SwapInfoCode {
         if(a === b) return SwapInfoCode.IndicesAreEqual;
@@ -187,6 +205,9 @@ export class BoxArray<T> implements ListenDeep<Change<T>> {
         });
     }
 
+    /**
+     * Returns the value located at the specified index.
+     */
     at(index: number) {
         return this.#array.at(index);
     }
@@ -241,7 +262,7 @@ export class BoxArray<T> implements ListenDeep<Change<T>> {
     }
 
     /**
-     * Prepends the `value` to the start of this {@link BoxArray}
+     * Prepends the `value` to the start of this {@link BoxArray}.
      */
     prepend(value: T) {
         this.#array.unshift(value);
