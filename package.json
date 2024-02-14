@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.12.3",
+    "version": "0.12.4",
     "description": "Your next SPA TypeScript framework.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -57,7 +57,7 @@
         }
     },
     "devDependencies": {
-        "typedoc": "^0.25.7",
+        "typedoc": "^0.25.8",
         "typescript": "^5.3.3",
         "vitest": "^1.2.2"
     },
