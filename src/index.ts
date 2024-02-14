@@ -1,6 +1,6 @@
 // Re-export commonly used things.
 
-export {Box, WritableBox} from "./box";
+export {Box, type ReadonlyBox} from "./box";
 export {BoxSet} from "./set";
 export {BoxArray} from "./array";
 export {BoxMap} from "./map";
@@ -12,19 +12,8 @@ export {
     mount
 } from "./jsx-runtime";
 
-import {Box, WritableBox} from "./box";
-import {BoxMap} from "./map";
-import {BoxSet} from "./set";
-import {BoxArray} from "./array";
+import {Box} from "./box";
 import {isObject} from "./internal";
-
-export const enum BoxIdentifier {
-    WritableBox = 0,
-    Box = 1,
-    BoxSet = 2,
-    BoxMap = 3,
-    BoxArray = 4
-}
 
 /**
  * Maps an array of boxes to their unboxed equivalents.
@@ -39,56 +28,6 @@ export type UnboxArray<A extends Box<any>[]> = {
 export type IntoBoxArray<T extends any[]> = {
     [K in keyof T]: Box<T[K]>;
 };
-
-/**
- *
- * Assumes that `obj` does not have a `""` property.
- * @param obj
- * @experimental
- */
-export function serialize<O extends Omit<object, "">>(obj: O) {
-    return JSON.stringify(obj, (_, value) => {
-        if(value instanceof WritableBox) return {"": BoxIdentifier.WritableBox, v: value.value};
-        if(value instanceof Box) return {"": BoxIdentifier.Box, v: value.value};
-        if(value instanceof BoxSet) return {"": BoxIdentifier.BoxSet, v: value.reduce(new Array<any>(), x => x)};
-        if(value instanceof BoxMap) return {"": BoxIdentifier.BoxMap, v: Array.from(value.entries())};
-        if(value instanceof BoxArray) return {"": BoxIdentifier.BoxArray, v: value.toArray()};
-        return value;
-    });
-}
-
-/**
- * Deserializes a string `s` serialized with {@link serialize}.
- * @experimental
- */
-export function deserialize<O extends Omit<object, "">>(s: string): O {
-    return JSON.parse(s, (_, value: {
-        "": BoxIdentifier,
-        v: any
-    } | {
-        [_: string | number | symbol]: any
-    }) => {
-        if(!isObject(value)) return value;
-        switch(value[""]) {
-            case BoxIdentifier.WritableBox:
-                return new WritableBox(value.v);
-            case BoxIdentifier.Box:
-                return new Box(value.v);
-            case BoxIdentifier.BoxSet:
-                const set = new BoxSet();
-                (value.v as unknown[]).forEach(v => set.add(v));
-                return set;
-            case BoxIdentifier.BoxMap:
-                const map = new BoxMap();
-                (value.v as [unknown, unknown][]).forEach(([k, v]) => map.set(k, v));
-                return map;
-            case BoxIdentifier.BoxArray:
-                return new BoxArray(value.v);
-            default:
-                return value;
-        }
-    }) as O;
-}
 
 /**
  * Derives a single {@link Box} from multiple boxes (dependencies).
@@ -113,7 +52,7 @@ export function reduce<V extends Box<any>[], T>(
 ): Box<T> {
     const values = dependencies.map(d => d!.value) as UnboxArray<V>;
 
-    const reducedBox = new WritableBox(reducer(values));
+    const reducedBox = new Box(reducer(values));
     dependencies.forEach((box, index) => box!.addListener(value => {
         values[index] = value;
         reducedBox.value = reducer(values);

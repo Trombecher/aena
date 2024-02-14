@@ -1,5 +1,5 @@
 import {expect, test} from "vitest";
-import {BoxSet, WritableBox} from "../src";
+import {Box, BoxSet} from "../src";
 import {Action} from "../src/set";
 
 function create012BoxSet() {
@@ -103,15 +103,15 @@ test("`Listen` implementation", () => {
 });
 
 test("`ListenDeep` implementation", () => {
-    type Item = {bar: WritableBox<number>};
+    type Item = {bar: Box<number>};
 
-    const set = new BoxSet<Item | WritableBox<number>>();
+    const set = new BoxSet<Item | Box<number>>();
     let callCount = 0;
 
     const listener = set.addDeepListener(() => ++callCount);
 
-    const foo = {bar: new WritableBox(Math.random())} satisfies Item;
-    const lee = new WritableBox(Math.random());
+    const foo = {bar: new Box(Math.random())} satisfies Item;
+    const lee = new Box(Math.random());
 
     set.add(foo);
     expect(callCount).toBe(1);

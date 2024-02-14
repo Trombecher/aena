@@ -2,20 +2,15 @@ import {expect, test} from "vitest";
 import {
     addListenerRecursively,
     Box,
-    BoxArray,
-    BoxMap,
     BoxSet,
-    deserialize,
     isInstanceOfListen,
     isInstanceOfListenDeep,
     reduce, removeListenerRecursively,
-    serialize,
-    WritableBox
 } from "../src";
 
 test("reduce", () => {
-    const boxA = new WritableBox(10);
-    const boxB = new WritableBox("Hello");
+    const boxA = new Box(10);
+    const boxB = new Box("Hello");
 
     const boxC = reduce([boxA, boxB] as const, ([a, b]) => `${a}${b}`);
     expect(boxC.value).toBe("10Hello");
@@ -29,24 +24,24 @@ test("reduce", () => {
 
 test("isInstanceOfListen", () => {
     expect(isInstanceOfListen({})).toBeFalsy();
-    expect(isInstanceOfListen(new WritableBox(0))).toBeTruthy();
+    expect(isInstanceOfListen(new Box(0))).toBeTruthy();
     expect(isInstanceOfListen(new BoxSet())).toBeTruthy();
 });
 
 test("isInstanceOfListenDeep", () => {
     expect(isInstanceOfListenDeep({})).toBeFalsy();
-    expect(isInstanceOfListenDeep(new WritableBox(0))).toBeFalsy();
+    expect(isInstanceOfListenDeep(new Box(0))).toBeFalsy();
     expect(isInstanceOfListenDeep(new BoxSet())).toBeTruthy();
 });
 
-test("addListenerRecursive", () => {
+test("addListenerRecursively", () => {
     let callCount = 0;
 
     const listener = () => ++callCount;
     const target = {
-        bar: new WritableBox("Hello"),
+        bar: new Box("Hello"),
         baz: {
-            lee: new WritableBox("World")
+            lee: new Box("World")
         }
     };
     addListenerRecursively(target, listener);
@@ -57,14 +52,14 @@ test("addListenerRecursive", () => {
     expect(callCount).toBe(2);
 });
 
-test("removeListenerRecursive", () => {
+test("removeListenerRecursively", () => {
     let callCount = 0;
 
     const listener = () => ++callCount;
     const target = {
-        bar: new WritableBox("Hello"),
+        bar: new Box("Hello"),
         baz: {
-            lee: new WritableBox("World")
+            lee: new Box("World")
         }
     };
     addListenerRecursively(target, listener);
@@ -74,41 +69,4 @@ test("removeListenerRecursive", () => {
     target.baz.lee.value = "yo";
 
     expect(callCount).toBe(0);
-});
-
-test("serialize / deserialize", () => {
-    const state = {
-        number: 10,
-        boolean: true,
-        undefined: undefined,
-        null: null,
-        string: "yo",
-        writableBox: new WritableBox("Hello"),
-        box: new Box(0),
-        boxSet: new BoxSet().add(0).add(1).add(20),
-        boxMap: new BoxMap<string, string>().set("Hello", "World"),
-        boxArray: new BoxArray([10])
-    };
-    const state2 = deserialize(serialize(state)) as typeof state;
-
-    expect(state.undefined).toBe(state2.undefined);
-    expect(state.number).toBe(state2.number);
-    expect(state.boolean).toBe(state2.boolean);
-    expect(state.null).toBe(state2.null);
-    expect(state.string).toBe(state2.string);
-
-    expect(state2.box).toBeInstanceOf(Box);
-    expect(state.box.value).toBe(state2.box.value);
-
-    expect(state2.boxSet).toBeInstanceOf(BoxSet);
-    expect(state2.boxSet.every(value => state.boxSet.has(value))).toBeTruthy();
-
-    expect(state2.boxMap).toBeInstanceOf(BoxMap);
-    expect(Array
-        .from(state2.boxMap.entries())
-        .every(([key, value]) => state.boxMap.get(key) === value)).toBeTruthy();
-
-    expect(state2.boxArray).toBeInstanceOf(BoxArray);
-    expect(state2.boxArray.every(value =>
-        state.boxArray.indexOf(value) !== -1)).toBeTruthy();
 });

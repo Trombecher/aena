@@ -1,5 +1,5 @@
 import {expect, test} from "vitest";
-import {BoxArray, WritableBox} from "../src";
+import {Box, BoxArray} from "../src";
 import {Action, IndexInfoCode, SetInfoCode, SwapIndicesInfoCode, SwapInfoCode} from "../src/array";
 
 function create012BoxArray(): BoxArray<number> {
@@ -214,15 +214,15 @@ test("`Listen` implementation", () => {
 });
 
 test("`ListenDeep` implementation", () => {
-    type Item = {bar: WritableBox<number>};
+    type Item = {bar: Box<number>};
 
-    const array = new BoxArray<Item | WritableBox<number>>();
+    const array = new BoxArray<Item | Box<number>>();
     let callCount = 0;
 
     const listener = array.addDeepListener(() => callCount++);
 
-    const foo = {bar: new WritableBox(0)} satisfies Item;
-    const baz = new WritableBox(0);
+    const foo = {bar: new Box(0)} satisfies Item;
+    const baz = new Box(0);
 
     array.append(foo);
     expect(callCount).toBe(1);

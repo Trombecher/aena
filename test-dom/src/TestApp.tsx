@@ -1,10 +1,9 @@
 import {
-    addListenerRecursively,
+    Box,
     BoxArray,
     BoxMap,
-    BoxSet, deserialize,
-    JSX, serialize,
-    WritableBox
+    BoxSet,
+    JSX,
 } from "../../src";
 import {
     insertBoxArray,
@@ -18,51 +17,11 @@ import {
     insertBoxToString,
 } from "../../src/glue";
 
-type State = {
-    box: WritableBox<number>,
-    array: BoxArray<number>,
-    set: BoxSet<number>,
-    map: BoxMap<string, number>
-}
-
 export default function TestApp() {
-    const url = new URL(location.href);
-    
-    let state: State;
-    if(url.searchParams.has("state")) {
-        state = deserialize<State>(decodeURIComponent(url.searchParams.get("state")!));
-    } else {
-        state = {
-            box: new WritableBox(0),
-            array: new BoxArray(),
-            set: new BoxSet(),
-            map: new BoxMap()
-        };
-        
-        state.array.append(0);
-        state.array.append(1);
-        state.array.append(2);
-        
-        state.set.add(0);
-        state.set.add(1);
-        state.set.add(2);
-        
-        state.map.set("zero", 0);
-        state.map.set("one", 1);
-        state.map.set("two", 2);
-    }
-    
-    addListenerRecursively(state, () => {
-        url.searchParams.set("state", encodeURIComponent(serialize(state)));
-        history.replaceState(null, "", url.toString());
-    });
-    
-    const {
-        box,
-        map,
-        set,
-        array
-    } = state;
+    const box = new Box(0),
+        array = new BoxArray<number>(),
+        set = new BoxSet<number>(),
+        map = new BoxMap<string, number>();
     
     return (
         <>

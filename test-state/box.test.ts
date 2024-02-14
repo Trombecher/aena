@@ -1,13 +1,13 @@
 import {expect, test} from "vitest";
-import {WritableBox} from "../src";
+import {Box} from "../src";
 
 test("value", () => {
-    const box = new WritableBox(10);
+    const box = new Box(10);
     expect(box.value).toBe(10);
 });
 
 test("`Listen` implementation", () => {
-    const box = new WritableBox("");
+    const box = new Box("");
     let newValue: string | null = null;
 
     const listener = box.addListener(value => newValue = value);
@@ -20,7 +20,7 @@ test("`Listen` implementation", () => {
 });
 
 test("derive", () => {
-    const box = new WritableBox<any>(false);
+    const box = new Box<any>(false);
     const boxString = box.derive(value => value.toString());
     expect(boxString.value).toBe("false");
     box.value = {};

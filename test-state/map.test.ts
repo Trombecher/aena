@@ -1,5 +1,5 @@
 import {expect, test} from "vitest";
-import {BoxMap, WritableBox} from "../src";
+import {Box, BoxMap} from "../src";
 import {Action} from "../src/map";
 
 function createNumberBoxMap() {
@@ -77,15 +77,15 @@ test("`Listen` implementation", () => {
 });
 
 test("`ListenDeep` implementation", () => {
-    type Item = {bar: WritableBox<number>};
+    type Item = {bar: Box<number>};
 
-    const map = new BoxMap<string, Item | WritableBox<number>>();
+    const map = new BoxMap<string, Item | Box<number>>();
     let callCount = 0;
 
     const listener = map.addDeepListener(() => ++callCount);
 
-    const foo = {bar: new WritableBox(0)} satisfies Item;
-    const lee = new WritableBox(Math.random());
+    const foo = {bar: new Box(0)} satisfies Item;
+    const lee = new Box(Math.random());
 
     map.set("foo", foo);
     expect(callCount).toBe(1);

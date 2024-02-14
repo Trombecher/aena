@@ -11,83 +11,88 @@ export type Unbox<B> = B extends Box<infer T> ? T : never;
  * # Example
  *
  * ```typescript
- * import {WritableBox, Box} from "aena";
+ * import {Box} from "aena";
  *
- * const count = new WritableBox(10);
+ * const count = new Box(10);
  *
  * const squared = count.derive(count => count * count);
- * square.value = 10; // Error
+ * squared.value = 10; // Error
  *
  * count.value = 12;
- * console.log(square.value); // Logs "144".
+ * console.log(squared.value); // Logs "144"
  * ```
  *
  * Whenever `count` gets updated, `square` gets updated with the square.
  */
 export class Box<T> implements Listen<T> {
-    protected _value: T;
+    /**
+     * The internal value.
+     *
+     * @private
+     */
+    #value: T;
 
     /**
      * Creates a new {@link  Box} from an initialValue.
      */
     constructor(value: T) {
-        this._value = value;
+        this.#value = value;
     }
 
     /**
      * The value of this {@link Box}.
      */
     get value() {
-        return this._value;
+        return this.#value;
+    }
+
+    set value(value: T) {
+        if(this.#value === value) return;
+        this.#value = value;
+        this.#listeners.forEach(listener => listener(value));
     }
 
     /**
-     * Derives a new {@link Box} from this, transforming the value in the process.
+     * Derives a new {@link ReadonlyBox}, transforming the value in the process.
      *
      * Example {@link Box here}.
      */
-    derive<U>(transform: (value: T) => U) {
-        const box = new WritableBox(transform(this._value));
+    derive<U>(transform: (value: T) => U): ReadonlyBox<U> {
+        const box = new Box(transform(this.#value));
         this.addListener(value => box.value = transform(value));
         return box.readonly();
     }
 
-    protected readonly _listeners = new Set<Listener<T>>();
+    readonly() {
+        return this as ReadonlyBox<T>;
+    }
+
+    readonly #listeners = new Set<Listener<T>>();
 
     addListener(listener: Listener<T>): Listener<T> {
-        this._listeners.add(listener);
+        this.#listeners.add(listener);
         return listener;
     }
 
     removeListener(listener: Listener<T>) {
-        this._listeners.delete(listener);
+        this.#listeners.delete(listener);
     }
 }
 
 /**
- * A writable store for immutable data.
- *
- * Example at {@link Box} documentation.
+ * A readonly {@link Box}.
  */
-export class WritableBox<T> extends Box<T> {
-    constructor(value: T) {
-        super(value);
-    }
-
-    override set value(value: T) {
-        if(this._value === value) return;
-        this._value = value;
-        this._listeners.forEach(listener => listener(value));
-    }
-
-    override get value() {
-        return this._value;
-    }
+export interface ReadonlyBox<T> extends Listen<T> {
+    /**
+     * The value of this {@link ReadonlyBox}.
+     * @property
+     */
+    get value(): T;
 
     /**
-     * Casts this {@link WritableBox} to a {@link Box} (readonly).
+     * Derives a new {@link ReadonlyBox}, transforming the value in the process.
+     *
+     * Example {@link ReadonlyBox} here.
      */
-    readonly() {
-        return this as Box<T>;
-    }
+    derive<U>(transform: (value: T) => U): ReadonlyBox<U>;
 }
