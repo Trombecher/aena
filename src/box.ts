@@ -6,6 +6,58 @@ import {Listen, Listener} from "./index";
 export type Unbox<B> = B extends Box<infer T> ? T : never;
 
 /**
+ * A readonly {@link Box} equivalent.
+ */
+export class ReadonlyBox<T> implements Listen<T> {
+    /**
+     * The internal value.
+     *
+     * @protected
+     */
+    protected _value: T;
+
+    /**
+     * Creates a new {@link ReadonlyBox} with a given initial `value`.
+     */
+    constructor(value: T) {
+        this._value = value;
+    }
+
+    /**
+     * Gets the value of this {@link ReadonlyBox}.
+     */
+    get value() {
+        return this._value;
+    }
+
+    /**
+     * Derives a new {@link ReadonlyBox}, transforming the value in the process.
+     *
+     * Example {@link Box here}.
+     */
+    derive<U>(transform: (value: T) => U): ReadonlyBox<U> {
+        const box = new Box(transform(this._value));
+        this.addListener(value => box.value = transform(value));
+        return box.readonly();
+    }
+
+    readonly() {
+        return this as ReadonlyBox<T>;
+    }
+
+    protected readonly _listeners = new Set<Listener<T>>();
+
+    addListener(listener: Listener<T>): Listener<T> {
+        this._listeners.add(listener);
+        return listener;
+    }
+
+    removeListener(listener: Listener<T>) {
+        this._listeners.delete(listener);
+    }
+}
+
+/**
  * A readonly store for immutable data.
  *
  * # Example
@@ -24,75 +76,27 @@ export type Unbox<B> = B extends Box<infer T> ? T : never;
  *
  * Whenever `count` gets updated, `square` gets updated with the square.
  */
-export class Box<T> implements Listen<T> {
+export class Box<T> extends ReadonlyBox<T> {
     /**
-     * The internal value.
-     *
-     * @private
-     */
-    #value: T;
-
-    /**
-     * Creates a new {@link  Box} from an initialValue.
+     * Creates a new {@link Box} from an initialValue.
      */
     constructor(value: T) {
-        this.#value = value;
+        super(value);
     }
 
     /**
-     * The value of this {@link Box}.
+     * Gets the value of this {@link Box}.
      */
-    get value() {
-        return this.#value;
-    }
-
-    set value(value: T) {
-        if(this.#value === value) return;
-        this.#value = value;
-        this.#listeners.forEach(listener => listener(value));
+    override set value(value: T) {
+        if(this._value === value) return;
+        this._value = value;
+        this._listeners.forEach(listener => listener(value));
     }
 
     /**
-     * Derives a new {@link ReadonlyBox}, transforming the value in the process.
-     *
-     * Example {@link Box here}.
+     * Sets the value of this {@link Box}.
      */
-    derive<U>(transform: (value: T) => U): ReadonlyBox<U> {
-        const box = new Box(transform(this.#value));
-        this.addListener(value => box.value = transform(value));
-        return box.readonly();
+    override get value() {
+        return this._value;
     }
-
-    readonly() {
-        return this as ReadonlyBox<T>;
-    }
-
-    readonly #listeners = new Set<Listener<T>>();
-
-    addListener(listener: Listener<T>): Listener<T> {
-        this.#listeners.add(listener);
-        return listener;
-    }
-
-    removeListener(listener: Listener<T>) {
-        this.#listeners.delete(listener);
-    }
-}
-
-/**
- * A readonly {@link Box}.
- */
-export interface ReadonlyBox<T> extends Listen<T> {
-    /**
-     * The value of this {@link ReadonlyBox}.
-     * @property
-     */
-    get value(): T;
-
-    /**
-     * Derives a new {@link ReadonlyBox}, transforming the value in the process.
-     *
-     * Example {@link ReadonlyBox} here.
-     */
-    derive<U>(transform: (value: T) => U): ReadonlyBox<U>;
 }

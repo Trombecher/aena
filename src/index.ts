@@ -1,6 +1,6 @@
 // Re-export commonly used things.
 
-export {Box, type ReadonlyBox} from "./box";
+export {Box, ReadonlyBox} from "./box";
 export {BoxSet} from "./set";
 export {BoxArray} from "./array";
 export {BoxMap} from "./map";
@@ -12,7 +12,7 @@ export {
     mount
 } from "./jsx-runtime";
 
-import {Box} from "./box";
+import {Box, ReadonlyBox} from "./box";
 import {isObject} from "./internal";
 
 /**
@@ -49,7 +49,7 @@ export type IntoBoxArray<T extends any[]> = {
 export function reduce<V extends Box<any>[], T>(
     dependencies: V,
     reducer: (values: UnboxArray<V>) => T
-): Box<T> {
+): ReadonlyBox<T> {
     const values = dependencies.map(d => d!.value) as UnboxArray<V>;
 
     const reducedBox = new Box(reducer(values));
@@ -57,7 +57,8 @@ export function reduce<V extends Box<any>[], T>(
         values[index] = value;
         reducedBox.value = reducer(values);
     }));
-    return reducedBox;
+
+    return reducedBox.readonly();
 }
 
 /**

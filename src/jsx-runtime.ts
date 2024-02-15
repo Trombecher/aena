@@ -1,4 +1,4 @@
-import {Box} from "./box";
+import {ReadonlyBox} from "./box";
 
 export const svgElements = new Set("altGlyph,altGlyphDef,altGlyphItem,animate,animateColor,animateMotion,animateTransform,animation,circle,clipPath,color-profile,cursor,defs,desc,discard,ellipse,feBlend,feColorMatrix,feComponentTransfer,feComposite,feConvolveMatrix,feDiffuseLighting,feDisplacementMap,feDistantLight,feDropShadow,feFlood,feFuncA,feFuncB,feFuncG,feFuncR,feGaussianBlur,feImage,feMerge,feMergeNode,feMorphology,feOffset,fePointLight,feSpecularLighting,feSpotLight,feTile,feTurbulence,filter,font,font-face,font-face-format,font-face-name,font-face-src,font-face-uri,foreignObject,g,glyph,glyphRef,handler,hkern,image,line,linearGradient,listener,marker,mask,metadata,missing-glyph,mpath,path,pattern,polygon,polyline,prefetch,radialGradient,rect,set,solidColor,stop,svg,switch,symbol,tbreak,text,textArea,textPath,tref,tspan,unknown,use,view,vkern".split(",")) as ReadonlySet<string>;
 
@@ -13,7 +13,7 @@ export namespace JSX {
         | ElementPrimitive;
     export type ElementPrimitive = number | object | string | boolean | symbol | null | undefined;
 
-    type BoxedOr<T> = Box<T> | T;
+    type BoxedOr<T> = ReadonlyBox<T> | T;
 
     interface EventHandler<T, E extends Event> {
         (
@@ -2095,7 +2095,7 @@ const keyMap: {[key: string]: string} = {
 /**
  * Iterates over all `JSX.ElementPrimitive`s while rendering.
  *
- * **Does not auto-insert `Box`, `BoxArray`, `BoxMap` nor `BoxSet`.**
+ * **Does not auto-insert `ReadonlyBox`, `BoxArray`, `BoxMap` nor `BoxSet`.**
  * This is so that the `asText` implementations can be bundled when needed.
  */
 export function traverseAndRender(
@@ -2182,12 +2182,12 @@ export function createElement(
 
         // `element` is always `{}`.
         if(isWritable(element.__proto__, translatedKey)) { // idl attribute
-            if(value instanceof Box) {
+            if(value instanceof ReadonlyBox) {
                 element[translatedKey] = value.value;
                 value.addListener(value => element[translatedKey] = value);
             } else element[translatedKey] = value;
         } else { // html attribute
-            if(value instanceof Box) {
+            if(value instanceof ReadonlyBox) {
                 element.setAttribute(key, value.value);
                 value.addListener(value => element.setAttribute(key, value));
             } else element.setAttribute(key, value);
