@@ -1,255 +1,295 @@
 import {expect, test} from "vitest";
-import {Box, BoxArray} from "../src";
-import {Action, IndexInfoCode, SetInfoCode, SwapIndicesInfoCode, SwapInfoCode} from "../src/array";
+import {Box, BoxArray, BoxSet} from "../src";
+import {Action, Change} from "../src/array";
 
-function create012BoxArray(): BoxArray<number> {
-    const boxArray = new BoxArray<number>();
-    boxArray.append(0);
-    boxArray.append(1);
-    boxArray.append(2);
-    return boxArray;
+type Item = {set: BoxSet<number>} | Box<number> | number;
+
+/**
+ * Tests the progression of changes in an array environment.
+ */
+function testChange<T>(
+    array: BoxArray<T>,
+    modify: (array: BoxArray<T>) => void,
+    resultingArray: T[],
+    deepCallCount: number,
+    changes: Change<T>[],
+    secondModify: (array: BoxArray<T>) => void,
+    secondResultingArray: T[]
+) {
+    let count = 0;
+    const recordedChanges = new Array<Change<T>>();
+
+    const deepListener = array.addDeepListener(() => ++count);
+    const listener = array.addListener(change => recordedChanges.push(change));
+
+    modify(array);
+
+    expect(array).toEqual(resultingArray);
+    expect(count).toBe(deepCallCount);
+    expect(changes).toEqual(recordedChanges);
+
+    const changeCount = changes.length;
+    const callCount = count;
+
+    array.removeDeepListener(deepListener);
+    array.removeListener(listener);
+
+    secondModify(array);
+
+    expect(array).toEqual(secondResultingArray);
+    expect(count).toBe(callCount);
+    expect(changes.length).toEqual(changeCount);
 }
 
-test("new", () => {
-    new BoxArray();
-});
+test("push", () => {
+    const foo = new Box(0),
+        bar = {set: new BoxSet()} satisfies Item;
 
-test("new(length)", () => {
-    const boxArray = new BoxArray(10);
-    expect(boxArray.length).toBe(10);
-});
-
-test("append & at", () => {
-    const boxArray = create012BoxArray();
-
-    expect(boxArray.at(0)).toBe(0);
-    expect(boxArray.at(1)).toBe(1);
-    expect(boxArray.at(2)).toBe(2);
-
-    expect(boxArray.length).toBe(3);
-});
-
-test("static from", () => {
-    const array = BoxArray.from(3, index => index);
-    expect(array.toString()).toBe("[0,1,2]");
-});
-
-test("prepend", () => {
-    const boxArray = new BoxArray<number>();
-    boxArray.prepend(0);
-    boxArray.prepend(1);
-
-    expect(boxArray.at(0)).toBe(1);
-    expect(boxArray.at(1)).toBe(0);
-    expect(boxArray.at(2)).toBe(undefined);
-});
-
-test("set", () => {
-    const boxArray = new BoxArray<number>(3);
-    expect(boxArray.set(0, 0)).toBe(SetInfoCode.Success);
-    expect(boxArray.set(0, 0)).toBe(SetInfoCode.SameValue);
-    expect(boxArray.at(0)).toBe(0);
-
-    expect(boxArray.set(-1, 3)).toBe(SetInfoCode.Success);
-    expect(boxArray.at(-1)).toBe(3);
-
-    expect(boxArray.set(10, 10)).toBe(SetInfoCode.IndexTooBig);
-    expect(boxArray.set(-10, 10)).toBe(SetInfoCode.IndexTooSmall);
-});
-
-test("insert", () => {
-    const boxArray = new BoxArray<boolean>();
-    boxArray.insert(0, false);
-    boxArray.insert(0, true);
-    boxArray.insert(0, true);
-
-    expect(boxArray.at(0)).toBe(true);
-    expect(boxArray.at(1)).toBe(true);
-    expect(boxArray.at(2)).toBe(false);
-
-    expect(boxArray.length).toBe(3);
-});
-
-test("indexOf", () => {
-    const boxArray = create012BoxArray();
-
-    expect(boxArray.indexOf(1)).toBe(1);
-    expect(boxArray.indexOf(1000)).toBe(-1);
-});
-
-test("BoxArray[Symbol.iterator]", () => {
-    const boxArray = create012BoxArray();
-
-    const copy = [];
-    for(const element of boxArray)
-        copy.push(element);
-
-    expect(copy[0]).toBe(0);
-    expect(copy[1]).toBe(1);
-    expect(copy[2]).toBe(2);
+    testChange(
+        new BoxArray(),
+        array => {
+            array.push(foo, bar);
+            foo.value = Math.random();
+            bar.set.add(Math.random());
+        },
+        [foo, bar],
+        4,
+        [{
+            action: Action.Insert,
+            value: foo,
+            index: 0
+        }, {
+            action: Action.Insert,
+            value: bar,
+            index: 1,
+        }],
+        array => array.push(foo),
+        [foo, bar, foo]
+    );
 });
 
 test("swapIndices", () => {
-    const boxArray = create012BoxArray();
-
-    expect(boxArray.swapIndices(0, 1)).toBe(SwapIndicesInfoCode.Success);
-
-    // Following statements should do nothing.
-    expect(boxArray.swapIndices(0, 0)).toBe(SwapIndicesInfoCode.IndicesAreEqual);
-    expect(boxArray.swapIndices(-10, 0)).toBe(SwapIndicesInfoCode.IndexAOutOfLowerBound);
-    expect(boxArray.swapIndices(10, 0)).toBe(SwapIndicesInfoCode.IndexAOutOfUpperBound);
-    expect(boxArray.swapIndices(0, -10)).toBe(SwapIndicesInfoCode.IndexBOutOfLowerBound);
-    expect(boxArray.swapIndices(0, 10)).toBe(SwapIndicesInfoCode.IndexBOutOfUpperBound);
-
-    // Resulting state:
-    expect(boxArray.at(0)).toBe(1);
-    expect(boxArray.at(1)).toBe(0);
-    expect(boxArray.at(2)).toBe(2);
+    testChange(
+        new BoxArray(0, 1, 2),
+        array => array.swapIndices(0, 2),
+        [2, 1, 0],
+        1,
+        [{
+            action: Action.Swap,
+            a: 0,
+            b: 2,
+            indexA: 0,
+            indexB: 2
+        }],
+        array => array.swapIndices(0, 1),
+        [1, 2, 0]
+    );
 });
 
 test("swap", () => {
-    const boxArray = create012BoxArray();
-
-    expect(boxArray.swap(1, 2)).toBe(SwapInfoCode.Success);
-
-    // Following statements should do nothing.
-    expect(boxArray.swap(0, 0)).toBe(SwapInfoCode.IndicesAreEqual);
-    expect(boxArray.swap(10, 0)).toBe(SwapInfoCode.ANotFound);
-    expect(boxArray.swap(0, 10)).toBe(SwapInfoCode.BNotFound);
-
-    // Resulting state:
-    expect(boxArray.at(0)).toBe(0);
-    expect(boxArray.at(1)).toBe(2);
-    expect(boxArray.at(2)).toBe(1);
+    testChange(
+        new BoxArray(0, 1, 2),
+        array => array.swap(0, 2),
+        [2, 1, 0],
+        1,
+        [{
+            action: Action.Swap,
+            a: 0,
+            b: 2,
+            indexA: 0,
+            indexB: 2
+        }],
+        array => array.swap(0, 2),
+        [0, 1, 2]
+    );
 });
 
-test("deleteAt", () => {
-    const boxArray = create012BoxArray();
-
-    expect(boxArray.deleteAt(0)).toBe(IndexInfoCode.Success);
-    expect(boxArray.deleteAt(-1)).toBe(IndexInfoCode.Success);
-
-    // Following statements should do nothing.
-    expect(boxArray.deleteAt(100)).toBe(IndexInfoCode.IndexTooBig);
-    expect(boxArray.deleteAt(-100)).toBe(IndexInfoCode.IndexTooSmall);
-
-    // Resulting state:
-    expect(boxArray.at(0)).toBe(1);
-    expect(boxArray.length).toBe(1);
+// `BoxArray.copyWithin` uses `BoxArray.set`, so `ListenDeep` implementation is tested via `set`
+test("copyWithin", () => {
+    testChange(
+        new BoxArray(0, 1, 2, 3, 4, 5),
+        array => array.copyWithin(0, 2, 6),
+        [2, 3, 4, 5, 4, 5],
+        8,
+        [
+            {action: Action.Delete, value: 0, index: 0},
+            {action: Action.Insert, value: 2, index: 0},
+            {action: Action.Delete, value: 1, index: 1},
+            {action: Action.Insert, value: 3, index: 1},
+            {action: Action.Delete, value: 2, index: 2},
+            {action: Action.Insert, value: 4, index: 2},
+            {action: Action.Delete, value: 3, index: 3},
+            {action: Action.Insert, value: 5, index: 3},
+        ],
+        array => array.copyWithin(0, 3, 6),
+        [5, 4, 5, 5, 4, 5]
+    );
 });
 
-test("delete", () => {
-    const boxArray = create012BoxArray();
-    expect(boxArray.delete(1)).toBeTruthy();
-    expect(boxArray.delete(10)).toBeFalsy();
-
-    expect(boxArray.at(0)).toBe(0);
-    expect(boxArray.at(1)).toBe(2);
-    expect(boxArray.length).toBe(2);
+test("fill", () => {
+    testChange(
+        new BoxArray(0, 1, 2),
+        array => array.fill(10, 1, 2),
+        [0, 10, 2],
+        2,
+        [{
+            action: Action.Delete,
+            value: 1,
+            index: 1
+        }, {
+            action: Action.Insert,
+            value: 10,
+            index: 1,
+        }],
+        array => array.fill(20),
+        [20, 20, 20]
+    );
 });
 
-test("clear", () => {
-    const boxArray = create012BoxArray();
-    boxArray.clear();
+test("pop", () => {
+    const foo = {set: new BoxSet()} satisfies Item;
 
-    expect(boxArray.length).toBe(0);
+    testChange(
+        new BoxArray<Item>(200, foo),
+        array => {
+            foo.set.add(Math.random());
+            array.pop();
+            foo.set.add(Math.random());
+        },
+        [200],
+        2,
+        [{
+            action: Action.Delete,
+            value: foo,
+            index: 1
+        }],
+        array => array.pop(),
+        []
+    );
 });
 
-test("`Listen` implementation", () => {
-    const array = new BoxArray<number>();
+test("set", () => {
+    const foo = {set: new BoxSet()} satisfies Item,
+        bar = new Box(0);
 
-    let lastInsertedValue: number | undefined = undefined;
-    let lastInsertedIndex: number | undefined = undefined;
-    let lastSwappedA: number | undefined = undefined;
-    let lastSwappedB: number | undefined = undefined;
-    let lastSwappedIndexA: number | undefined = undefined;
-    let lastSwappedIndexB: number | undefined = undefined;
-    let lastDeletedValue: number | undefined = undefined;
-    let lastDeletedIndex: number | undefined = undefined;
-
-    const listener = array.addListener(change => {
-        switch(change.action) {
-            case Action.Insert:
-                lastInsertedValue = change.value;
-                lastInsertedIndex = change.index;
-                break;
-            case Action.Swap:
-                lastSwappedA = change.a;
-                lastSwappedB = change.b;
-                lastSwappedIndexA = change.indexA;
-                lastSwappedIndexB = change.indexB;
-                break;
-            case Action.Delete:
-                lastDeletedValue = change.value;
-                lastDeletedIndex = change.index;
-                break;
-        }
-    });
-
-    array.insert(0, 10);
-    expect(lastInsertedIndex).toBe(0);
-    expect(lastInsertedValue).toBe(10);
-
-    array.insert(1, 20);
-    expect(lastInsertedIndex).toBe(1);
-    expect(lastInsertedValue).toBe(20);
-
-    array.swapIndices(0, 1);
-    expect(lastSwappedIndexA).toBe(0);
-    expect(lastSwappedIndexB).toBe(1);
-    expect(lastSwappedA).toBe(10);
-    expect(lastSwappedB).toBe(20);
-
-    array.deleteAt(0);
-    expect(lastDeletedIndex).toBe(0);
-    expect(lastDeletedValue).toBe(20);
-
-    array.set(0, 42);
-    expect(lastDeletedIndex).toBe(0);
-    expect(lastDeletedValue).toBe(10);
-    expect(lastInsertedIndex).toBe(0);
-    expect(lastInsertedValue).toBe(42);
-
-    array.removeListener(listener);
+    testChange(
+        new BoxArray<Item>(foo),
+        array => {
+            bar.value = Math.random(); // Updates deep lister count
+            foo.set.add(Math.random());
+            array.set(0, bar); // Updates 2x
+            bar.value = Math.random(); // Updates
+            foo.set.add(Math.random());
+        },
+        [bar],
+        4,
+        [{
+            action: Action.Delete,
+            value: foo,
+            index: 0,
+        }, {
+            action: Action.Insert,
+            value: bar,
+            index: 0
+        }],
+        array => {
+            array.set(0, foo);
+            bar.value = Math.random(); // Should do nothing
+        },
+        [foo],
+    );
 });
 
-test("`ListenDeep` implementation", () => {
-    type Item = {bar: Box<number>};
+test("shift", () => {
+    const foo = {set: new BoxSet()} satisfies Item;
 
-    const array = new BoxArray<Item | Box<number>>();
-    let callCount = 0;
+    testChange(
+        new BoxArray<Item>(foo, 200),
+        array => {
+            foo.set.add(Math.random());
+            array.shift();
+            foo.set.add(Math.random());
+        },
+        [200],
+        2,
+        [{
+            action: Action.Delete,
+            value: foo,
+            index: 0
+        }],
+        array => array.shift(),
+        []
+    );
+});
 
-    const listener = array.addDeepListener(() => callCount++);
+test("splice", () => {
+    const foo = {set: new BoxSet()} satisfies Item;
 
-    const foo = {bar: new Box(0)} satisfies Item;
-    const baz = new Box(0);
+    testChange(
+        new BoxArray(10, 20),
+        array => {
+            array.splice(0, 0, foo);
+            array.splice(1, 1);
+            foo.set.add(Math.random());
+        },
+        [foo, 20],
+        3,
+        [{
+            action: Action.Insert,
+            value: foo,
+            index: 0
+        }, {
+            action: Action.Delete,
+            value: 10,
+            index: 1
+        }],
+        array => {
+            array.splice(0, 1, 1);
+            foo.set.add(Math.random());
+        },
+        [1, 20]
+    );
+});
 
-    array.append(foo);
-    expect(callCount).toBe(1);
+test("sort", () => {
+    testChange(
+        new BoxArray(0, 2, 1),
+        array => array.sort((a, b) => a - b),
+        [0, 1, 2],
+        4,
+        [
+            {action: Action.Delete, value: 2, index: 1},
+            {action: Action.Insert, value: 1, index: 1},
+            {action: Action.Delete, value: 1, index: 2},
+            {action: Action.Insert, value: 2, index: 2},
+        ],
+        _ => {
+        },
+        [0, 1, 2],
+    );
+});
 
-    foo.bar.value = Math.random();
-    expect(callCount).toBe(2);
+test("unshift", () => {
+    const foo = {set: new BoxSet()} satisfies Item;
 
-    array.clear();
-    expect(callCount).toBe(3);
-
-    array.append(baz);
-    expect(callCount).toBe(4);
-
-    baz.value = Math.random();
-    expect(callCount).toBe(5);
-
-    array.clear();
-    expect(callCount).toBe(6);
-
-    // At this point the listener should not be called.
-
-    foo.bar.value = Math.random();
-    baz.value = Math.random();
-    array.removeDeepListener(listener);
-    array.append(foo);
-    expect(callCount).toBe(6);
-    array.clear();
-
-    expect(callCount).toBe(6);
+    testChange(
+        new BoxArray(2, 3),
+        array => {
+            foo.set.add(Math.random());
+            array.unshift(foo); // Updates
+            foo.set.add(Math.random()); // Updates
+        },
+        [foo, 2, 3],
+        2,
+        [{
+            action: Action.Insert,
+            value: foo,
+            index: 0
+        }],
+        array => {
+            foo.set.add(Math.random());
+            array.unshift(10);
+        },
+        [10, foo, 2, 3]
+    )
 });

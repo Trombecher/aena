@@ -1,34 +1,12 @@
-import {addListenerRecursively, DeepListener, ListenDeep, Listener, removeListenerRecursively} from "./index";
+import {
+    addListenerRecursively,
+    clampIndex, clampIndexLower, clampIndexUpTo,
+    DeepListener,
+    ListenDeep,
+    Listener,
+    removeListenerRecursively
+} from "./index";
 import {addListenersDeep, removeListenersDeep} from "./internal";
-
-export const enum SwapIndicesInfoCode {
-    Success,
-    IndexAOutOfLowerBound,
-    IndexAOutOfUpperBound,
-    IndexBOutOfLowerBound,
-    IndexBOutOfUpperBound,
-    IndicesAreEqual
-}
-
-export const enum IndexInfoCode {
-    Success,
-    IndexTooSmall = -1,
-    IndexTooBig = -2
-}
-
-export const enum SetInfoCode {
-    Success = IndexInfoCode.Success,
-    IndexTooSmall = IndexInfoCode.IndexTooSmall,
-    IndexTooBig = IndexInfoCode.IndexTooBig,
-    SameValue = -3
-}
-
-export const enum SwapInfoCode {
-    Success,
-    ANotFound,
-    BNotFound,
-    IndicesAreEqual
-}
 
 export const enum Action {
     Insert,
@@ -52,242 +30,21 @@ export type Change<T> = {
     index: number
 };
 
-/**
- * `BoxArray` is a signal based array designed for immutable values.
- *
- * # Example
- *
- * ```ts
- * const numbers = new BoxArray<number>();
- *
- * const strings = new BoxArray<string>(10);
- *
- * const booleans = new BoxArray([true, false]);
- * ```
- */
-export class BoxArray<T> implements ListenDeep<Change<T>> {
-    readonly #array;
+export class BoxArray<T> extends Array<T> implements ListenDeep<Change<T>> {
+    [index: number]: never;
 
     /**
-     * Creates a {@link BoxArray} from the given `length` and a function which is generating the elements.
-     */
-    static from<T>(length: number, generate: (index: number) => T): BoxArray<T> {
-        const array = new Array<T>(length);
-        while(length--) array[length] = generate(length);
-        return new BoxArray(array);
-    }
-
-    constructor(lengthOrArray?: number | T[]) {
-        this.#array = lengthOrArray
-            ? (Array.isArray(lengthOrArray)
-                ? lengthOrArray
-                : new Array<T>(lengthOrArray))
-            : new Array<T>();
-    }
-
-    /**
-     * Returns the iterator for this {@link BoxArray}.
-     * This is useful for iteration via a for-of loop, but {@link BoxArray.forEach} will be faster because it is running natively.
+     * Sets the given `value` to the given `index`.
      *
-     * # Example
      *
-     * ```typescript
-     * const array = new BoxArray<number>();
-     * array.append(10);
-     * for(const value of array) console.log(value);
-     * ```
      */
-    [Symbol.iterator]() {
-        return this.#array[Symbol.iterator]();
-    }
+    set(index: number, value: T): this {
+        index = clampIndexLower(index, this.length);
 
-    /**
-     * Iterates over the values of this {@link BoxArray}.
-     */
-    forEach(handler: (value: T, index: number) => void) {
-        this.#array.forEach(handler);
-    }
+        const oldValue = this.at(index)!;
+        if(oldValue === value) return this;
 
-    /**
-     * Returns the index of the provided `value` and `-1` if the value was not found.
-     */
-    indexOf(value: T): number {
-        return this.#array.indexOf(value);
-    }
-
-    /**
-     * Swaps the values at the given indices.
-     */
-    swapIndices(indexA: number, indexB: number): SwapIndicesInfoCode {
-        if(indexA < -this.#array.length)
-            return SwapIndicesInfoCode.IndexAOutOfLowerBound;
-        else if(indexA >= this.#array.length)
-            return SwapIndicesInfoCode.IndexAOutOfUpperBound;
-
-        if(indexA < 0) indexA = indexA + this.#array.length;
-
-        if(indexB < -this.#array.length)
-            return SwapIndicesInfoCode.IndexBOutOfLowerBound;
-        else if(indexB >= this.#array.length)
-            return SwapIndicesInfoCode.IndexBOutOfUpperBound;
-
-        if(indexB < 0) indexB = indexB + this.#array.length;
-
-        if(indexA === indexB)
-            return SwapIndicesInfoCode.IndicesAreEqual;
-
-        this.#swapIndicesUnchecked(indexA, indexB);
-        return SwapIndicesInfoCode.Success;
-    }
-
-    /**
-     * Swaps values a and b.
-     */
-    swap(a: T, b: T): SwapInfoCode {
-        if(a === b) return SwapInfoCode.IndicesAreEqual;
-
-        const indexA = this.#array.indexOf(a);
-        if(indexA === -1) return SwapInfoCode.ANotFound;
-        const indexB = this.#array.indexOf(b);
-        if(indexB === -1) return SwapInfoCode.BNotFound;
-
-        this.#swapIndicesUnchecked(indexA, indexB);
-        return SwapInfoCode.Success;
-    }
-
-    #swapIndicesUnchecked(indexA: number, indexB: number) {
-        const a = this.#array[indexA]!;
-        const b = this.#array[indexB]!;
-        this.#array[indexA] = b;
-        this.#array[indexB] = a;
-
-        this.#notify({
-            action: Action.Swap,
-            a,
-            b,
-            indexA,
-            indexB
-        });
-    }
-
-    /**
-     * Removes the value at the specified index.
-     */
-    deleteAt(index: number): IndexInfoCode {
-        index = this.#normalizeIndex(index);
-        if(index < 0) return index;
-
-        this.#deleteAtUnchecked(index);
-        return IndexInfoCode.Success;
-    }
-
-    /**
-     * Removes the value.
-     *
-     * @returns `true` if the value was successfully removed, `false` otherwise.
-     */
-    delete(value: T): boolean {
-        const index = this.#array.indexOf(value);
-        if(index === -1) return false;
-        this.#deleteAtUnchecked(index);
-        return true;
-    }
-
-    #deleteAtUnchecked(index: number) {
-        const value = this.#array.splice(index, 1)[0]!;
-
-        removeListenersDeep(this.#deepListeners, value);
-
-        this.#notify({
-            action: Action.Delete,
-            value,
-            index
-        });
-    }
-
-    /**
-     * Returns the value located at the specified index.
-     */
-    at(index: number) {
-        return this.#array.at(index);
-    }
-
-    get length() {
-        return this.#array.length;
-    }
-
-    /**
-     * Appends a new value to the end of this {@link BoxArray}.
-     */
-    append(value: T) {
-        addListenersDeep(this.#deepListeners, value);
-
-        this.#notify({
-            action: Action.Insert,
-            value,
-            index: this.#array.push(value) - 1
-        });
-    }
-
-    /**
-     * Inserts the value at the index, so that the resulting index matches the specified index, effectively shifting all elements on the right by one index.
-     *
-     * @param value The value to insert
-     *
-     * @param index Specific ranges of indices are remapped as following:
-     *
-     * - index < -length: index = 0
-     * - index < 0: index = index + length
-     * - index > length: index = length
-     *
-     * The normalized index is then passed to the listeners (after insertion)
-     */
-    insert(index: number, value: T): IndexInfoCode {
-        // We cannot use `#normalizeIndex(...)` because `index == length` is also valid.
-        if(index < -this.#array.length) return IndexInfoCode.IndexTooSmall;
-        if(index < 0) index = index + this.#array.length;
-        else if(index > this.#array.length) return IndexInfoCode.IndexTooBig;
-
-        this.#array.splice(index, 0, value);
-
-        addListenersDeep(this.#deepListeners, value);
-
-        this.#notify({
-            action: Action.Insert,
-            value,
-            index
-        });
-
-        return IndexInfoCode.Success;
-    }
-
-    /**
-     * Prepends the `value` to the start of this {@link BoxArray}.
-     */
-    prepend(value: T) {
-        this.#array.unshift(value);
-
-        // Ensure that the value has all deep listeners.
-        addListenersDeep(this.#deepListeners, value);
-
-        this.#notify({
-            action: Action.Insert,
-            value,
-            index: 0
-        });
-    }
-
-    /**
-     * Sets the index to the value, effectively replacing the previous value.
-     */
-    set(index: number, value: T): SetInfoCode {
-        index = this.#normalizeIndex(index);
-        if(index < 0) return index;
-
-        const oldValue = this.#array[index]!;
-        if(oldValue === value) return SetInfoCode.SameValue;
-        this.#array[index] = value;
-
+        this.#set(index, value);
         removeListenersDeep(this.#deepListeners, oldValue);
 
         // Simulate a remove change.
@@ -306,67 +63,168 @@ export class BoxArray<T> implements ListenDeep<Change<T>> {
             index
         });
 
-        return SetInfoCode.Success;
+        return this;
     }
 
     /**
-     * Clears this {@link BoxArray} by sequentially deleting each value, starting at the end.
-     */
-    clear() {
-        let i = this.#array.length;
-        while(i--) this.#deleteAtUnchecked(i);
-    }
-
-    /**
-     * Converts all values of this {@link BoxArray} to strings and joins them via an optional separator.
-     */
-    join(separator?: string) {
-        return this.#array.join(separator);
-    }
-
-    /**
-     * @returns `true` if every value in this {@link BoxArray} matches the given predicate; otherwise `false`.
-     */
-    every(predicate: (value: T) => boolean) {
-        return this.#array.every(predicate);
-    }
-
-    /**
-     * Reduces this {@link BoxArray} to a `U`.
+     * Swaps the items at the given indices.
      *
-     * Can be used to implement mapping behaviour.
+     * Both indices are clamped to the length via {@link clampIndex}.
      */
-    reduce<U>(initialValue: U, reducer: (previousValue: U, value: T, index: number) => U): U {
-        return this.#array.reduce(reducer, initialValue);
+    swapIndices(indexA: number, indexB: number) {
+        this.#swapIndicesUnchecked(
+            clampIndex(indexA, this.length),
+            clampIndex(indexB, this.length)
+        );
     }
 
     /**
-     * Maps this {@link BoxArray} to `U[]`.
-     *
-     * Similar mapping targets can be emulated using {@link BoxArray.reduce}
-     * but this function exists because it can be forwarded to a native {@link Array.map} call for speed.
+     * Swaps the items `a` and `b`. If at least one is not found, this is a no-op.
      */
-    map<U>(mapper: (value: T) => U): U[] {
-        return this.#array.map(mapper);
+    swap(a: T, b: T) {
+        const indexA = this.indexOf(a);
+        if(indexA === -1) return;
+        const indexB = this.indexOf(b);
+        if(indexB === -1) return;
+
+        this.#swapIndicesUnchecked(indexA, indexB, a, b);
+    }
+
+    #swapIndicesUnchecked(
+        indexA: number,
+        indexB: number,
+        a = this.at(indexA) as T,
+        b = this.at(indexB) as T,
+    ) {
+        this.#set(indexA, b);
+        this.#set(indexB, a);
+
+        this.#notify({
+            action: Action.Swap,
+            a,
+            b,
+            indexA,
+            indexB
+        });
     }
 
     /**
-     * @returns An info code less than zero or `0 <= index < length`
+     * Bypasses the index restriction.
      * @private
      */
-    #normalizeIndex(index: number): IndexInfoCode {
-        if(index < -this.#array.length) return IndexInfoCode.IndexTooSmall;
-        if(index < 0) index = index + this.#array.length;
-        else if(index >= this.#array.length) return IndexInfoCode.IndexTooBig;
-        return index;
+    #set(index: number, value: T) {
+        // @ts-ignore
+        this[index] = value;
     }
 
-    toString() {
-        return `[${this.join(",")}]`;
+    override copyWithin(target: number, start: number, end?: number): this {
+        target = clampIndex(target, this.length);
+        start = clampIndex(start, this.length);
+        end = clampIndexUpTo(end || this.length, this.length);
+
+        for(let i = start; i < end; i++)
+            this.set(target + i - start, this.at(i)!);
+
+        return this;
     }
 
-    toArray(): readonly T[] {
-        return this.#array;
+    override fill(value: T, start = 0, end = this.length): this {
+        for(let i = clampIndex(start, this.length); i < clampIndexUpTo(end, this.length); ++i)
+            this.set(i, value);
+        return this;
+    }
+
+    override pop(): T | undefined {
+        const value = super.pop();
+        if(value) {
+            removeListenersDeep(this.#deepListeners, value);
+            this.#notify({
+                action: Action.Delete,
+                value,
+                index: this.length
+            });
+        }
+        return value;
+    }
+
+    override push(...items: T[]): number {
+        const length = this.length;
+        super.push(...items);
+
+        items.forEach((item, index) => {
+            addListenersDeep(this.#deepListeners, item);
+            this.#notify({
+                action: Action.Insert,
+                value: item,
+                index: index + length
+            });
+        });
+
+        return this.length;
+    }
+
+    override shift(): T | undefined {
+        const item = super.shift();
+        if(item) {
+            removeListenersDeep(this.#deepListeners, item);
+            this.#notify({
+                action: Action.Delete,
+                value: item,
+                index: 0
+            });
+        }
+        return item;
+    }
+
+    override splice(start: number, deleteCount = 0, ...items: T[]): T[] {
+        const removed = super.splice(start, deleteCount, ...items);
+        removed.forEach((item, index) => {
+            removeListenersDeep(this.#deepListeners, item);
+            this.#notify({
+                action: Action.Delete,
+                value: item,
+                index: index + start
+            });
+        });
+        items.forEach((item, index) => {
+            addListenersDeep(this.#deepListeners, item);
+            this.#notify({
+                action: Action.Insert,
+                index: index + start,
+                value: item
+            });
+        });
+        return removed;
+    }
+
+    override sort(comparator: (a: T, b: T) => number = ((a, b) => +a - +b)): this {
+        const indices = new Array(this.length);
+        for(let i = 0; i < indices.length; ++i)
+            indices[i] = i;
+        indices.sort((a, b) => comparator(this.at(a)!, this.at(b)!));
+        const array = [...this];
+        for(let i = 0; i < indices.length; ++i)
+            this.set(i!, array.at(indices[i])!);
+        return this;
+    }
+
+    /**
+     * Inserts the given `items` at the start.
+     *
+     * @returns The new array length
+     */
+    override unshift(...items: T[]): number {
+        super.unshift(...items);
+        items.forEach((item, i) => {
+            addListenersDeep(this.#deepListeners, item);
+            this.#notify({
+                action: Action.Insert,
+                value: item,
+                index: i
+            } satisfies Change<T>);
+        });
+
+        return this.length;
     }
 
     // The following code may repeat across files but there is no other option.

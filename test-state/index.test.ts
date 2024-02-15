@@ -2,7 +2,7 @@ import {expect, test} from "vitest";
 import {
     addListenerRecursively,
     Box,
-    BoxSet,
+    BoxSet, clampIndex, clampIndexLower,
     isInstanceOfListen,
     isInstanceOfListenDeep,
     reduce, removeListenerRecursively,
@@ -69,4 +69,24 @@ test("removeListenerRecursively", () => {
     target.baz.lee.value = "yo";
 
     expect(callCount).toBe(0);
+});
+
+test("clampIndex", () => {
+    const length = 10;
+    expect(clampIndex(0, length)).toBe(0);
+    expect(clampIndex(9, length)).toBe(9);
+    expect(clampIndex(10, length)).toBe(9);
+    expect(clampIndex(-1, length)).toBe(9);
+    expect(clampIndex(-10, length)).toBe(0);
+    expect(clampIndex(-11, length)).toBe(0);
+});
+
+test("clampIndexLower", () => {
+    const length = 10;
+    expect(clampIndexLower(0, length)).toBe(0);
+    expect(clampIndexLower(9, length)).toBe(9);
+    expect(clampIndexLower(10, length)).toBe(10);
+    expect(clampIndex(-1, length)).toBe(9);
+    expect(clampIndex(-10, length)).toBe(0);
+    expect(clampIndex(-11, length)).toBe(0);
 });

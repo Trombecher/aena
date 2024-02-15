@@ -1,10 +1,4 @@
-import {
-    Box,
-    BoxArray,
-    BoxMap,
-    BoxSet,
-    JSX,
-} from "../../src";
+import {Box, BoxArray, BoxMap, BoxSet, JSX} from "../../src";
 import {
     insertBoxArray,
     insertBox,
@@ -74,13 +68,13 @@ export default function TestApp() {
                 <h1>Testing: <code>aena/glue</code> integration for <code>BoxArray</code></h1>
 
                 <h2>Adding</h2>
-                <button onclick={() => array.append(Math.round(Math.random() * 10))}>Add random number</button>
+                <button onclick={() => array.push(Math.round(Math.random() * 10))}>Add random number</button>
 
                 <h2>Swapping</h2>
                 <button onclick={() => array.swapIndices(0, -1)}>Swap first and last element</button>
 
                 <h2>Deleting</h2>
-                <button onclick={() => array.deleteAt(0)}>Remove the first element</button>
+                <button onclick={() => array.splice(0, 1)}>Remove the first element</button>
 
                 <h2>Insert As Text</h2>
                 <div>{insertBoxArrayAsText(array)}</div>
