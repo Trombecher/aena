@@ -1,6 +1,6 @@
 // Re-export commonly used things.
 
-export {Box, ReadonlyBox} from "./box";
+export {Box} from "./box";
 export {BoxSet} from "./set";
 export {BoxArray} from "./array";
 export {BoxMap} from "./map";
@@ -12,7 +12,7 @@ export {
     mount
 } from "./jsx-runtime";
 
-import {Box, ReadonlyBox} from "./box";
+import {Box} from "./box";
 import {isObject} from "./internal";
 
 /**
@@ -49,7 +49,7 @@ export type IntoBoxArray<T extends any[]> = {
 export function reduce<V extends Box<any>[], T>(
     dependencies: V,
     reducer: (values: UnboxArray<V>) => T
-): ReadonlyBox<T> {
+): Readonly<Box<T>> {
     const values = dependencies.map(d => d!.value) as UnboxArray<V>;
 
     const reducedBox = new Box(reducer(values));
@@ -79,11 +79,6 @@ export function isInstanceOfListenDeep<L extends Function>(o: object): o is List
 }
 
 /**
- * The standard listener type.
- */
-export type Listener<C> = (change: C) => void;
-
-/**
  * The standard deep listener type.
  *
  * Extracted to a separate type due to flexibility.
@@ -107,18 +102,18 @@ export type DeepListener = () => void;
  * boxed.removeListener(listener);
  * ```
  */
-export interface Listen<C> {
+export interface Listen<L extends Function = Function> {
     /**
      * Add a listener.
      *
      * @returns The parameter `listener` for lazy typing.
      */
-    addListener(listener: Listener<C>): Listener<C>;
+    addListener(listener: L): L;
 
     /**
      * Remove a listener.
      */
-    removeListener(listener: Listener<C>): void;
+    removeListener(listener: L): void;
 }
 
 /**
@@ -143,7 +138,7 @@ export interface Listen<C> {
  * boxedParent.removeDeepListener(listener);
  * ```
  */
-export interface ListenDeep<C> extends Listen<C> {
+export interface ListenDeep<L extends Function = Function> extends Listen<L> {
     /**
      * Add a deep listener.
      *
@@ -179,51 +174,4 @@ export function removeListenerRecursively(value: any, listener: DeepListener): v
     else if(isInstanceOfListen(value)) value.removeListener(listener);
     else Object.keys(value).forEach(key =>
             removeListenerRecursively(value[key as keyof typeof value], listener));
-}
-
-/**
- * Maps the index according to the following pattern:
- *
- * - If `index < -length`: return `0`
- * - If `index < 0`: return `index + length`
- * - If `index >= length`: return `length - 1`
- * - Else: return `index`
- *
- * This map ensures that the returned index is always valid.
- */
-export function clampIndex(index: number, length: number): number {
-    index = clampIndexLower(index, length);
-    if(index >= length) return length - 1;
-    return index;
-}
-
-/**
- * Maps the index according to the following pattern.
- *
- * - If `index < -length`: return `0`
- * - If `index < 0`: return `index + length`
- * - If `index > length`: return `length`
- * - Else: return `index`
- *
- * This map ensures a valid _target_ index up to (including) `length`.
- */
-export function clampIndexUpTo(index: number, length: number): number {
-    index = clampIndexLower(index, length);
-    if(index > length) return length;
-    return index;
-}
-
-/**
- * Maps the index according to the following pattern:
- *
- * - If `index < -length`: return `0`
- * - If `index < 0`: return `index + length`
- * - Else: return `index`
- *
- * This map ensures that the index is always positive, but validity is not ensured.
- */
-export function clampIndexLower(index: number, length: number): number {
-    if(index < -length) return 0;
-    if(index < 0) return index + length;
-    return index;
 }

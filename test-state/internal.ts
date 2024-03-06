@@ -1,5 +1,12 @@
 import {expect, test} from "vitest";
-import {addListenersDeep, isObject, removeListenersDeep} from "../src/internal";
+import {
+    addListenersDeep,
+    clampIndex,
+    clampIndexLower,
+    clampIndexUpTo,
+    isObject,
+    removeListenersDeep
+} from "../src/internal";
 import {Box, DeepListener} from "../src";
 
 test("isObject", () => {
@@ -22,4 +29,33 @@ test("addListenersDeep / removeListenersDeep", () => {
     removeListenersDeep(set, {box});
     box.value = Math.random();
     expect(count).toBe(1);
+});
+
+test("clampIndex", () => {
+    const length = 10;
+    expect(clampIndex(0, length)).toBe(0);
+    expect(clampIndex(9, length)).toBe(9);
+    expect(clampIndex(10, length)).toBe(9);
+    expect(clampIndex(-1, length)).toBe(9);
+    expect(clampIndex(-10, length)).toBe(0);
+    expect(clampIndex(-11, length)).toBe(0);
+});
+
+test("clampIndexLower", () => {
+    const length = 10;
+    expect(clampIndexLower(0, length)).toBe(0);
+    expect(clampIndexLower(9, length)).toBe(9);
+    expect(clampIndexLower(10, length)).toBe(10);
+    expect(clampIndex(-1, length)).toBe(9);
+    expect(clampIndex(-10, length)).toBe(0);
+    expect(clampIndex(-11, length)).toBe(0);
+});
+
+test("clampIndexUpTo", () => {
+    const length = 10;
+    expect(clampIndexUpTo(3, length)).toBe(3);
+    expect(clampIndexUpTo(-1, length)).toBe(length - 1);
+    expect(clampIndexUpTo(-length, length)).toBe(0);
+    expect(clampIndexUpTo(-100, length)).toBe(0);
+    expect(clampIndexUpTo(100, length)).toBe(length);
 });

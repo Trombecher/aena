@@ -1,10 +1,12 @@
-import {addListenerRecursively, DeepListener, ListenDeep, Listener, removeListenerRecursively} from "./index";
+import {addListenerRecursively, DeepListener, ListenDeep, removeListenerRecursively} from "./index";
 import {addListenersDeep, removeListenersDeep} from "./internal";
 
 export const enum Action {
     Add,
     Delete
 }
+
+export type Listener<T> = (change: Change<T>) => void;
 
 export type Change<T> = Readonly<{
     action: Action.Add,
@@ -52,7 +54,7 @@ export type Change<T> = Readonly<{
  * set.removeDeepListener(deepListener);
  * ```
  */
-export class BoxSet<T> extends Set<T> implements ListenDeep<Change<T>> {
+export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
     override add(value: T): this {
         if(this.has(value)) return this;
         super.add(value);
@@ -132,7 +134,7 @@ export class BoxSet<T> extends Set<T> implements ListenDeep<Change<T>> {
     }
 
     // The following code may repeat across files but there is no other option.
-    readonly #listeners = new Set<Listener<Change<T>>>();
+    readonly #listeners = new Set<Listener<T>>();
     readonly #deepListeners = new Set<DeepListener>();
 
     #notify(change: Change<T>) {
@@ -151,12 +153,12 @@ export class BoxSet<T> extends Set<T> implements ListenDeep<Change<T>> {
         this.forEach(value => removeListenerRecursively(value, listener));
     }
 
-    addListener(listener: Listener<Change<T>>) {
+    addListener(listener: Listener<T>) {
         this.#listeners.add(listener);
         return listener;
     }
 
-    removeListener(listener: Listener<Change<T>>) {
+    removeListener(listener: Listener<T>) {
         this.#listeners.delete(listener);
     }
 }

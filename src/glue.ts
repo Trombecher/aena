@@ -1,24 +1,24 @@
 import {JSX, renderToNode, traverseAndRender} from "./jsx-runtime";
-import {ReadonlyBox, BoxArray, BoxMap, BoxSet} from "./index";
+import {Box, BoxArray, BoxMap, BoxSet} from "./index";
 import {Action as BoxArrayAction} from "./array";
 import {Action as BoxSetAction} from "./set";
 import {Action as BoxMapAction} from "./map";
 
 const createAnchor = () => document.createTextNode("");
 
-export function insertBoxAsText(box: ReadonlyBox<any>): Node {
+export function insertBoxAsText(box: Readonly<Box<any>>): Node {
     const textNode = document.createTextNode(box.value + "");
     box.addListener(value => textNode.textContent = value + "");
     return textNode;
 }
 
-export function insertBoxToString<T>(box: ReadonlyBox<T>, transform: (value: T) => string): Node {
+export function insertBoxToString<T>(box: Readonly<Box<T>>, transform: (value: T) => string): Node {
     const textNode = document.createTextNode(transform(box.value));
     box.addListener(value => textNode.textContent = transform(value));
     return textNode;
 }
 
-export function insertBox<T>(box: ReadonlyBox<T>, transform: (value: T) => JSX.Element) {
+export function insertBox<T>(box: Readonly<Box<T>>, transform: (value: T) => JSX.Element) {
     const start = createAnchor();
     const end = createAnchor();
     box.addListener(element => {

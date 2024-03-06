@@ -1,10 +1,12 @@
-import {addListenerRecursively, DeepListener, ListenDeep, Listener, removeListenerRecursively} from "./index";
+import {addListenerRecursively, DeepListener, ListenDeep, removeListenerRecursively} from "./index";
 import {addListenersDeep, removeListenersDeep} from "./internal";
 
 export const enum Action {
     Set,
     Delete
 }
+
+export type Listener<K, V> = (change: Change<K, V>) => void;
 
 export type Change<K, V> = Readonly<{
     action: Action.Set,
@@ -19,7 +21,7 @@ export type Change<K, V> = Readonly<{
 /**
  * A reactive map for immutable data.
  */
-export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Change<K, V>> {
+export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Listener<K, V>> {
     override set(key: K, value: V): this {
         if(this.has(key)) return this;
         super.set(key, value);
@@ -93,7 +95,7 @@ export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Change<K, V>> 
     }
 
     // The following code may repeat across files but there is no other option.
-    readonly #listeners = new Set<Listener<Change<K, V>>>();
+    readonly #listeners = new Set<Listener<K, V>>();
     readonly #deepListeners = new Set<DeepListener>();
 
     #notify(change: Change<K, V>) {
@@ -112,12 +114,12 @@ export class BoxMap<K, V> extends Map<K, V> implements ListenDeep<Change<K, V>> 
         this.forEach(value => removeListenerRecursively(value, listener));
     }
 
-    addListener(listener: Listener<Change<K, V>>) {
+    addListener(listener: Listener<K, V>) {
         this.#listeners.add(listener);
         return listener;
     }
 
-    removeListener(listener: Listener<Change<K, V>>) {
+    removeListener(listener: Listener<K, V>) {
         this.#listeners.delete(listener);
     }
 }
