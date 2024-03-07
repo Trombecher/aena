@@ -178,12 +178,12 @@ export class BoxArray<T> extends Array<T> implements ListenDeep<Listener<T>> {
 
     override splice(start: number, deleteCount = 0, ...items: T[]): T[] {
         const removed = super.splice(start, deleteCount, ...items);
-        removed.forEach((item, index) => {
+        removed.forEach(item => {
             removeListenersDeep(this.#deepListeners, item);
             this.#notify({
                 action: Action.Delete,
                 value: item,
-                index: index
+                index: start
             });
         });
         items.forEach((item, index) => {
