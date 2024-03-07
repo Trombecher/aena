@@ -183,7 +183,7 @@ export class BoxArray<T> extends Array<T> implements ListenDeep<Listener<T>> {
             this.#notify({
                 action: Action.Delete,
                 value: item,
-                index: index + start
+                index: index
             });
         });
         items.forEach((item, index) => {
