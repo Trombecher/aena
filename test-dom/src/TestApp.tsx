@@ -4,10 +4,10 @@ import {
     insertBox,
     insertBoxSet,
     insertBoxMap,
-    insertBoxAsText,
-    insertBoxArrayAsText,
-    insertBoxSetAsText,
-    insertBoxMapAsText,
+    insertBoxAsString,
+    insertBoxArrayAsString,
+    insertBoxSetAsString,
+    insertBoxMapAsString,
     insertBoxToString,
 } from "../../src/glue";
 
@@ -48,13 +48,13 @@ export default function TestApp() {
                 <button onclick={() => box.value--}>Decrement</button>
 
                 <h2>Insert As Text</h2>
-                <div>There should be a counter: {insertBoxAsText(box)}</div>
+                <div>There should be a counter: {insertBoxAsString(box)}</div>
 
                 <h2>Insert As Custom Text</h2>
-                <div>{insertBoxAsText(box)} * {insertBoxAsText(box)} = {insertBoxToString(box, value => String(value * value))}</div>
+                <div>{insertBoxAsString(box)} * {insertBoxAsString(box)} = {insertBoxToString(box, value => String(value * value))}</div>
 
                 <h2>Insert With Transform (AIO)</h2>
-                <div>{insertBoxAsText(box)} * 100 = {insertBox(box, value => `${value * 100}`)}</div>
+                <div>{insertBoxAsString(box)} * 100 = {insertBox(box, value => `${value * 100}`)}</div>
 
                 <h2>Insert With Transform To Node(s)</h2>
                 <div>{insertBox(box, value => (new Array(Math.abs(value))).fill(0).map((_, i) => (
@@ -77,7 +77,7 @@ export default function TestApp() {
                 <button onclick={() => array.splice(0, 2)}>Remove the first element</button>
 
                 <h2>Insert As Text</h2>
-                <div>{insertBoxArrayAsText(array)}</div>
+                <div>{insertBoxArrayAsString(array)}</div>
 
                 <h2>Insert With Transform</h2>
                 <div>{insertBoxArray(array, value => (
@@ -94,7 +94,7 @@ export default function TestApp() {
                 <button onclick={() => set.delete(set[Symbol.iterator]().next().value)}>Delete one key</button>
 
                 <h2>Insert As Text</h2>
-                <div>{insertBoxSetAsText(set)}</div>
+                <div>{insertBoxSetAsString(set)}</div>
 
                 <h2>Insert With Transform</h2>
                 <div>{insertBoxSet(set, n => (
@@ -111,7 +111,7 @@ export default function TestApp() {
                 <button onclick={() => map.delete("three")}>Delete three</button>
 
                 <h2>Insert As Text</h2>
-                <div>{insertBoxMapAsText(map)}</div>
+                <div>{insertBoxMapAsString(map)}</div>
 
                 <h2>Insert</h2>
                 <div>{insertBoxMap(map, (key, value) => (

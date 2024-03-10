@@ -6,7 +6,7 @@ import {Action as BoxMapAction} from "./map";
 
 const createAnchor = () => document.createTextNode("");
 
-export function insertBoxAsText(box: Readonly<Box<any>>): Node {
+export function insertBoxAsString(box: Readonly<Box<any>>): Node {
     const textNode = document.createTextNode(box.value + "");
     box.addListener(value => textNode.textContent = value + "");
     return textNode;
@@ -50,7 +50,7 @@ export function insertBoxArray<T>(array: BoxArray<T>, transform: (value: T) => J
 
                 // DOM Swap:
 
-                // There is always a `previousSilbling` because of the `start` anchor.
+                // There is always a `previousSibling` because of the `start` anchor.
                 const prevA = a.previousSibling!;
                 (b as ChildNode).replaceWith(a);
                 prevA.after(b);
@@ -67,7 +67,7 @@ export function insertBoxArray<T>(array: BoxArray<T>, transform: (value: T) => J
     return nodes;
 }
 
-export function insertBoxArrayAsText(boxArray: BoxArray<any>) {
+export function insertBoxArrayAsString(boxArray: BoxArray<any>) {
     const textNode = document.createTextNode(boxArray.toString());
     boxArray.addListener(() => textNode.textContent = boxArray.toString());
     return textNode;
@@ -106,7 +106,7 @@ export function insertBoxSet<T>(set: BoxSet<T>, transform: (value: T) => JSX.Ele
     return initialNodes;
 }
 
-export function insertBoxSetAsText(boxSet: BoxSet<any>) {
+export function insertBoxSetAsString(boxSet: BoxSet<any>) {
     const textNode = document.createTextNode(boxSet.toString());
     boxSet.addListener(() => textNode.textContent = boxSet.toString());
     return textNode;
@@ -144,7 +144,7 @@ export function insertBoxMap<K, V>(map: BoxMap<K, V>, transform: (key: K, value:
     return initialNodes;
 }
 
-export function insertBoxMapAsText(boxMap: BoxMap<any, any>) {
+export function insertBoxMapAsString(boxMap: BoxMap<any, any>) {
     const textNode = document.createTextNode(boxMap.toString());
     boxMap.addListener(() => textNode.textContent = boxMap.toString());
     return textNode;

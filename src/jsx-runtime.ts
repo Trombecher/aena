@@ -2104,7 +2104,7 @@ export function traverseAndRender(
 ) {
     if(element instanceof Node) callback(element);
     else if(element instanceof Array) element.forEach(element => traverseAndRender(element, callback));
-    else if(element !== null && element !== undefined && element !== false) callback(document.createTextNode(String(element)));
+    else if(element !== null && element !== undefined && typeof element !== "boolean") callback(document.createTextNode(String(element)));
 }
 
 /**

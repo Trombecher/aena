@@ -65,9 +65,33 @@ const myButton = (
 
 (Whenever this button is clicked, the page will alert "Clicked!").
 
-## Inserting Values
+## Dynamic Attributes
 
-Like in attributes, we can insert TypeScript values into the elements:
+Many HTML attributes support a value type or a `Box` of that value type to allow for dynamic attributes:
+
+```tsx
+const disabled = new Box(false);
+
+const dynamicButton = <button disabled={disabled}></button>;
+```
+
+Whenever the `Box` changes, the new value will be set to the attribute.
+
+---
+
+If your attribute value is dependent on your state and needs mapping before inserting, you can use `Box.derive(...)`:
+
+```tsx
+const tab = new Box<"orders" | "products">("orders");
+
+const dynamicAnchor = <a href={tab.derive(tab => `/${tab}`)}>Jump</a>
+```
+
+Another common use case is dynamic styling, [covered here](/docs/styling#dynamic-styling).
+
+## Inserting/Embedding Values
+
+Like in attributes, we can insert TypeScript values into the elements using `{}`:
 
 ```tsx
 const element = (
@@ -80,8 +104,71 @@ The type of the value to insert is set by `JSX.Element` in `aena`. It can be:
 - `number`: will be converted to string
 - `object`: will be converted to string
 - `string`
-- `boolean`: `true` will be converted to `"true"`, `false` will be ignored
 - `symbol`: will be converted to string
-- `null` and `undefined`: will be ignored
+- `boolean`, `null` and `undefined`: will be ignored
 - `Node`: will be inserted
-- `Element[]` (array of itself): all nodes will be inserted
+- `JSX.Element[]` (array of itself): all nodes will be inserted
+
+## Conditional Inserting/Embedding
+
+In some cases, we want to render nothing conditionally. Regularly, this kind of conditional rendering would involve some kind of if-check or [ternary operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator):
+
+```tsx
+const someCondition = true;
+
+const element = someCondition ? (
+    <div>Case: true</div>
+): (
+    // Render nothing (`undefined` is ingored).
+    undefined
+);
+```
+
+But because `boolean`, `null` and `undefined` are ignored during rendering, conditional statements can be simplified:
+
+```tsx
+const someCondition = true;
+
+const element = someCondition && (
+    <div>Case: true</div>
+);
+```
+
+If `someCondition` is false, false is returned from the `&&` expression and not rendered. [`&&` always returns the last value](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND) (if it is true, also due to type coercion), which is the div.
+
+## Fragments
+
+One handy feature in TSX are "fragments". They are basically a regular element without a tag name:
+
+```tsx
+const fragment = (
+    <>
+        <div>Hello,</div>
+        <div>World!</div>
+    </>
+);
+```
+
+You can use them whenever you need to store/return multiple elements at once, for example in components:
+
+```tsx
+export function MyComponent() {
+    return (
+        <>
+            <div>This is:</div>
+            <div>My component.</div>
+        </>
+    );
+}
+```
+
+In Aena, fragments resolve into arrays, because `JSX.Element` also accepts `JSX.Element[]`. So it is equivalent to writing:
+
+```tsx
+export function MyComponent() {
+    return [
+        <div>This is:</div>,
+        <div>My component</div>
+    ];
+}
+```
