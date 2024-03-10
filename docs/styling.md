@@ -1,6 +1,6 @@
 # Styling
 
-Use of [TailwindCSS](https://tailwindcss.com/) is heavily recommended.
+Use of [TailwindCSS](https://tailwindcss.com/) is heavily recommended. As of installation, you can use [this guide](https://tailwindcss.com/docs/installation/using-postcss).
 
 ```tsx
 export function MyApp() {
@@ -32,4 +32,18 @@ export function MyApp() {
 
 ## Dynamic Styling
 
-If you want your styles to be dependent on your state, Aena allows
+Dynamic `class` attributes are used frequently. Here is an example:
+
+```tsx
+import {Box} from "aena";
+import {insertBoxAsString} from "aena/glue";
+
+export function RedGreenBalance({balance}: {balance: Box<number>}) {
+    return (
+        <div class={balance.derive(balance =>
+            `${balance > 0 ? "bg-green-400" : "bg-red-400"} font-mono`)}>
+            Balance: {insertBoxAsString(balance)}
+        </div>
+    );
+}
+```
