@@ -20,7 +20,7 @@
     "license": "ISC",
     "type": "module",
     "files": [
-        "../../README.md",
+        "README.md",
         "src",
         "LICENSE",
         "dist"
