@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.14.1",
+    "version": "0.14.2",
     "description": "Your next SPA TypeScript framework.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -14,7 +14,7 @@
         "state"
     ],
     "scripts": {
-        "compile": "bunx tsc"
+        "compile": "pwsh build.ps1"
     },
     "author": "Tobias Hillemanns",
     "license": "ISC",
