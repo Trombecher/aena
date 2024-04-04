@@ -38,5 +38,5 @@ export declare class Box<T> {
     /**
      * Removes a listener from this {@link Box}.
      */
-    detach<T>(listener: Listener<T>);
+    detach<T>(listener: Listener<T>): void;
 }
