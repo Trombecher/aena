@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.13.3",
+    "version": "0.13.4",
     "description": "Your next SPA TypeScript framework.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -14,14 +14,13 @@
         "state"
     ],
     "scripts": {
-        "test": "vitest run",
-        "docs": "typedoc --entryPointStrategy expand ./src && .\\docs\\index.html"
+        "compile": "bunx tsc"
     },
     "author": "Tobias Hillemanns",
     "license": "ISC",
     "type": "module",
     "files": [
-        "README.md",
+        "../../README.md",
         "src",
         "LICENSE",
         "dist"
@@ -57,9 +56,8 @@
         }
     },
     "devDependencies": {
-        "typedoc": "^0.25.8",
-        "typescript": "^5.3.3",
-        "vitest": "^1.2.2"
+        "@types/bun": "latest",
+        "typescript": "^5.4.2"
     },
     "repository": "https://github.com/trombecher/aena"
 }

@@ -1,13 +1,15 @@
-# State
+---
+title: "State"
+---
 
 > Note: This part of the documentation is decoupled from any UI code.
 
 State refers to the state in which your app is in. You can change state or make other state dependent on some state. Aena provides four "state primitives" to compose your state:
 
-- Use [`Box`](/docs/state/box) if you want an immutable store like a counter or a string.
-- Use [`BoxArray`](/docs/state/array) if you want a reactive array, e.g. for a todo-list container.
-- Use [`BoxSet`](/docs/state/set) if you could use a `BoxArray` but ordering does not matter. `BoxSet` is much faster than `BoxArray`, so use it where you can.
-- Use [`BoxMap`](/docs/state/map) if you want reactive keys and values (rarely used).
+- Use [`Box`](/website2/app/docs/state/box) if you want an immutable store like a counter or a string.
+- Use [`BoxArray`](/website2/app/docs/state/array) if you want a reactive array, e.g. for a todo-list container.
+- Use [`BoxSet`](/website2/app/docs/state/set) if you could use a `BoxArray` but ordering does not matter. `BoxSet` is much faster than `BoxArray`, so use it where you can.
+- Use [`BoxMap`](/website2/app/docs/state/map) if you want reactive keys and values (rarely used).
 
 Instead of decoupled setters and getters of immutable stores commonly found in other frameworks/libraries, like React or SolidJS, Aena has replacements of existing datastructures to make them reactive.
 
@@ -19,7 +21,7 @@ Listening is the mechanism that allows for reactive state. The basic principle i
 
 All primitives which implement the `Listen` interface, have both `Listen.addListener(...)` and `Listen.removeListener(...)` functions. Internally, listeners are stored in a [`Set`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) for constant time operations.
 
-Arguments passed to listeners vary with the primitive. For example, [`Box` listeners are provided with the new and old value](/docs/state/box#listening).
+Arguments passed to listeners vary with the primitive. For example, [`Box` listeners are provided with the new and old value](/website2/app/docs/state/box#listening).
 
 ---
 

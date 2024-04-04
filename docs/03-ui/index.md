@@ -1,4 +1,6 @@
-# UI In Aena
+---
+title: "UI"
+---
 
 UI is written in special HTML-like TypeScript expressions, called [TSX](https://www.typescriptlang.org/docs/handbook/jsx.html). You can use this syntax in `.tsx` files if the [`jsx` option](https://www.typescriptlang.org/tsconfig#jsx) in your tsconfig is enabled (if you used the installation guide, this option is enabled).
 

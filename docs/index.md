@@ -1,10 +1,10 @@
-# Introduction
+---
+title: "Overview"
+---
 
 Welcome to the Aena documentation!
 
 ---
-
-## What is Aena
 
 Aena is a frontend framework for building [single page applications](https://developer.mozilla.org/en-US/docs/Glossary/SPA) in [TypeScript](https://www.typescriptlang.org/).
 
@@ -17,7 +17,7 @@ Aena is a frontend framework for building [single page applications](https://dev
 
 ## Overview
 
-Aena consists of two main parts: **[state](/docs/state) and [ui](/docs/ui)**. When working with Aena, you often declare state (reactive or not) and ui, while **mapping your state into the ui**. Then you let the ui make changes to your state.
+Aena consists of two main parts: **[state](/website/src/content/docsite/src/content/docs/state) and [ui](/website/src/content/docsite/src/content/docs/ui)**. When working with Aena, you often declare state (reactive or not) and ui, while **mapping your state into the ui**. Then you let the ui make changes to your state.
 
 The following example is the default example for ui frameworks: the counter.
 

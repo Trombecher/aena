@@ -1,4 +1,4 @@
-import {expect, test} from "vitest";
+import {expect, test} from "bun:test";
 import {Box, BoxMap} from "../src";
 import {Action} from "../src/map";
 

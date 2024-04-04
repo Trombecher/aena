@@ -3,27 +3,11 @@
 ![](aena.webp)
 
 > [!WARNING]
-> Still in beta. Do not use in production. Inherently unstable api, no guarantees made.
+> Still in beta. Do not use in production.
 
-Aena is your next SPA TypeScript framework. It comes with components, flexible built-in state management and TSX support.
+Aena is your next SPA TypeScript framework.
 
-## Installation
-
-Via [template](https://github.com/trombecher/aena-template). Instruction are [here](https://github.com/trombecher/aena-template).
-
-You can also install [Aena](https://www.npmjs.com/package/aena) directly via NPM:
-
-```shell
-npm i aena
-```
-
-```shell
-pnpm i aena
-```
-
-## Docs
-
-### [Quickstart Guide](./QUICKSTART.md)
+## [Docs Are Here](https://github.com/Trombecher/aena/blob/main/docs/index.md)
 
 ## This Package Does _Not_ Throw!
 

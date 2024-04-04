@@ -1,4 +1,6 @@
-## Components
+---
+title: "Components"
+---
 
 Components are just functions that return elements, like this one:
 

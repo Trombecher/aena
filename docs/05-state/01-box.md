@@ -1,8 +1,10 @@
-# `Box`
+---
+title: "Box"
+---
 
 There are times when you want one thing to change as another thing changes. For example: UI needs to change when the state changes. `Box` is such a reactive value. When the value in the `Box` is changed, all listeners are notified of this change.
 
-Note: `Box` only reports changes when the value inside changes. That does not happen if you mutate an object (like an array) stored inside the `Box`, since the check `oldValue !== newValue` fails. [**You will find reactive arrays and other datastructures here**](/docs/state).
+Note: `Box` only reports changes when the value inside changes. That does not happen if you mutate an object (like an array) stored inside the `Box`, since the check `oldValue !== newValue` fails. [**You will find reactive arrays and other datastructures here**](/website/src/content/docsite/src/content/docs/state).
 
 ## Creating
 

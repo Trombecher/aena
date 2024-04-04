@@ -18,41 +18,6 @@ export type Change<T> = Readonly<{
 
 /**
  * A set store for immutable data.
- *
- * # Example
- *
- * ```typescript
- * import {BoxSet} from "aena";
- * import {Action} from "aena/set";
- *
- * const set = new BoxSet<number>();
- *
- * const listener = set.addListener(change => {
- *     switch(change.action) {
- *         case Action.Add:
- *             console.log(`Added ${change.value}`);
- *             break;
- *         case Action.Delete:
- *             console.log(`Deleted ${change.value}`);
- *             break;
- *     }
- * });
- *
- * set.add(0); // Logs "Added 0".
- * set.delete(0); // Logs "Deleted 0".
- *
- * set.removeListener(listener);
- *
- * set.add(0); // Logs nothing.
- * set.delete(0); // Logs nothing.
- *
- * const deepListener = set.addDeepListener(() => console.log("Set has changed."));
- *
- * set.add(0); // Logs "Set has changed".
- * set.delete(0); // Logs "Set has changed".
- *
- * set.removeDeepListener(deepListener);
- * ```
  */
 export class BoxSet<T> extends Set<T> implements ListenDeep<Listener<T>> {
     override add(value: T): this {

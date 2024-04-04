@@ -1,4 +1,6 @@
-# Styling
+---
+title: "Styling"
+---
 
 Use of [TailwindCSS](https://tailwindcss.com/) is heavily recommended. As of installation, you can use [this guide](https://tailwindcss.com/docs/installation/using-postcss).
 

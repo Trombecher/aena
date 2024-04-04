@@ -1,4 +1,6 @@
-# Integrating State
+---
+title: "Integrating State"
+---
 
 You have state and UI and want to bring them together? This page provides solutions.
 

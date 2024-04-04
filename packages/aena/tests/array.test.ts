@@ -1,4 +1,4 @@
-import {expect, test} from "vitest";
+import {expect, test} from "bun:test";
 import {Box, BoxArray, BoxSet} from "../src";
 import {Action, Change} from "../src/array";
 
@@ -24,7 +24,7 @@ function testChange<T>(
 
     modify(array);
 
-    expect(array).toEqual(resultingArray);
+    expect(resultingArray).toEqual(array);
     expect(count).toBe(deepCallCount);
     expect(changes).toEqual(recordedChanges);
 
@@ -36,7 +36,7 @@ function testChange<T>(
 
     secondModify(array);
 
-    expect(array).toEqual(secondResultingArray);
+    expect(secondResultingArray).toEqual(array);
     expect(count).toBe(callCount);
     expect(changes.length).toEqual(changeCount);
 }

@@ -22,9 +22,9 @@
         "noFallthroughCasesInSwitch": true,
         "strictFunctionTypes": true,
         "jsx": "preserve",
-        "jsxFactory": "_0",
-        "jsxFragmentFactory": "_1",
-        "jsxImportSource": "../../src"
+        "jsxFactory": "createElement",
+        "jsxFragmentFactory": "Fragment",
+        "jsxImportSource": "../../packages/aena/src"
     },
     "include": [
         "src"

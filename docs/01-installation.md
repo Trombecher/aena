@@ -1,4 +1,6 @@
-# Installation
+---
+title: "Installation"
+---
 
 ## [Via Template](https://github.com/trombecher/aena-template)
 

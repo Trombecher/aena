@@ -725,7 +725,28 @@ export namespace JSX {
         size?: BoxedOr<number | string>;
         src?: BoxedOr<string>;
         step?: BoxedOr<number | string>;
-        type?: BoxedOr<string>;
+        type?: BoxedOr<"button"
+            | "checkbox"
+            | "color"
+            | "date"
+            | "datetime-local"
+            | "email"
+            | "file"
+            | "hidden"
+            | "image"
+            | "month"
+            | "number"
+            | "password"
+            | "radio"
+            | "range"
+            | "reset"
+            | "search"
+            | "submit"
+            | "tel"
+            | "text"
+            | "time"
+            | "url"
+            | "week">;
         value?: BoxedOr<string | string[] | number>;
         width?: BoxedOr<number | string>;
     }

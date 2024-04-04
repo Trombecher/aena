@@ -1,5 +1,3 @@
-# Elements
-
 Elements start with a _start tag_ (here `<div>`) and end with an _end tag_ (here `</div>`):
 
 ```tsx
@@ -87,7 +85,7 @@ const tab = new Box<"orders" | "products">("orders");
 const dynamicAnchor = <a href={tab.derive(tab => `/${tab}`)}>Jump</a>
 ```
 
-Another common use case is dynamic styling, [covered here](/docs/styling#dynamic-styling).
+Another common use case is dynamic styling, [covered here](/website2/app/docs/styling#dynamic-styling).
 
 ## Inserting/Embedding Values
 

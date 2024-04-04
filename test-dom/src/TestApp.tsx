@@ -1,4 +1,4 @@
-import {Box, BoxArray, BoxMap, BoxSet, JSX} from "../../src";
+import {Box, BoxArray, BoxMap, BoxSet, JSX} from "../../packages/aena/src";
 import {
     insertBoxArray,
     insertBox,
@@ -9,7 +9,7 @@ import {
     insertBoxSetAsString,
     insertBoxMapAsString,
     insertBoxToString,
-} from "../../src/glue";
+} from "../../packages/aena/src/glue";
 
 export default function TestApp() {
     const box = new Box(0),
@@ -74,7 +74,7 @@ export default function TestApp() {
                 <button onclick={() => array.swapIndices(0, -1)}>Swap first and last element</button>
 
                 <h2>Deleting</h2>
-                <button onclick={() => array.splice(0, 2)}>Remove the first element</button>
+                <button onclick={() => array.splice(0, 1)}>Remove the first element</button>
 
                 <h2>Insert As Text</h2>
                 <div>{insertBoxArrayAsString(array)}</div>
