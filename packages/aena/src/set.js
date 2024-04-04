@@ -3,7 +3,7 @@ import {
     implementListenDeep,
     notify,
     removeListenersDeep
-} from "./internal.ts";
+} from "./internal";
 
 export const ACTION_ADD = 0;
 export const ACTION_DELETE = 1;
