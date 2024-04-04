@@ -1,4 +1,5 @@
-import {addListenerRecursively, DeepListener, removeListenerRecursively} from "./index";
+import {addListenerRecursively, DeepListener, ListenDeep, removeListenerRecursively} from "./index";
+import {BoxSet} from "./set";
 
 /**
  * Checks if the parameter `value` is an object and not null.
@@ -70,4 +71,42 @@ export function clampIndexLower(index: number, length: number): number {
     if(index < -length) return 0;
     if(index < 0) return index + length;
     return index;
+}
+
+/**
+ * Notifies all listeners and deep listeners of a {@link BoxSet}, {@link BoxArray} or a {@link BoxMap} of a change.
+ */
+export function notify<L extends (change: C) => void, C>(target: {l: Set<L>, d: Set<DeepListener>}, change: C) {
+    target.l.forEach(listener => listener(change));
+    target.d.forEach(listener => listener());
+}
+
+/**
+ * Implements a shared {@link ListenDeep} functionality for {@link BoxSet}, {@link BoxMap} and {@link BoxArray}.
+ * @param target
+ */
+export function implementListenDeep<L extends Function>(target: {
+    l: Set<L>,
+    d: Set<DeepListener>,
+    forEach: (fn: (value: any) => void) => void,
+} & ListenDeep<L>) {
+    target.attach = function(listener) {
+        this.l.add(listener);
+        return listener;
+    };
+
+    target.attachDeep = function(listener) {
+        this.d.add(listener);
+        this.forEach(value => addListenerRecursively(value, listener));
+        return listener;
+    };
+
+    target.detach = function(listener) {
+        this.l.delete(listener);
+    };
+
+    target.detachDeep = function(listener) {
+        this.d.delete(listener);
+        this.forEach(value => removeListenerRecursively(value, listener));
+    };
 }

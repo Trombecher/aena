@@ -10,11 +10,11 @@ test("`Listen` implementation", () => {
     const box = new Box("");
     let newValue: string | null = null;
 
-    const listener = box.addListener(value => newValue = value);
+    const listener = box.attach(value => newValue = value);
     box.value = "test";
     expect(newValue).toBe("test");
 
-    box.removeListener(listener);
+    box.detach(listener);
     box.value = "other test";
     expect(newValue).toBe("test");
 });

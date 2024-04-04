@@ -2202,15 +2202,15 @@ export function createElement(
         const translatedKey = translateKey(key);
 
         // `element` is always `{}`.
-        if(isWritable(element.__proto__, translatedKey)) { // idl attribute
+        if(isWritable(Object.getPrototypeOf(element), translatedKey)) { // idl attribute
             if(value instanceof Box) {
                 element[translatedKey] = value.value;
-                value.addListener(value => element[translatedKey] = value);
+                value.attach(value => element[translatedKey] = value);
             } else element[translatedKey] = value;
         } else { // html attribute
             if(value instanceof Box) {
                 element.setAttribute(key, value.value);
-                value.addListener(value => element.setAttribute(key, value));
+                value.attach(value => element.setAttribute(key, value));
             } else element.setAttribute(key, value);
         }
     });

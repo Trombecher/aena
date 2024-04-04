@@ -53,29 +53,29 @@ export function reduce<V extends Box<any>[], T>(
     const values = dependencies.map(d => d!.value) as UnboxArray<V>;
 
     const reducedBox = new Box(reducer(values));
-    dependencies.forEach((box, index) => box!.addListener(value => {
+    dependencies.forEach((box, index) => box!.attach(value => {
         values[index] = value;
         reducedBox.value = reducer(values);
     }));
 
-    return reducedBox.readonly();
+    return reducedBox;
 }
 
 /**
  * Checks if parameter `o` is instance of a class implementing {@link Listen}.
  */
 export function isInstanceOfListen<L extends Function>(o: object): o is Listen<L> {
-    return "addListener" in o && "removeListener" in o;
+    return "attach" in o && "detach" in o;
 }
 
 /**
  * Checks if parameter `o` is instance of a class implementing {@link ListenDeep}.
  */
 export function isInstanceOfListenDeep<L extends Function>(o: object): o is ListenDeep<L> {
-    return "addListener" in o
-        && "removeListener" in o
-        && "addDeepListener" in o
-        && "removeDeepListener" in o;
+    return "attach" in o
+        && "detach" in o
+        && "attachDeep" in o
+        && "detachDeep" in o;
 }
 
 /**
@@ -108,12 +108,12 @@ export interface Listen<L extends Function = Function> {
      *
      * @returns The parameter `listener` for lazy typing.
      */
-    addListener(listener: L): L;
+    attach(listener: L): L;
 
     /**
      * Remove a listener.
      */
-    removeListener(listener: L): void;
+    detach(listener: L): void;
 }
 
 /**
@@ -144,12 +144,12 @@ export interface ListenDeep<L extends Function = Function> extends Listen<L> {
      *
      * @returns The parameter `listener` for lazy typing.
      */
-    addDeepListener(listener: DeepListener): DeepListener;
+    attachDeep(listener: DeepListener): DeepListener;
 
     /**
      * Remove a deep listener.
      */
-    removeDeepListener(listener: DeepListener): void;
+    detachDeep(listener: DeepListener): void;
 }
 
 /**
@@ -158,8 +158,8 @@ export interface ListenDeep<L extends Function = Function> extends Listen<L> {
 export function addListenerRecursively(value: any, listener: DeepListener): void {
     if(!isObject(value)) return;
 
-    if(isInstanceOfListenDeep(value)) value.addDeepListener(listener);
-    else if(isInstanceOfListen(value)) value.addListener(listener);
+    if(isInstanceOfListenDeep(value)) value.attachDeep(listener);
+    else if(isInstanceOfListen(value)) value.attach(listener);
     else Object.keys(value).forEach(key =>
             addListenerRecursively(value[key as keyof typeof value], listener));
 }
@@ -170,8 +170,8 @@ export function addListenerRecursively(value: any, listener: DeepListener): void
 export function removeListenerRecursively(value: any, listener: DeepListener): void {
     if(!isObject(value)) return;
 
-    if(isInstanceOfListenDeep(value)) value.removeDeepListener(listener);
-    else if(isInstanceOfListen(value)) value.removeListener(listener);
+    if(isInstanceOfListenDeep(value)) value.detachDeep(listener);
+    else if(isInstanceOfListen(value)) value.detach(listener);
     else Object.keys(value).forEach(key =>
             removeListenerRecursively(value[key as keyof typeof value], listener));
 }

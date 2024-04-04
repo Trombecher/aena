@@ -1,6 +1,6 @@
 import {expect, test} from "bun:test";
 import {Box, BoxArray, BoxSet} from "../src";
-import {Action, Change} from "../src/array";
+import {Change, ACTION_INSERT, ACTION_SWAP, ACTION_DELETE} from "../src/array";
 
 type Item = {set: BoxSet<number>} | Box<number> | number;
 
@@ -19,8 +19,8 @@ function testChange<T>(
     let count = 0;
     const recordedChanges = new Array<Change<T>>();
 
-    const deepListener = array.addDeepListener(() => ++count);
-    const listener = array.addListener(change => recordedChanges.push(change));
+    const deepListener = array.attachDeep(() => ++count);
+    const listener = array.attach(change => recordedChanges.push(change));
 
     modify(array);
 
@@ -31,8 +31,8 @@ function testChange<T>(
     const changeCount = changes.length;
     const callCount = count;
 
-    array.removeDeepListener(deepListener);
-    array.removeListener(listener);
+    array.detachDeep(deepListener);
+    array.detach(listener);
 
     secondModify(array);
 
@@ -55,11 +55,11 @@ test("push", () => {
         [foo, bar],
         4,
         [{
-            action: Action.Insert,
+            action: ACTION_INSERT,
             value: foo,
             index: 0
         }, {
-            action: Action.Insert,
+            action: ACTION_INSERT,
             value: bar,
             index: 1,
         }],
@@ -75,7 +75,7 @@ test("swapIndices", () => {
         [2, 1, 0],
         1,
         [{
-            action: Action.Swap,
+            action: ACTION_SWAP,
             a: 0,
             b: 2,
             indexA: 0,
@@ -93,7 +93,7 @@ test("swap", () => {
         [2, 1, 0],
         1,
         [{
-            action: Action.Swap,
+            action: ACTION_SWAP,
             a: 0,
             b: 2,
             indexA: 0,
@@ -112,14 +112,14 @@ test("copyWithin", () => {
         [2, 3, 4, 5, 4, 5],
         8,
         [
-            {action: Action.Delete, value: 0, index: 0},
-            {action: Action.Insert, value: 2, index: 0},
-            {action: Action.Delete, value: 1, index: 1},
-            {action: Action.Insert, value: 3, index: 1},
-            {action: Action.Delete, value: 2, index: 2},
-            {action: Action.Insert, value: 4, index: 2},
-            {action: Action.Delete, value: 3, index: 3},
-            {action: Action.Insert, value: 5, index: 3},
+            {action: ACTION_DELETE, value: 0, index: 0},
+            {action: ACTION_INSERT, value: 2, index: 0},
+            {action: ACTION_DELETE, value: 1, index: 1},
+            {action: ACTION_INSERT, value: 3, index: 1},
+            {action: ACTION_DELETE, value: 2, index: 2},
+            {action: ACTION_INSERT, value: 4, index: 2},
+            {action: ACTION_DELETE, value: 3, index: 3},
+            {action: ACTION_INSERT, value: 5, index: 3},
         ],
         array => array.copyWithin(0, 3, 6),
         [5, 4, 5, 5, 4, 5]
@@ -133,11 +133,11 @@ test("fill", () => {
         [0, 10, 2],
         2,
         [{
-            action: Action.Delete,
+            action: ACTION_DELETE,
             value: 1,
             index: 1
         }, {
-            action: Action.Insert,
+            action: ACTION_INSERT,
             value: 10,
             index: 1,
         }],
@@ -159,7 +159,7 @@ test("pop", () => {
         [200],
         2,
         [{
-            action: Action.Delete,
+            action: ACTION_DELETE,
             value: foo,
             index: 1
         }],
@@ -184,11 +184,11 @@ test("set", () => {
         [bar],
         4,
         [{
-            action: Action.Delete,
+            action: ACTION_DELETE,
             value: foo,
             index: 0,
         }, {
-            action: Action.Insert,
+            action: ACTION_INSERT,
             value: bar,
             index: 0
         }],
@@ -213,7 +213,7 @@ test("shift", () => {
         [200],
         2,
         [{
-            action: Action.Delete,
+            action: ACTION_DELETE,
             value: foo,
             index: 0
         }],
@@ -235,11 +235,11 @@ test("splice", () => {
         [foo, 20],
         3,
         [{
-            action: Action.Insert,
+            action: ACTION_INSERT,
             value: foo,
             index: 0
         }, {
-            action: Action.Delete,
+            action: ACTION_DELETE,
             value: 10,
             index: 1
         }],
@@ -258,10 +258,10 @@ test("sort", () => {
         [0, 1, 2],
         4,
         [
-            {action: Action.Delete, value: 2, index: 1},
-            {action: Action.Insert, value: 1, index: 1},
-            {action: Action.Delete, value: 1, index: 2},
-            {action: Action.Insert, value: 2, index: 2},
+            {action: ACTION_DELETE, value: 2, index: 1},
+            {action: ACTION_INSERT, value: 1, index: 1},
+            {action: ACTION_DELETE, value: 1, index: 2},
+            {action: ACTION_INSERT, value: 2, index: 2},
         ],
         _ => {
         },
@@ -282,7 +282,7 @@ test("unshift", () => {
         [foo, 2, 3],
         2,
         [{
-            action: Action.Insert,
+            action: ACTION_INSERT,
             value: foo,
             index: 0
         }],

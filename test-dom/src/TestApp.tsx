@@ -5,9 +5,6 @@ import {
     insertBoxSet,
     insertBoxMap,
     insertBoxAsString,
-    insertBoxArrayAsString,
-    insertBoxSetAsString,
-    insertBoxMapAsString,
     insertBoxToString,
 } from "../../packages/aena/src/glue";
 
@@ -76,9 +73,6 @@ export default function TestApp() {
                 <h2>Deleting</h2>
                 <button onclick={() => array.splice(0, 1)}>Remove the first element</button>
 
-                <h2>Insert As Text</h2>
-                <div>{insertBoxArrayAsString(array)}</div>
-
                 <h2>Insert With Transform</h2>
                 <div>{insertBoxArray(array, value => (
                     <span>{value} * 100 = {value * 100}, </span>
@@ -93,9 +87,6 @@ export default function TestApp() {
                 <h2>Deleting</h2>
                 <button onclick={() => set.delete(set[Symbol.iterator]().next().value)}>Delete one key</button>
 
-                <h2>Insert As Text</h2>
-                <div>{insertBoxSetAsString(set)}</div>
-
                 <h2>Insert With Transform</h2>
                 <div>{insertBoxSet(set, n => (
                     <div>{n} * {n} = {n * n}</div>
@@ -109,9 +100,6 @@ export default function TestApp() {
 
                 <h2>Deleting</h2>
                 <button onclick={() => map.delete("three")}>Delete three</button>
-
-                <h2>Insert As Text</h2>
-                <div>{insertBoxMapAsString(map)}</div>
 
                 <h2>Insert</h2>
                 <div>{insertBoxMap(map, (key, value) => (

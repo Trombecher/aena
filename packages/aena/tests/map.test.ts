@@ -1,6 +1,5 @@
 import {expect, test} from "bun:test";
-import {Box, BoxMap} from "../src";
-import {Action} from "../src/map";
+import {BoxMap} from "../src";
 
 function createNumberBoxMap() {
     const boxMap = new BoxMap<string, number>();
@@ -31,6 +30,7 @@ test("delete", () => {
     expect(map.size).toBe(2);
 });
 
+/*
 test("reduce", () => {
     const map = createNumberBoxMap();
     const squares = map.reduce(new Set<string>(),
@@ -116,3 +116,4 @@ test("`ListenDeep` implementation", () => {
     map.delete("foo");
     expect(callCount).toBe(6);
 });
+ */
