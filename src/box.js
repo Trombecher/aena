@@ -10,6 +10,7 @@ export class Box {
     }
 
     set value(value) {
+        if(value === this._) return;
         const oldValue = this._;
         this._ = value;
         this.l.forEach(listener => listener(value, oldValue));

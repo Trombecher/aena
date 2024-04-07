@@ -3,3 +3,5 @@
 **/.idea
 **/node_modules
 **/pnpm-lock.yaml
+**/bun.lockb
+**/.astro
