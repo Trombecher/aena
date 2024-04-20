@@ -1,110 +1,33 @@
-import {Box, BoxArray, BoxMap, BoxSet, JSX} from "../../packages/aena/src";
-import {
-    insertBoxArray,
-    insertBox,
-    insertBoxSet,
-    insertBoxMap,
-    insertBoxAsString,
-    insertBoxToString,
-} from "../../packages/aena/src/glue";
+import {getState, insertState, insertStateToString, setState, State} from "../../src";
+import {JSX} from "../../src/jsx-runtime";
 
 export default function TestApp() {
-    const box = new Box(0),
-        array = new BoxArray<number>(),
-        set = new BoxSet<number>(),
-        map = new BoxMap<string, number>();
+    const state = new State(0);
     
     return (
         <>
-            <section>
-                <h1>Testing: <code>aena/jsx-runtime</code></h1>
-                <div>
-                    By seeing this text, aena/jsx-runtime has successfully passed createElement(...) and
-                    Fragment(...) tests
-                </div>
-                <div>
-                    There should be a number: <Number/>
-                </div>
-                <div>
-                    There should be wrapped content:
-                    <Wrapper>Wrapped content</Wrapper>
-                </div>
-            </section>
+            <h1>Testing: <code>aena/jsx-runtime</code></h1>
+            <div>
+                By seeing this text, aena/jsx-runtime has successfully passed createElement(...) and
+                Fragment(...) tests
+            </div>
+            <div>
+                There should be a number: <Number/>
+            </div>
+            <div>
+                There should be wrapped content:
+                <Wrapper>Wrapped content</Wrapper>
+            </div>
+            <h1>Testing: State</h1>
+            <div className={""}>Count: {insertState(state, c => <span>{c}</span>)}</div>
+            <div>Double: {insertStateToString(state, c => `${c * c}`)}</div>
+            <button onclick={() => setState(state, getState(state) + 1)}>Increment</button>
+            <button onclick={() => setState(state, getState(state) - 1)}>Decrement</button>
             <section>
                 <h1>Testing: <code>aena/jsx-runtime</code> SVG support</h1>
-                <svg xmlns={"https://www.w3.org/2000/svg"} width={"128"} height={"128"}>
-                    <rect width={"128"} height={"128"} fill={"#da3434"}/>
+                <svg _width={"128"} _height={"128"}>
+                    <rect _width={"128"} _height={"128"} _fill={"#da3434"}/>
                 </svg>
-            </section>
-            <section>
-                <h1>Testing: <code>aena/glue</code> integration for <code>Box</code></h1>
-
-                <h2>Updating</h2>
-                <button onclick={() => box.value++}>Increment</button>
-                {" and "}
-                <button onclick={() => box.value--}>Decrement</button>
-
-                <h2>Insert As Text</h2>
-                <div>There should be a counter: {insertBoxAsString(box)}</div>
-
-                <h2>Insert As Custom Text</h2>
-                <div>{insertBoxAsString(box)} * {insertBoxAsString(box)} = {insertBoxToString(box, value => String(value * value))}</div>
-
-                <h2>Insert With Transform (AIO)</h2>
-                <div>{insertBoxAsString(box)} * 100 = {insertBox(box, value => `${value * 100}`)}</div>
-
-                <h2>Insert With Transform To Node(s)</h2>
-                <div>{insertBox(box, value => (new Array(Math.abs(value))).fill(0).map((_, i) => (
-                    <div>{i}</div>
-                )))}</div>
-
-                <h2>Insert With Transform To Undefined (Only Even)</h2>
-                <div>{insertBox(box, value => value % 2 === 0 ? <div>{value}</div> : undefined)}</div>
-            </section>
-            <section>
-                <h1>Testing: <code>aena/glue</code> integration for <code>BoxArray</code></h1>
-
-                <h2>Adding</h2>
-                <button onclick={() => array.push(Math.round(Math.random() * 10))}>Add random number</button>
-
-                <h2>Swapping</h2>
-                <button onclick={() => array.swapIndices(0, -1)}>Swap first and last element</button>
-
-                <h2>Deleting</h2>
-                <button onclick={() => array.splice(0, 1)}>Remove the first element</button>
-
-                <h2>Insert With Transform</h2>
-                <div>{insertBoxArray(array, value => (
-                    <span>{value} * 100 = {value * 100}, </span>
-                ))}</div>
-            </section>
-            <section>
-                <h1>Testing: <code>aena/glue</code> integration for <code>BoxSet</code></h1>
-
-                <h2>Adding</h2>
-                <button onclick={() => set.add(Math.random())}>Add random number</button>
-
-                <h2>Deleting</h2>
-                <button onclick={() => set.delete(set[Symbol.iterator]().next().value)}>Delete one key</button>
-
-                <h2>Insert With Transform</h2>
-                <div>{insertBoxSet(set, n => (
-                    <div>{n} * {n} = {n * n}</div>
-                ))}</div>
-            </section>
-            <section>
-                <h1>Testing: <code>aena/glue</code> integration for <code>BoxMap</code></h1>
-
-                <h2>Adding</h2>
-                <button onclick={() => map.set("three", 3)}>Add three</button>
-
-                <h2>Deleting</h2>
-                <button onclick={() => map.delete("three")}>Delete three</button>
-
-                <h2>Insert</h2>
-                <div>{insertBoxMap(map, (key, value) => (
-                    <div>{key}: {value}</div>
-                ))}</div>
             </section>
         </>
     );

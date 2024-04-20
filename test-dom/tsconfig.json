@@ -24,7 +24,7 @@
         "jsx": "preserve",
         "jsxFactory": "createElement",
         "jsxFragmentFactory": "Fragment",
-        "jsxImportSource": "../../packages/aena/src"
+        "jsxImportSource": "../../src"
     },
     "include": [
         "src"

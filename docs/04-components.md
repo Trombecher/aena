@@ -33,7 +33,7 @@ export function Outer() {
 }
 ```
 
-If the tag name starts with a capital letter, like `<Inner/>`, TSX searches for a function. Otherwise, it interprets it as an HTML tag, like `<div>...</div>`.
+If the tag name starts with a capital letter, like `<Inner/>`, TSX searches for a function.
 
 Note: this is only handy syntax. Because components are just functions, you could also nest via insertion, however the former is preferred:
 
@@ -94,12 +94,12 @@ A frequent pattern encountered is standardizing elements. Here is a `MyButton` c
 import {JSX} from "aena";
 
 export function MyButton({
-    class: className,
+    className,
     children,
     ...rest
 }: JSX.IntrinsicElements<"button">) {
     return (
-        <button class={`${className} <YOUR_CLASSES>`} {...rest}>
+        <button className={`${className} <YOUR_CLASSES>`} {...rest}>
             {children}
         </button>
     );

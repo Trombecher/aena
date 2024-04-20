@@ -1,3 +1,7 @@
+---
+title: "Elements"
+---
+
 Elements start with a _start tag_ (here `<div>`) and end with an _end tag_ (here `</div>`):
 
 ```tsx
@@ -35,7 +39,7 @@ const horizontalLine = (
 );
 ```
 
-## Attributes
+## TypeScript Attributes
 
 Attributes are written as follows:
 
@@ -53,7 +57,7 @@ const myOtherImage = (
 );
 ```
 
-This difference is, that the curly braces `{}` indicate inserting a TypeScript expression, here a string. You could also pass in a number, a boolean or a function:
+This difference is, that the curly braces `{}` insert a TypeScript expression, here a string. You could also pass in a number, a boolean or a function:
 
 ```tsx
 const myButton = (
@@ -63,26 +67,40 @@ const myButton = (
 
 (Whenever this button is clicked, the page will alert "Clicked!").
 
-## Dynamic Attributes
+## HTML Attributes
 
-Many HTML attributes support a value type or a `Box` of that value type to allow for dynamic attributes:
+If you cannot find a TypeScript attribute, try prefixing it with an underscore:
 
 ```tsx
-const disabled = new Box(false);
+const mySvg = (
+    <svg _width={32} _height={32} _viewState={"0 0 32 32"}></svg>
+);
+```
+
+_Why and when do you need to do this?_ The [DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) specifies two types of attributes: [content and IDL attributes](https://developer.mozilla.org/en-US/docs/Glossary/IDL#content_versus_idl_attributes). In short, _content attributes_ are the attributes that you set _on the HTML element_ via `setAttribute` and _IDL attributes_ are the attributes that you set _on the TypeScript object representing the element_.
+
+**Content / HTML Attributes are prefixed with an underscore.** This underscore is omitted in the process, but it instructs Aena on how to set the attribute. Previous versions of Aena used a recursive algorithm to determine if an attribute was an IDL attribute, but using this prefixing we can reduce the bundle size significantly.
+
+## Dynamic Attributes
+
+Many HTML attributes support a value type or a `State` of that value type to allow for dynamic attributes:
+
+```tsx
+const disabled = new State(false);
 
 const dynamicButton = <button disabled={disabled}></button>;
 ```
 
-Whenever the `Box` changes, the new value will be set to the attribute.
+Whenever the `State` changes, the new value will be set to the attribute.
 
 ---
 
-If your attribute value is dependent on your state and needs mapping before inserting, you can use `Box.derive(...)`:
+If your attribute value is dependent on your state and needs mapping before inserting, you can use `deriveState(...)`:
 
 ```tsx
-const tab = new Box<"orders" | "products">("orders");
+const tab = new State<"orders" | "products">("orders");
 
-const dynamicAnchor = <a href={tab.derive(tab => `/${tab}`)}>Jump</a>
+const dynamicAnchor = <a href={deriveState(tab, tab => `/${tab}`)}>Jump</a>
 ```
 
 Another common use case is dynamic styling, [covered here](/website2/app/docs/styling#dynamic-styling).
@@ -100,14 +118,13 @@ const element = (
 The type of the value to insert is set by `JSX.Element` in `aena`. It can be:
 
 - `number`: will be converted to string
-- `object`: will be converted to string
 - `string`
 - `symbol`: will be converted to string
 - `boolean`, `null` and `undefined`: will be ignored
 - `Node`: will be inserted
 - `JSX.Element[]` (array of itself): all nodes will be inserted
 
-## Conditional Inserting/Embedding
+## Conditional Insertion/Embedding
 
 In some cases, we want to render nothing conditionally. Regularly, this kind of conditional rendering would involve some kind of if-check or [ternary operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_operator):
 
@@ -133,6 +150,49 @@ const element = someCondition && (
 ```
 
 If `someCondition` is false, false is returned from the `&&` expression and not rendered. [`&&` always returns the last value](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND) (if it is true, also due to type coercion), which is the div.
+
+## Dynamic Insertion
+
+If you have some `State` you can bind it to the ui in the following ways:
+
+### `insertStateToString`
+
+This function is used if the state should simply map to text.
+
+```tsx
+import {State, insertStateToString, getState, setState} from "aena";
+
+export function Counter() {
+    const counter = new Box(0);
+    
+    return (
+        <button onclick={() => setState(counter, getState(counter) + 1)}>
+            Squared: {insertStateToString(counter, value => `${value * value}`)}
+        </button>
+    );
+}
+```
+
+### `insertState`
+
+If the state should be mapped dynamically to nodes, use this function.
+
+This example maps each number to an array of `<div/>`s, counting from 0 to the number:
+
+```tsx
+import {State, insertState, getState, setState} from "aena";
+
+export function Counter() {
+    const counter = new Box(0);
+    
+    return (
+        <>
+            <button onclick={() => setState(counter, getState(counter) + 1)}>Increment</button>
+            {insertState(counter, value => (new Array).fill(0).map((_, index) => <div>${value}</div>))}
+        </>
+    );
+}
+```
 
 ## Fragments
 

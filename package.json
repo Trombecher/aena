@@ -1,6 +1,6 @@
 {
     "name": "aena",
-    "version": "0.14.4",
+    "version": "0.15.0",
     "description": "Your next SPA TypeScript framework.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -13,9 +13,7 @@
         "performance",
         "state"
     ],
-    "scripts": {
-        "compile": "pwsh build.ps1"
-    },
+    "scripts": {},
     "author": "Tobias Hillemanns",
     "license": "ISC",
     "type": "module",
@@ -23,41 +21,17 @@
         "README.md",
         "src",
         "LICENSE",
-        "dist"
+        "aena.webp"
     ],
     "exports": {
         ".": {
-            "default": "./dist/index.js",
-            "types": "./dist/index.d.ts"
-        },
-        "./array": {
-            "default": "./dist/array.js",
-            "types": "./dist/array.d.ts"
-        },
-        "./box": {
-            "default": "./dist/box.js",
-            "types": "./dist/box.d.ts"
-        },
-        "./glue": {
-            "default": "./dist/glue.js",
-            "types": "./dist/glue.d.ts"
+            "default": "./src/index.js",
+            "types": "./src/index.d.ts"
         },
         "./jsx-runtime": {
-            "default": "./dist/jsx-runtime.js",
-            "types": "./dist/jsx-runtime.d.ts"
-        },
-        "./map": {
-            "default": "./dist/map.js",
-            "types": "./dist/map.d.ts"
-        },
-        "./set": {
-            "default": "./dist/set.js",
-            "types": "./dist/set.d.ts"
+            "types": "./src/jsx-runtime.d.ts"
         }
     },
-    "devDependencies": {
-        "@types/bun": "latest",
-        "typescript": "latest"
-    },
+    "devDependencies": {},
     "repository": "https://github.com/trombecher/aena"
 }

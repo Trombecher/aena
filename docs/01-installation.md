@@ -8,7 +8,7 @@ This template is a TypeScript Vite SPA template with TailwindCSS.
 
 ## Manual Install
 
-Aena is available via [`npm`](https://www.npmjs.com/package/aena), so you can install it with your favourite package manager.
+Aena is available via [`NPM`](https://www.npmjs.com/package/aena), so you can install it with your favourite package manager.
 
 ### TypeScript Setup
 

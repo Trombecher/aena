@@ -8,7 +8,7 @@ Use of [TailwindCSS](https://tailwindcss.com/) is heavily recommended. As of ins
 export function MyApp() {
     return (
         <main>
-            <h1 class={"text-2xl font-bold"}>Welcome To My App</h1>
+            <h1 className={"text-2xl font-bold"}>Welcome To My App</h1>
             <p>Lorem ipsum...</p>
         </main>
     );
@@ -17,7 +17,7 @@ export function MyApp() {
 
 ## Conditional Styling
 
-Many times, you want to apply styles conditionally. Because TSX allows inserting strings in attribute values, you can build your class-string yourself. Consider using [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) for readability:
+Many times, you want to apply styles conditionally. Because TSX allows inserting strings in attribute values, you can build your className-string yourself. Consider using [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) for readability:
 
 ```tsx
 export function MyApp() {
@@ -25,7 +25,7 @@ export function MyApp() {
 
     return (
         <main>
-            <h1 class={`${large ? "text-2xl" : "text-sm"} text-2xl font-bold`}>Welcome To My App</h1>
+            <h1 className={`${large ? "text-2xl" : "text-sm"} text-2xl font-bold`}>Welcome To My App</h1>
             <p>Lorem ipsum...</p>
         </main>
     );
@@ -34,17 +34,16 @@ export function MyApp() {
 
 ## Dynamic Styling
 
-Dynamic `class` attributes are used frequently. Here is an example:
+Dynamic `className` attributes are used frequently. Here is an example:
 
 ```tsx
-import {Box} from "aena";
-import {insertBoxAsString} from "aena/glue";
+import {Box, insertStateToString, deriveState} from "aena";
 
 export function RedGreenBalance({balance}: {balance: Box<number>}) {
     return (
-        <div class={balance.derive(balance =>
+        <div className={deriveState(balance, balance =>
             `${balance > 0 ? "bg-green-400" : "bg-red-400"} font-mono`)}>
-            Balance: {insertBoxAsString(balance)}
+            Balance: {insertStateToString(balance)}
         </div>
     );
 }

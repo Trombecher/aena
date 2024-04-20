@@ -1,4 +1,4 @@
 import TestApp from "./TestApp";
-import {mount} from "../../packages/aena/src";
+import {mount} from "../../src";
 
 mount(document.body, TestApp());
