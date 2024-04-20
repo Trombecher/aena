@@ -5,7 +5,7 @@
 > [!WARNING]
 > Still in beta. Do not use in production.
 
-A small web framework supporting TSX, written in JavaScript. Features:
+A small (<1kb) web framework supporting TSX, written in JavaScript. Features:
 
 - 🪶 Ultra-lightweight
 - 🦅 Unopinionated
