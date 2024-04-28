@@ -19,7 +19,7 @@ export declare type InferStateType<S extends State<any>> = S extends State<infer
  * An immutable state.
  */
 export declare class State<T> {
-    private _; // Prevents accidental type coercion.
+    private _; // Prevents type accidental coercion
 
     constructor(value: T);
 }
@@ -38,6 +38,13 @@ export declare function setState<T>(state: State<T>, value: T): void;
  */
 export declare type ListTransform<T, U> = (list: Readonly<T[]>) => U;
 
+export declare type ListListener<T> = (
+    list: Readonly<T[]>,
+    start: number,
+    deleteCount: number,
+    ...itemsToInsert: Readonly<T[]>
+) => void;
+
 /**
  * Infers the type `T` of `L<T>` where `L` extends {@link List `List`}.
  */
@@ -47,7 +54,7 @@ export declare type InferListType<L extends List<any>> = L extends List<infer T>
  * A mutable array-like state.
  */
 export declare class List<T> {
-    private _; // Prevents accidental type coercion.
+    private _; // Prevents type accidental coercion
 
     constructor(initial?: T[]);
 }
@@ -68,79 +75,50 @@ export declare function insertList<T>(list: List<T>, transform: (item: T) => JSX
 // SHARED
 
 /**
- * Describes the transformation of `X` to `U` where `X` extends {@link State `State<T>`} or {@link List `List<T>`}.
- *
- * Use of this type outside this context is discouraged.
- */
-export declare type Transform<X extends State<any> | List<any>, U> = X extends State<infer T>
-    ? StateTransform<T, U>
-    : X extends List<infer T>
-        ? ListTransform<T, U>
-        : never;
-
-/**
- * The type of the listener function attached to a {@link State `State`} or a {@link List `List`} via {@link attach `attach(...)`}.
- */
-export declare type Listener<X extends State<any> | List<any>> = X extends State<infer T>
-    ? StateTransform<T, void>
-    : X extends List<infer T>
-        ? (list: Readonly<T[]>, start: number, deleteCount: number, ...itemsToInsert: Readonly<T[]>) => void
-        : never;
-
-/**
  * Gets the value out of a {@link State `State`} or a {@link List `List`}.
  */
-export declare function get<X extends State<any> | List<any>>(
-    stateOrList: X,
-): Readonly<X extends State<infer T>
-    ? T
-    : X extends List<infer T>
-        ? T[]
-        : never>;
+export declare function get<T>(state: State<T>): Readonly<T>;
+
+export declare function get<T>(list: List<T>): Readonly<T[]>;
 
 /**
  * Derives a new {@link State `State`} from an existing {@link State `State`} or {@link List `List`}.
  */
-export declare function derive<X extends State<any> | List<any>, U>(
-    stateOrList: X,
-    transform: Transform<X, U>,
-): Readonly<State<U>>;
+export declare function derive<T, U>(state: State<T>, transform: StateTransform<T, U>): State<U>;
+
+export declare function derive<T, U>(list: List<T>, transform: ListTransform<T, U>): State<U>;
 
 /**
  * Attaches the `listener` to a {@link State `State`} or a {@link List `List`}.
  *
  * **Returns the same listener which was passed in**, for type inference.
  */
-export declare function attach<X extends State<any> | List<any>>(
-    to: X,
-    listener: Listener<X>,
-): Listener<X>;
+export declare function attach<T>(to: State<T>, listener: StateTransform<T, void>): StateTransform<T, void>;
+
+export declare function attach<T>(to: List<T>, listener: ListListener<T>): StateTransform<T, void>;
 
 /**
  * Detaches the `listener` from a {@link State `State`} or a {@link List `List`}.
  */
-export declare function detach<X extends State<any> | List<any>>(
-    from: X,
-    listener: Listener<X>,
-): void;
+export declare function detach<T>(from: State<T>, listener: StateTransform<T, void>): void;
+
+export declare function detach<T>(from: List<T>, listener: ListListener<T>): void;
 
 /**
  * Inserts a {@link State `State`} or a {@link List `List`} into the UI
  * by dynamically mapping the value to a {@link JSX.Element `JSX.Element`}.
  */
-export declare function insert<X extends State<any> | List<any>>(
-    stateOrList: X,
-    transform: Transform<X, JSX.Element>,
-): Node;
+export declare function insert<T>(state: State<T>, transform: StateTransform<T, JSX.Element>): Node;
+
+export declare function insert<T>(list: List<T>, transform: ListTransform<T, JSX.Element>): Node;
 
 /**
  * Inserts a {@link State `State`} or a {@link List `List`} into the UI
  * by dynamically mapping the value to a string.
  */
-export declare function insertToString<X extends State<any> | List<any>>(
-    stateOrList: X,
-    transform?: Transform<X, string>,
-): Text;
+export declare function insertToString<T>(state: State<T>, transform?: StateTransform<T, string>): Text;
+
+export declare function insertToString<T>(list: List<T>, transform?: ListTransform<T, string>): Text;
 
 // JSX
 
@@ -157,7 +135,7 @@ export declare function traverseAndRender(
 /**
  * Renders the given `element` and appends it to the `target`.
  */
-export declare function mount(target: Element, element: JSX.Element): void;
+export declare function mount(target: Element, element: Readonly<JSX.Element>): void;
 
 /**
  * Creates a {@link Node}.

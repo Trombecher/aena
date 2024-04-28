@@ -98,20 +98,21 @@ export let createElement = (tagOrFunction, props, ...children) => {
         ? _document[createElementString + "NS"]("http://www.w3.org/2000/svg", tagOrFunction)
         : _document[createElementString](tagOrFunction);
 
-    Object.entries(props)[forEach](([key, value]) => key[0] === "_"
-        ? (key = key.slice(1), setAttributeOnElement(
-            element,
-            key,
-            isInstanceOf(value, State)
-                ? (attach(value, value => setAttributeOnElement(element, key, value)), value.v)
-                : value
-        ))
-        : element[key] = isInstanceOf(value, State)
-            ? (attach(value, value => element[key] = value), value.v)
-            : value);
+    Object.entries(props)[forEach](([key, value]) => key === "ref"
+        ? value(element)
+        : key[0] === "_"
+            ? (key = key.slice(1), setAttributeOnElement(
+                element,
+                key,
+                isInstanceOf(value, State)
+                    ? (attach(value, value => setAttributeOnElement(element, key, value)), value.v)
+                    : value
+            ))
+            : element[key] = isInstanceOf(value, State)
+                ? (attach(value, value => element[key] = value), value.v)
+                : value);
 
     mount(element, children);
-    // TODO: ref
 
     return element;
 };
