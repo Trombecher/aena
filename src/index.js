@@ -1,4 +1,15 @@
-// Aliasing
+// CONSTRUCTORS
+
+export function State(value) {
+    init(this, value);
+}
+
+export function List(list = []) {
+    init(this, list);
+}
+
+// ALIASES
+
 let setAttributeOnElement = (element, key, value) => element.setAttribute(key, value),
     isInstanceOf = (test, prototype) => test instanceof prototype,
     _document = document,
@@ -6,38 +17,68 @@ let setAttributeOnElement = (element, key, value) => element.setAttribute(key, v
     nextSibling = element => element.nextSibling,
     createElementString = "createElement",
     forEach = "forEach",
-    slice = "slice",
-    toUpperCase = "toUpperCase";
+    toUpperCase = "toUpperCase",
+    childrenString = "children";
 
-export function State(value) {
-    this.l = new Set;
-    this.v = value;
-}
+let init = (target, value) => (target.l = new Set, target.v = value);
 
-export let getState = state => state.v;
+// STATE
 
 export let setState = (state, value, oldValue = state.v) => value !== state.v &&
     (state.v = value, state.l[forEach](listener => listener(value, oldValue)));
 
-export let deriveState = (state, transform, newState = new State(transform(state.v))) =>
-    (attach(state, (value, oldValue) => setState(newState, transform(value, oldValue))), newState);
+// LIST
 
-export let attach = (state, listener) => (state.l.add(listener), listener);
+export let mutateList = (list, ...spliceArgs) =>
+    (list.v.splice(...spliceArgs), list.l[forEach](listener => listener(list.v, ...spliceArgs)));
+
+export let insertList = (
+    list,
+    transform,
+    anchor = createText()
+) => (attach(list, (_, start, deleteCount, ...itemsToInsert) => {
+    let current = anchor;
+    while(start--) current = nextSibling(current);
+
+    while(deleteCount--) nextSibling(current).remove();
+
+    current.after(...itemsToInsert.map(transform));
+}),
+    [anchor, list.v.map(transform)]);
+
+// SHARED
+
+export let get = state => state.v;
+
+export let derive = (stateOrList, transform, newState = new State(transform(stateOrList.v, stateOrList.v))) =>
+    (attach(stateOrList, (value, oldValue) => setState(newState, transform(value, oldValue))), newState);
+
+export let attach = (stateOrList, listener) => (stateOrList.l.add(listener), listener);
 
 export let detach = (state, listener) => {
     state.l.delete(listener);
 };
 
-export let insertStateToString = (state, transform = x => x, textNode = createText(transform(state.v))) =>
-    (attach(state, (value, oldValue) => textNode.textContent = transform(value, oldValue)), textNode);
+export let insertToString = (
+    stateOrList,
+    transform = x => x,
+    textNode = createText(transform(stateOrList.v, stateOrList.v))
+) => (attach(stateOrList, (value, oldValue) => textNode.textContent = transform(value, oldValue)),
+    textNode);
 
-export let insertState = (state, transform, start = createText(), end = createText()) =>
-    (attach(state, element => {
-        while(nextSibling(start) !== end) nextSibling(start).remove();
-        traverseAndRender(transform(element), node => end.before(node));
-    }), [start, transform(state.v), end]);
+export let insert = (
+    stateOrList,
+    transform,
+    start = createText(),
+    end = createText()
+) => (attach(stateOrList, (value, oldValue) => {
+    while(nextSibling(start) !== end) nextSibling(start).remove();
+    traverseAndRender(transform(value, oldValue), node => end.before(node));
+}), [start, transform(stateOrList.v, stateOrList.v), end]);
 
-let traverseAndRender = (element, callback) => isInstanceOf(element, Node)
+// JSX
+
+export let traverseAndRender = (element, callback) => isInstanceOf(element, Node)
     ? callback(element) // Call the callback with the node.
     : isInstanceOf(element, Array)
         ? element[forEach](element => traverseAndRender(element, callback)) // Call recursively for children
@@ -51,14 +92,14 @@ export let createElement = (tagOrFunction, props, ...children) => {
     props ||= {};
 
     if(isInstanceOf(tagOrFunction, Function))
-        return (props.children = children, tagOrFunction(props));
+        return (props[childrenString] = children, tagOrFunction(props));
 
-    let element = testSVG(tagOrFunction[0][toUpperCase]() + tagOrFunction[slice](1)) || testSVG(tagOrFunction[toUpperCase]())
+    let element = testSVG(tagOrFunction[0][toUpperCase]() + tagOrFunction.slice(1)) || testSVG(tagOrFunction[toUpperCase]())
         ? _document[createElementString + "NS"]("http://www.w3.org/2000/svg", tagOrFunction)
         : _document[createElementString](tagOrFunction);
 
     Object.entries(props)[forEach](([key, value]) => key[0] === "_"
-        ? (key = key[slice](1), setAttributeOnElement(
+        ? (key = key.slice(1), setAttributeOnElement(
             element,
             key,
             isInstanceOf(value, State)
@@ -75,4 +116,4 @@ export let createElement = (tagOrFunction, props, ...children) => {
     return element;
 };
 
-export let Fragment = ({children: c}) => c;
+export let Fragment = props => props[childrenString];

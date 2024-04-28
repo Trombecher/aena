@@ -1407,7 +1407,7 @@ export declare namespace JSX {
         inert?: StateOr<boolean>;
         lang?: StateOr<string>;
         spellcheck?: StateOr<boolean>;
-        style?: string;
+        _style?: StateOr<string>;
         tabindex?: StateOr<number | string>;
         title?: StateOr<string>;
         translate?: StateOr<"yes" | "no">;

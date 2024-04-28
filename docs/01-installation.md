@@ -17,27 +17,15 @@ If you want to use [TSX](https://www.typescriptlang.org/docs/handbook/jsx.html),
 ```json5
 {
     // ...
-    "compiler-options": {
-        "lib": [
-            "ESNext",
-            "DOM",
-            "DOM.Iterable"
-        ],
+    "compilerOptions": {
+        // ...
+        "jsx": "preserve",
+        "jsxFactory": "createElement",
+        "jsxFragmentFactory": "Fragment",
+        "jsxImportSource": "aena"
     },
-    "module": "ESNext",
-    "target": "ESNext",
-    
-    // ... strict options
-    
-    // Most importantly:
-    "jsx": "preserve",
-    "jsxFactory": "createElement",
-    "jsxFragmentFactory": "Fragment",
-    "jsxImportSource": "aena"
 }
 ```
-
-The latter tells TypeScript, that you are using the TSX types from `aena`.
 
 ### Bundler Setup
 

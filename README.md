@@ -5,38 +5,38 @@
 > [!WARNING]
 > Still in beta. Do not use in production.
 
-A small (<1kb) web framework supporting TSX, written in JavaScript. Features:
+A small (~1150 byte) web framework written in JavaScript. Features:
 
 - 🪶 Ultra-lightweight
 - 🦅 Unopinionated
 - ✅ TSX
 - ✅ Type definitions
-- ❌ Zero dependencies
-- ❌ Zero runtime errors
-- ❌ Zero setup
+- ✅ Zero dependencies
+- ✅ Zero throw expressions
+- ✅ Zero setup
 
 Here is the classic counter example:
 
 ```tsx
 import {
     State,
-    getState,
+    get,
     setState,
-    insertStateToString,
+    insertToString,
     mount
 } from "aena";
 
 let counter = new State(0);
 mount(document.body, (
-    <button onclick={() => setState(state, getState(state) + 1)}>
-        Clicked: {insertStateToString(state)}
+    <button onclick={() => setState(state, get(state) + 1)}>
+        Clicked: {insertToString(state)}
     </button>
 ));
 ```
 
 ## Installation
 
-You can install `wurm` via [NPM](https://www.npmjs.com/package/wurm):
+You can install Aena via [NPM](https://www.npmjs.com/package/aena):
 
 ```shell
 bun i aena

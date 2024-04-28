@@ -1,33 +1,77 @@
-import {getState, insertState, insertStateToString, setState, State} from "../../src";
+import {
+    get,
+    insert,
+    insertList,
+    insertToString,
+    List,
+    mutateList,
+    setState,
+    State,
+} from "../../src";
 import {JSX} from "../../src/jsx-runtime";
 
 export default function TestApp() {
     const state = new State(0);
-    
+    const list = new List<number>([0, 1, 2, 3]);
+
     return (
         <>
-            <h1>Testing: <code>aena/jsx-runtime</code></h1>
-            <div>
-                By seeing this text, aena/jsx-runtime has successfully passed createElement(...) and
-                Fragment(...) tests
-            </div>
-            <div>
-                There should be a number: <Number/>
-            </div>
-            <div>
-                There should be wrapped content:
-                <Wrapper>Wrapped content</Wrapper>
-            </div>
-            <h1>Testing: State</h1>
-            <div className={""}>Count: {insertState(state, c => <span>{c}</span>)}</div>
-            <div>Double: {insertStateToString(state, c => `${c * c}`)}</div>
-            <button onclick={() => setState(state, getState(state) + 1)}>Increment</button>
-            <button onclick={() => setState(state, getState(state) - 1)}>Decrement</button>
+            <h1>Browser Testing Suite For Aena</h1>
             <section>
-                <h1>Testing: <code>aena/jsx-runtime</code> SVG support</h1>
+                <h2>Testing: <code>aena/jsx-runtime</code></h2>
+
+                <h3>Content And Attributes</h3>
+                <div className={""}>
+                    By seeing this text, aena/jsx-runtime has successfully passed createElement(...) and
+                    Fragment(...) tests. This element should have an empty class attribute.
+                </div>
+                <div>
+                    There should be a number: <Number/>
+                </div>
+                <div>
+                    There should be wrapped content:
+                    <Wrapper>Wrapped content</Wrapper>
+                </div>
+
+                <h3>SVG Support</h3>
                 <svg _width={"128"} _height={"128"}>
                     <rect _width={"128"} _height={"128"} _fill={"#da3434"}/>
                 </svg>
+            </section>
+            <section>
+                <h2>Testing: <code>State</code></h2>
+
+                <h3><code>setState(...)</code> / <code>getState(...)</code></h3>
+                <button onclick={() => setState(state, get(state) + 1)}>Increment</button>
+                <button onclick={() => setState(state, get(state) - 1)}>Decrement</button>
+
+                <h3><code>insert(...)</code></h3>
+                <div>Count: {insert(state, c => <span>{c}</span>)}</div>
+
+                <h3><code>insertToString(...)</code></h3>
+                <div>Double: {insertToString(state, c => `${c * c}`)}</div>
+            </section>
+            <section>
+                <h2>Testing: <code>List</code></h2>
+
+                <h3><code>mutateList(...)</code></h3>
+                <button onclick={() => mutateList(list, get(list).length, 0, Math.floor(Math.random() * 10))}>
+                    Push Random Number
+                </button>
+                <button onclick={() => mutateList(list, 0, 1)}>Pop First</button>
+
+                <h3><code>insert(...)</code></h3>
+                {insert(list, list => <span>{list}</span>)}
+
+                <h3><code>insertToString(...)</code></h3>
+                {insertToString(list, list => JSON.stringify(list))}
+
+                <h3><code>insertList(...)</code></h3>
+                {insertList(list, num => (
+                    <div>{num}</div>
+                ))}
+            </section>
+            <section>
             </section>
         </>
     );
