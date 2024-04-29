@@ -1,63 +1,17 @@
-// CONSTRUCTORS
-
-export function State(value) {
-    init(this, value);
-}
-
-export function List(list = []) {
-    init(this, list);
-}
+import {_Object, forEachString, isInstanceOf} from "./shared-aliases.js";
+import {attach, State} from "./state.js";
 
 // ALIASES
 
 let setAttributeOnElement = (element, key, value) => element.setAttribute(key, value),
-    isInstanceOf = (test, prototype) => test instanceof prototype,
     _document = document,
     createText = text => _document.createTextNode(text || ""),
     nextSibling = element => element.nextSibling,
     createElementString = "createElement",
-    forEach = "forEach",
     toUpperCase = "toUpperCase",
     childrenString = "children";
 
-let init = (target, value) => (target.l = new Set, target.v = value);
-
-// STATE
-
-export let setState = (state, value, oldValue = state.v) => value !== state.v &&
-    (state.v = value, state.l[forEach](listener => listener(value, oldValue)));
-
-// LIST
-
-export let mutateList = (list, ...spliceArgs) =>
-    (list.v.splice(...spliceArgs), list.l[forEach](listener => listener(list.v, ...spliceArgs)));
-
-export let insertList = (
-    list,
-    transform,
-    anchor = createText()
-) => (attach(list, (_, start, deleteCount, ...itemsToInsert) => {
-    let current = anchor;
-    while(start--) current = nextSibling(current);
-
-    while(deleteCount--) nextSibling(current).remove();
-
-    current.after(...itemsToInsert.map(transform));
-}),
-    [anchor, list.v.map(transform)]);
-
-// SHARED
-
-export let get = state => state.v;
-
-export let derive = (stateOrList, transform, newState = new State(transform(stateOrList.v, stateOrList.v))) =>
-    (attach(stateOrList, (value, oldValue) => setState(newState, transform(value, oldValue))), newState);
-
-export let attach = (stateOrList, listener) => (stateOrList.l.add(listener), listener);
-
-export let detach = (state, listener) => {
-    state.l.delete(listener);
-};
+// STATE INTEGRATION
 
 export let insertToString = (
     stateOrList,
@@ -76,12 +30,26 @@ export let insert = (
     traverseAndRender(transform(value, oldValue), node => end.before(node));
 }), [start, transform(stateOrList.v, stateOrList.v), end]);
 
+export let insertList = (
+    list,
+    transform,
+    anchor = createText()
+) => (attach(list, (_, start, deleteCount, ...itemsToInsert) => {
+    let current = anchor;
+    while(start--) current = nextSibling(current);
+
+    while(deleteCount--) nextSibling(current).remove();
+
+    current.after(...itemsToInsert.map(transform));
+}),
+    [anchor, list.v.map(transform)]);
+
 // JSX
 
 export let traverseAndRender = (element, callback) => isInstanceOf(element, Node)
     ? callback(element) // Call the callback with the node.
     : isInstanceOf(element, Array)
-        ? element[forEach](element => traverseAndRender(element, callback)) // Call recursively for children
+        ? element[forEachString](element => traverseAndRender(element, callback)) // Call recursively for children
         : (element || element === 0) && callback("" + element); // To string if element
 
 export let mount = (target, element) => traverseAndRender(element, node => target.append(node));
@@ -98,7 +66,7 @@ export let createElement = (tagOrFunction, props, ...children) => {
         ? _document[createElementString + "NS"]("http://www.w3.org/2000/svg", tagOrFunction)
         : _document[createElementString](tagOrFunction);
 
-    Object.entries(props)[forEach](([key, value]) => key === "ref"
+    _Object.entries(props)[forEachString](([key, value]) => key === "ref"
         ? value(element)
         : key[0] === "_"
             ? (key = key.slice(1), setAttributeOnElement(

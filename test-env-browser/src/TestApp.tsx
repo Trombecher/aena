@@ -1,14 +1,10 @@
 import {
-    get,
     insert,
     insertList,
     insertToString,
-    List,
-    mutateList,
-    setState,
-    State,
 } from "../../src";
 import {JSX} from "../../src/jsx-runtime";
+import {get, List, mutateList, setState, State} from "../../src/state";
 
 export default function TestApp() {
     const state = new State(0);

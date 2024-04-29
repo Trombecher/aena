@@ -1,0 +1,8 @@
+{
+    "name": "test-static",
+    "private": true,
+    "type": "module",
+    "devDependencies": {
+        "@types/bun": "latest"
+    }
+}
