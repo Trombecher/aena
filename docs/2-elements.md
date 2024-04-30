@@ -86,6 +86,8 @@ _Why and when do you need to do this?_ The [DOM](https://developer.mozilla.org/e
 Many HTML attributes support a value type or a `State` of that value type to allow for dynamic attributes:
 
 ```tsx
+import {State} from "aena/state";
+
 const disabled = new State(false);
 
 const dynamicButton = <button disabled={disabled}></button>;
@@ -95,15 +97,17 @@ Whenever the `State` changes, the new value will be set to the attribute.
 
 ---
 
-If your attribute value is dependent on your state and needs mapping before inserting, you can use `deriveState(...)`:
+If your attribute value is dependent on your state and needs mapping before inserting, you can use `derive(...)`:
 
 ```tsx
+import {State, derive} from "aena/state";
+
 const tab = new State<"orders" | "products">("orders");
 
-const dynamicAnchor = <a href={deriveState(tab, tab => `/${tab}`)}>Jump</a>
+const dynamicAnchor = <a href={derive(tab, tab => `/${tab}`)}>Jump</a>;
 ```
 
-Another common use case is dynamic styling, [covered here](/website2/app/docs/styling#dynamic-styling).
+Another common use case is dynamic styling, [covered here](./6-styling.md).
 
 ## Inserting/Embedding Values
 
@@ -155,19 +159,20 @@ If `someCondition` is false, false is returned from the `&&` expression and not 
 
 If you have some `State` you can bind it to the ui in the following ways:
 
-### `insertStateToString`
+### `insertToString`
 
 This function is used if the state should simply map to text.
 
 ```tsx
-import {State, insertStateToString, getState, setState} from "aena";
+import {insertToString} from "aena";
+import {State, get, setState} from "aena";
 
 export function Counter() {
     const counter = new Box(0);
     
     return (
-        <button onclick={() => setState(counter, getState(counter) + 1)}>
-            Squared: {insertStateToString(counter, value => `${value * value}`)}
+        <button onclick={() => setState(counter, get(counter) + 1)}>
+            Squared: {insertToString(counter, value => `${value * value}`)}
         </button>
     );
 }

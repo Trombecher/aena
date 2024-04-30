@@ -29,7 +29,7 @@ If you want to use [TSX](https://www.typescriptlang.org/docs/handbook/jsx.html),
 
 ### Bundler Setup
 
-Now you just have to tell your bundler, that it should bundle TSX code with the `aena` framework functions. Here is the config for the [Vite bundler](https://vitejs.dev/) (similar to [Rollup](https://rollupjs.org/)):
+Now you just have to tell your bundler, that it should bundle TSX code with the `aena` framework functions. Here is the config for [Vite](https://vitejs.dev/) (similar to [Rollup](https://rollupjs.org/)):
 
 ```ts
 // vite.config.ts

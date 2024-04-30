@@ -37,13 +37,14 @@ export function MyApp() {
 Dynamic `className` attributes are used frequently. Here is an example:
 
 ```tsx
-import {Box, insertStateToString, deriveState} from "aena";
+import {insertToString} from "aena";
+import {State, derive} from "aena/state";
 
-export function RedGreenBalance({balance}: {balance: Box<number>}) {
+export function RedGreenBalance({balance}: {balance: State<number>}) {
     return (
-        <div className={deriveState(balance, balance =>
+        <div className={derive(balance, balance =>
             `${balance > 0 ? "bg-green-400" : "bg-red-400"} font-mono`)}>
-            Balance: {insertStateToString(balance)}
+            Balance: {insertToString(balance)}
         </div>
     );
 }

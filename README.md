@@ -5,7 +5,7 @@
 > [!WARNING]
 > Still in beta. Do not use in production.
 
-A small (~1369 bytes) web framework written in JavaScript. Features:
+A small (~1.5kb) web framework written in JavaScript. Features:
 
 - 🪶 Ultra-lightweight
 - 🦅 Unopinionated

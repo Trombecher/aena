@@ -99,9 +99,9 @@ export let stringify = state => JSON.stringify(state, (_, value) =>
     (!isInstanceOf(value, _Object) || isArray(value))
         ? value
         : isInstanceOf(value, State)
-            ? {s: get(value)}
+            ? {s: value.v}
             : isInstanceOf(value, List)
-                ? {l: get(value)}
+                ? {l: value.v}
                 : objectEntries(value).reduce((obj, [key, value]) =>
                     (obj[key[startsWithString](sString)
                         ? sString + key
