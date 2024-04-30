@@ -1,21 +1,17 @@
 import {JSX} from "./jsx-runtime";
-import {List, ListTransform, State, StateTransform} from "./state";
+import {List, State, Transform} from "./state";
 
 /**
  * Inserts a {@link State `State`} or a {@link List `List`} into the UI
  * by dynamically mapping the value to a {@link JSX.Element `JSX.Element`}.
  */
-export declare function insert<T>(state: State<T>, transform: StateTransform<T, JSX.Element>): Node;
-
-export declare function insert<T>(list: List<T>, transform: ListTransform<T, JSX.Element>): Node;
+export declare function insert<S extends State<any> | List<any>>(state: S, transform: Transform<S, JSX.Element>): Node;
 
 /**
  * Inserts a {@link State `State`} or a {@link List `List`} into the UI
  * by dynamically mapping the value to a string.
  */
-export declare function insertToString<T>(state: State<T>, transform?: StateTransform<T, string>): Text;
-
-export declare function insertToString<T>(list: List<T>, transform?: ListTransform<T, string>): Text;
+export declare function insertToString<S extends State<any> | List<any>>(state: S, transform?: Transform<S, string>): Text;
 
 /**
  * Inserts a {@link List `List`} by mapping each item to an element.

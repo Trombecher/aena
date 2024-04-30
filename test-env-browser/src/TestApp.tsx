@@ -30,9 +30,9 @@ export default function TestApp() {
                 </div>
 
                 <h3>SVG Support</h3>
-                <svg _width={"128"} _height={"128"}>
-                    <rect _width={"128"} _height={"128"} _fill={"#da3434"}/>
-                </svg>
+                <svg_ _width={"128"} _height={"128"}>
+                    <rect_ _width={"128"} _height={"128"} _fill={"#da3434"}/>
+                </svg_>
             </section>
             <section>
                 <h2>Testing: <code>State</code></h2>

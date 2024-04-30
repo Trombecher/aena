@@ -18,13 +18,8 @@ A small (~1.5kb) web framework written in JavaScript. Features:
 Here is the classic counter example:
 
 ```tsx
-import {
-    State,
-    get,
-    setState,
-    insertToString,
-    mount
-} from "aena";
+import {insertToString, mount} from "aena";
+import {State, get, setState} from "aena/state";
 
 let counter = new State(0);
 mount(document.body, (

@@ -8,7 +8,6 @@ let setAttributeOnElement = (element, key, value) => element.setAttribute(key, v
     createText = text => _document.createTextNode(text || ""),
     nextSibling = element => element.nextSibling,
     createElementString = "createElement",
-    toUpperCase = "toUpperCase",
     childrenString = "children";
 
 // STATE INTEGRATION
@@ -54,16 +53,14 @@ export let traverseAndRender = (element, callback) => isInstanceOf(element, Node
 
 export let mount = (target, element) => traverseAndRender(element, node => target.append(node));
 
-let testSVG = tag => window[`SVG${tag}Element`];
-
 export let createElement = (tagOrFunction, props, ...children) => {
     props ||= {};
 
     if(isInstanceOf(tagOrFunction, Function))
         return (props[childrenString] = children, tagOrFunction(props));
 
-    let element = testSVG(tagOrFunction[0][toUpperCase]() + tagOrFunction.slice(1)) || testSVG(tagOrFunction[toUpperCase]())
-        ? _document[createElementString + "NS"]("http://www.w3.org/2000/svg", tagOrFunction)
+    let element = tagOrFunction.slice(-1) === "_"
+        ? _document[createElementString + "NS"]("http://www.w3.org/2000/svg", tagOrFunction.slice(0, -1))
         : _document[createElementString](tagOrFunction);
 
     objectEntries(props)[forEachString](([key, value]) => key === "ref"

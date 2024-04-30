@@ -157,9 +157,9 @@ If `someCondition` is false, false is returned from the `&&` expression and not 
 
 ## Dynamic Insertion
 
-If you have some `State` you can bind it to the ui in the following ways:
+If you have some `State` or `List`, you can bind it to the ui in the following ways:
 
-### `insertToString`
+### `insertToString(...)`
 
 This function is used if the state should simply map to text.
 
@@ -178,22 +178,23 @@ export function Counter() {
 }
 ```
 
-### `insertState`
+### `insert(...)`
 
 If the state should be mapped dynamically to nodes, use this function.
 
 This example maps each number to an array of `<div/>`s, counting from 0 to the number:
 
 ```tsx
-import {State, insertState, getState, setState} from "aena";
+import {insert} from "aena";
+import {State, get, setState} from "aena/state";
 
 export function Counter() {
-    const counter = new Box(0);
+    const counter = new State(0);
     
     return (
         <>
-            <button onclick={() => setState(counter, getState(counter) + 1)}>Increment</button>
-            {insertState(counter, value => (new Array).fill(0).map((_, index) => <div>${value}</div>))}
+            <button onclick={() => setState(counter, get(counter) + 1)}>Increment</button>
+            {insert(counter, value => (new Array).fill(0).map((_, index) => <div>${value}</div>))}
         </>
     );
 }
@@ -234,4 +235,22 @@ export function MyComponent() {
         <div>My component</div>
     ];
 }
+```
+
+## SVG Namespace Elements
+
+Elements from the SVG namespace are created differently than normal elements. This forced Aena to do some tricks at runtime to determine if the tag name belongs to the SVG namespace. Old versions used to ship a basic list of elements to compare against.
+
+More developed versions used to check against the scope for the corresponding svg interface (named commonly `SVG${tagName}Element`, for example `SVGAnchorElement`), but there were numerous problems with this strategy, including upper-casing.
+
+Starting with v0.15.5, these elements are determined at compile-time. TypeScript enforces a trailing _ on those elements, which is ignored at runtime (similar to content vs. IDL attributes).
+
+This may result in less readable code, but runtime performance and bundle size is greatly improved:
+
+```tsx
+const svg = (
+    <svg_ _width={32} _height={32}>
+        <rect_ _width={32} _height={32} _fill={"#f00"}/>
+    </svg_>
+);
 ```
