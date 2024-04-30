@@ -1,4 +1,4 @@
-import {_Object, forEachString, isInstanceOf} from "./shared-aliases.js";
+import {forEachString, isArray, isInstanceOf, objectEntries} from "./shared-aliases.js";
 import {attach, State} from "./state.js";
 
 // ALIASES
@@ -48,7 +48,7 @@ export let insertList = (
 
 export let traverseAndRender = (element, callback) => isInstanceOf(element, Node)
     ? callback(element) // Call the callback with the node.
-    : isInstanceOf(element, Array)
+    : isArray(element)
         ? element[forEachString](element => traverseAndRender(element, callback)) // Call recursively for children
         : (element || element === 0) && callback("" + element); // To string if element
 
@@ -66,7 +66,7 @@ export let createElement = (tagOrFunction, props, ...children) => {
         ? _document[createElementString + "NS"]("http://www.w3.org/2000/svg", tagOrFunction)
         : _document[createElementString](tagOrFunction);
 
-    _Object.entries(props)[forEachString](([key, value]) => key === "ref"
+    objectEntries(props)[forEachString](([key, value]) => key === "ref"
         ? value(element)
         : key[0] === "_"
             ? (key = key.slice(1), setAttributeOnElement(

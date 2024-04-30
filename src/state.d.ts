@@ -7,11 +7,6 @@
 export declare type StateTransform<T, U> = (value: Readonly<T>, oldValue: Readonly<T>) => U;
 
 /**
- * Infers the type `T` of `S<T>` where `S` extends {@link State `State`}.
- */
-export declare type InferStateType<S extends State<any>> = S extends State<infer T> ? T : never;
-
-/**
  * An immutable state.
  */
 export declare class State<T> {
@@ -41,11 +36,6 @@ export declare type ListListener<T> = (
     ...itemsToInsert: Readonly<T[]>
 ) => void;
 
-/**
- * Infers the type `T` of `L<T>` where `L` extends {@link List `List`}.
- */
-export declare type InferListType<L extends List<any>> = L extends List<infer T> ? T : never;
-
 export declare type DeepListener = () => void;
 
 /**
@@ -68,32 +58,56 @@ export declare function detachDeep(list: List<any>, deepListener: DeepListener):
 
 // SHARED
 
+export declare type Listener<S extends State<any> | List<any>> = S extends State<infer T>
+    ? StateTransform<T, void>
+    : S extends List<infer T>
+        ? ListListener<T>
+        : never;
+
+export declare type ValueOf<S extends State<any> | List<any>> = S extends State<infer T>
+    ? Readonly<T>
+    : S extends List<infer T>
+        ? Readonly<T[]>
+        : never;
+
+export declare type Transform<S extends State<any> | List<any>, U> = S extends State<infer T>
+    ? StateTransform<T, U>
+    : S extends List<infer T>
+        ? ListTransform<T, U>
+        : never;
+
 /**
  * Gets the value out of a {@link State `State`} or a {@link List `List`}.
  */
-export declare function get<T>(state: State<T>): Readonly<T>;
-
-export declare function get<T>(list: List<T>): Readonly<T[]>;
+export declare function get<S extends State<any> | List<any>>(state: S): ValueOf<S>;
 
 /**
  * Derives a new {@link State `State`} from an existing {@link State `State`} or {@link List `List`}.
  */
-export declare function derive<T, U>(state: State<T>, transform: StateTransform<T, U>): State<U>;
-
-export declare function derive<T, U>(list: List<T>, transform: ListTransform<T, U>): State<U>;
+export declare function derive<S extends State<any> | List<any>, U>(state: S, transform: Transform<S, U>): State<U>;
 
 /**
  * Attaches the `listener` to a {@link State `State`} or a {@link List `List`}.
  *
  * **Returns the same listener which was passed in**, for type inference.
  */
-export declare function attach<T>(to: State<T>, listener: StateTransform<T, void>): StateTransform<T, void>;
-
-export declare function attach<T>(to: List<T>, listener: ListListener<T>): ListListener<T>;
+export declare function attach<S extends State<any> | List<any>>(to: S, listener: Listener<S>): Listener<S>;
 
 /**
  * Detaches the `listener` from a {@link State `State`} or a {@link List `List`}.
  */
-export declare function detach<T>(from: State<T>, listener: StateTransform<T, void>): void;
+export declare function detach<S extends State<any> | List<any>>(from: S, listener: Listener<S>): void;
 
-export declare function detach<T>(from: List<T>, listener: ListListener<T>): void;
+/**
+ * Serializes the value which produces **valid JSON**.
+ *
+ * Correctly handles {@link State `State`} and {@link List `List`}, but does not serialize listeners.
+ */
+export declare function stringify(value: any): string;
+
+/**
+ * Parses a JSON string **produced from {@link stringify `stringify(...)`}**.
+ *
+ * Correctly constructs {@link State `State`} and {@link List `List`}.
+ */
+export declare function parse(input: string): any;
