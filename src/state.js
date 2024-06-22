@@ -61,16 +61,21 @@ let attachOrDetachDeepListenersOfListOnTargets = (list, targets, method) => list
 /**
  * SAFETY: Caller must ensure that `list` is of type `List` and `...spliceArgs` conform to `Array.splice` args.
  */
-export let mutateList = (list, ...spliceArgs) => (
+export let mutateList = (list, ...spliceArgs) => {
+    let removed = list.v.splice(...spliceArgs);
+
     // Detach all deep listeners from all removed elements
-    attachOrDetachDeepListenersOfListOnTargets(list, list.v.splice(...spliceArgs), "delete"),
+    attachOrDetachDeepListenersOfListOnTargets(list, removed, "delete");
 
-        // Add all existing deep listeners
-        attachOrDetachDeepListenersOfListOnTargets(list, spliceArgs.slice(2), "add"),
+    // Add all existing deep listeners
+    attachOrDetachDeepListenersOfListOnTargets(list, spliceArgs.slice(2), "add");
 
-        // Notify listeners and deep listeners
-        list.l[forEachString](listener => listener(list.v, ...spliceArgs)),
-        list.d[forEachString](listener => listener()));
+    // Notify listeners and deep listeners
+    list.l[forEachString](listener => listener(list.v, ...spliceArgs));
+    list.d[forEachString](listener => listener());
+
+    return removed;
+};
 
 export let attachDeep = (list, deepListener) => (attach(list, deepListener, "d"),
     attachOrDetachDeepListenerOnTargets(deepListener, list.v, "add"),

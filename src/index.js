@@ -1,5 +1,5 @@
-import {forEachString, isArray, isInstanceOf, objectEntries} from "./shared-aliases.js";
-import {attach, State} from "./state.js";
+import { forEachString, isArray, isInstanceOf, objectEntries } from "./shared-aliases.js";
+import { attach, State } from "./state.js";
 
 // ALIASES
 
@@ -25,7 +25,7 @@ export let insert = (
     start = createText(),
     end = createText()
 ) => (attach(stateOrList, (value, oldValue) => {
-    while(nextSibling(start) !== end) nextSibling(start).remove();
+    while (nextSibling(start) !== end) nextSibling(start).remove();
     traverseAndRender(transform(value, oldValue), node => end.before(node));
 }), [start, transform(stateOrList.v, stateOrList.v), end]);
 
@@ -35,9 +35,9 @@ export let insertList = (
     anchor = createText()
 ) => (attach(list, (_, start, deleteCount, ...itemsToInsert) => {
     let current = anchor;
-    while(start--) current = nextSibling(current);
+    while (start--) current = nextSibling(current);
 
-    while(deleteCount--) nextSibling(current).remove();
+    while (deleteCount--) nextSibling(current).remove();
 
     current.after(...itemsToInsert.map(transform));
 }),
@@ -56,7 +56,7 @@ export let mount = (target, element) => traverseAndRender(element, node => targe
 export let createElement = (tagOrFunction, props, ...children) => {
     props ||= {};
 
-    if(isInstanceOf(tagOrFunction, Function))
+    if (isInstanceOf(tagOrFunction, Function))
         return (props[childrenString] = children, tagOrFunction(props));
 
     let element = tagOrFunction.slice(-1) === "_"
@@ -83,3 +83,10 @@ export let createElement = (tagOrFunction, props, ...children) => {
 };
 
 export let Fragment = props => props[childrenString];
+
+export let Suspense = (props, wrapper = createElement("div", { style: "display:contents" }, props.fallback)) => (
+    Promise
+        .all(props[childrenString])
+        .then(children => (wrapper.innerHTML = "", mount(wrapper, children))),
+    wrapper
+);

@@ -50,7 +50,7 @@ export declare class List<T> {
 /**
  * Mutates the list by applying a {@link Array.splice `splice`}-like mutation.
  */
-export declare function mutateList<T>(list: List<T>, start: number, deleteCount: number, ...itemsToInsert: T[]): void;
+export declare function mutateList<T>(list: List<T>, start: number, deleteCount: number, ...itemsToInsert: T[]): T[];
 
 export declare function attachDeep(list: List<any>, deepListener: DeepListener): DeepListener;
 

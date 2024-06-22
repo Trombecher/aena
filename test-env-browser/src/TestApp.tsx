@@ -1,10 +1,19 @@
 import {
+    Suspense,
     insert,
     insertList,
     insertToString,
 } from "../../src";
 import {JSX} from "../../src/jsx-runtime";
 import {get, List, mutateList, setState, State} from "../../src/state";
+
+export async function SlowComponent() {
+    await new Promise(res => setTimeout(res, 2000));
+
+    return (
+        <div>This is a slow component!</div>
+    )
+}
 
 export default function TestApp() {
     const state = new State(0);
@@ -33,6 +42,13 @@ export default function TestApp() {
                 <svg_ _width={"128"} _height={"128"}>
                     <rect_ _width={"128"} _height={"128"} _fill={"#da3434"}/>
                 </svg_>
+            </section>
+            <section>
+                <h2>Testing <code>&lt;Suspense&gt;</code></h2>
+                <Suspense fallback={<p>Two components are loading...</p>}>
+                    <SlowComponent/>
+                    <SlowComponent/>
+                </Suspense>
             </section>
             <section>
                 <h2>Testing: <code>State</code></h2>

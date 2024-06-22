@@ -49,3 +49,8 @@ export declare function createElement<T extends (keyof JSX.IntrinsicElements) | 
  * This is the fragment function.
  */
 export declare function Fragment<T extends any[]>(props: {children: T}): T;
+
+/**
+ * `<Suspense>` lets you display a fallback until its children have finished loading.
+ */
+export declare function Suspense(props: {children?: Promise<JSX.Element>[], fallback: JSX.Element}): JSX.Element[];

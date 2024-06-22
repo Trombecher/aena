@@ -6,7 +6,7 @@ type DOMElement = Element;
  * Adapted from [SolidJS](https://github.com/solidjs/solid/tree/main/packages/solid).
  */
 export declare namespace JSX {
-    export type Element = Node | Element[] | number | string | boolean | symbol | null | undefined;
+    export type Element = any; // Node | Element[] | number | string | boolean | symbol | null | undefined;
     type StateOr<T> = Readonly<State<T>> | T;
 
     interface EventHandler<T, E extends Event> {
