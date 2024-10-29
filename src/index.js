@@ -1,5 +1,5 @@
 import { forEachString, isArray, isInstanceOf, objectEntries } from "./shared-aliases.js";
-import { attach, State } from "./state.js";
+import {attach, captureStack, detach, State} from "./state.js";
 
 // ALIASES
 
@@ -29,6 +29,16 @@ export let insert = (
     traverseAndRender(transform(value, oldValue), node => end.before(node));
 }), [start, transform(stateOrList.v, stateOrList.v), end]);
 
+
+let captured = new WeakMap;
+
+let track = (fn, ...values) => {
+    captureStack.push([]);
+    let value = fn(...values);
+    captured.set(value, captureStack.pop())
+    return value;
+}
+
 export let insertList = (
     list,
     transform,
@@ -37,11 +47,15 @@ export let insertList = (
     let current = anchor;
     while (start--) current = nextSibling(current);
 
-    while (deleteCount--) nextSibling(current).remove();
+    while (deleteCount--) {
+        let sibling = nextSibling(current);
+        captured.get(sibling)[forEachString]((state, i, array) => i % 2 === 0 && detach(state, array[i + 1]));
+        sibling.remove();
+    }
 
-    current.after(...itemsToInsert.map(transform));
+    current.after(...itemsToInsert.map(item => track(transform, item)));
 }),
-    [anchor, list.v.map(transform)]);
+    [anchor, list.v.map(item => track(transform, item))]);
 
 // JSX
 

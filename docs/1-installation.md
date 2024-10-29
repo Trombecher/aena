@@ -52,12 +52,12 @@ project/
   ...
   src/
     App.tsx
-    main.ts
+    main.tsx
     main.css (or App.css)
     ...
 ```
 
-`App.tsx` will default export some App function that returns UI and `main.ts` will mount that function to the dom. The following code accomplishes that.
+`App.tsx` will default export some App function that returns UI and `main.tsx` will mount that function to the dom. The following code accomplishes that.
 
 ```tsx
 // src/App.tsx
@@ -70,7 +70,7 @@ export default function App() {
 ```
 
 ```tsx
-// src/main.ts
+// src/main.tsx
 
 import "./main.css"; // or `App.css`
 import App from "./App";

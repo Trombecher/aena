@@ -1,4 +1,6 @@
-import {_Object, forEachString, isArray, isInstanceOf, objectEntries} from "./shared-aliases";
+import {_Object, forEachString, isArray, isInstanceOf, objectEntries} from "./shared-aliases.js";
+
+export let captureStack = [];
 
 // ALIASES
 
@@ -91,8 +93,10 @@ export let get = state => state.v;
 export let derive = (stateOrList, transform, newState = new State(transform(stateOrList.v, stateOrList.v))) =>
     (attach(stateOrList, (value, oldValue) => setState(newState, transform(value, oldValue))), newState);
 
-export let attach = (stateOrList, listener, property = lString) =>
-    (stateOrList[property].add(listener), listener);
+export let attach = (stateOrList, listener, property = lString) => (
+    stateOrList[property].add(listener),
+        (captureStack.at(-1) && captureStack.at(-1).push(stateOrList, listener)),
+        listener);
 
 export let detach = (state, listener, property = lString) => {
     state[property].delete(listener);
